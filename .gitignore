@@ -15,4 +15,4 @@ DerivedData/
 *.lock
 
 # Ignore Swift Package Manager resolved file
-Package.resolved
+**/Package.resolved
