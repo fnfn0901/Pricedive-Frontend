@@ -40,7 +40,7 @@ class MainTabBarController: UITabBarController {
 
     private func setupViewControllers() {
         let categoryController = CategoryViewController()
-        let homeViewController = MainViewController()
+        let homeViewController = HomeViewController()
         let searchViewController = SearchViewController()
         let myPageViewController = MyPageViewController()
 
@@ -50,5 +50,8 @@ class MainTabBarController: UITabBarController {
         myPageViewController.tabBarItem = UITabBarItem(title: "MyPage", image: UIImage(systemName: "person.crop.circle"), tag: 3)
 
         viewControllers = [categoryController, homeViewController, searchViewController, myPageViewController]
+        
+        selectedIndex = 1
     }
+    
 }
