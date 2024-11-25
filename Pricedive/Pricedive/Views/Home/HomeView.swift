@@ -33,7 +33,6 @@ class HomeView: UIView {
     // MARK: - Setup Methods
 
     private func setupView() {
-        backgroundColor = .mainWhite
 
         setupTopFixedFrame()
         setupScrollView()
