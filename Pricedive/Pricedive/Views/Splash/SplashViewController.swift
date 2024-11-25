@@ -32,7 +32,7 @@ class SplashViewController: UIViewController {
 
     private func setupView() {
         splashView = SplashView(frame: self.view.bounds)
-        self.view.addSubview(splashView)
+        view.addSubview(splashView)
     }
 
     private func bindViewModel() {
@@ -47,9 +47,9 @@ class SplashViewController: UIViewController {
     }
 
     private func navigateToNextScreen() {
-        let nextViewController = MainViewController() // 메인 화면 뷰컨트롤러로 변경
+        let nextViewController = MainViewController()
         nextViewController.modalTransitionStyle = .crossDissolve
         nextViewController.modalPresentationStyle = .fullScreen
-        self.present(nextViewController, animated: true, completion: nil)
+        present(nextViewController, animated: true)
     }
 }

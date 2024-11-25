@@ -60,11 +60,22 @@ struct CustomStyles {
     
     static func logoText() -> UILabel {
         return UILabel.createCustomLabel(
-            text: "",
+            text: "Pricedive",
             color: UIColor.mainBlue,
-            font: UIFont(name: "HelveticaNeueMediumItalic", size: 30)!,
+            font: UIFont(name: "HelveticaNeue-MediumItalic", size: 30)!,
             lineHeight: 0.6,
             kern: -0.41
         )
     }
+    
+    static func splashDescriptionText() -> UILabel {
+        return UILabel.createCustomLabel(
+            text: "",
+            color: UIColor.white,
+            font: UIFont(name: "NotoSans-Bold", size: 24)!,
+            lineHeight: 1.1,
+            kern: -0.41
+        )
+    }
+
 }
