@@ -57,4 +57,14 @@ struct CustomStyles {
             kern: -0.41
         )
     }
+    
+    static func logoText() -> UILabel {
+        return UILabel.createCustomLabel(
+            text: "",
+            color: UIColor.mainBlue,
+            font: UIFont(name: "HelveticaNeueMediumItalic", size: 30)!,
+            lineHeight: 0.6,
+            kern: -0.41
+        )
+    }
 }
