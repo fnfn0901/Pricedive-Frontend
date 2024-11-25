@@ -12,11 +12,11 @@ class HomeView: UIView {
 
     // MARK: - Properties
 
-    private let topFixedFrame = TopFixedFrameView()
-    private let scrollView = UIScrollView()
-    private let categoryFilterView = CategoryFilterView()
-    private let carouselView = CarouselView()
-    private let eventProductView = EventProductView()
+    let topFixedFrame = TopFixedFrameView()
+    let scrollView = UIScrollView()
+    let categoryFilterView = CategoryFilterView()
+    let carouselView = CarouselView()
+    let eventProductView = EventProductView()
 
     // MARK: - Initializers
 
@@ -33,7 +33,6 @@ class HomeView: UIView {
     // MARK: - Setup Methods
 
     private func setupView() {
-
         setupTopFixedFrame()
         setupScrollView()
         setupScrollContent()
@@ -51,11 +50,9 @@ class HomeView: UIView {
 
     private func setupScrollView() {
         addSubview(scrollView)
-        scrollView.backgroundColor = .yellow
         scrollView.snp.makeConstraints { make in
             make.top.equalTo(topFixedFrame.snp.bottom).offset(17)
-            make.leading.equalToSuperview().offset(20)
-            make.trailing.equalToSuperview().inset(20)
+            make.leading.trailing.equalToSuperview().inset(20)
             make.bottom.equalToSuperview()
         }
     }
@@ -87,3 +84,4 @@ class HomeView: UIView {
         }
     }
 }
+

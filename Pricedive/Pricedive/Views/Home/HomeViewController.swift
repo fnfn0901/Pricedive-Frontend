@@ -19,10 +19,12 @@ class HomeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupBindings()
+
     }
     
     private func setupBindings() {
         viewModel.titleText.bind { [weak self] text in
+            guard let self = self else { return }
             
         }
     }
