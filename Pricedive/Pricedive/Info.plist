@@ -22,6 +22,7 @@
 	<key>UIAppFonts</key>
 	<array>
 		<string>HelveticaNeueMediumItalic.otf</string>
+		<string>NotoSans-Bold.ttf</string>
 		<string>Pretendard-Thin.ttf</string>
 		<string>Pretendard-ExtraLight.ttf</string>
 		<string>Pretendard-Light.ttf</string>
