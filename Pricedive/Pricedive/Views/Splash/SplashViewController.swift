@@ -47,7 +47,7 @@ class SplashViewController: UIViewController {
     }
 
     private func navigateToNextScreen() {
-        let nextViewController = MainViewController()
+        let nextViewController = MainTabBarController()
         nextViewController.modalTransitionStyle = .crossDissolve
         nextViewController.modalPresentationStyle = .fullScreen
         present(nextViewController, animated: true)

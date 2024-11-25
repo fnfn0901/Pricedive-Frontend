@@ -42,7 +42,7 @@ class SplashView: UIView {
         gradientLayer.locations = [0.0, 1.0]
         gradientLayer.startPoint = CGPoint(x: 0.5, y: 0.5)
         gradientLayer.endPoint = CGPoint(x: 1.0, y: 1.0)
-        gradientLayer.frame = CGRect(x: 0, y: 0, width: Constants.additionalViewWidth, height: Constants.additionalViewHeight)
+        gradientLayer.frame = CGRect(x: 0, y: 0, width: 393, height: 429)
         view.layer.insertSublayer(gradientLayer, at: 0)
         return view
     }()
