@@ -63,7 +63,7 @@ struct CustomStyles {
             text: "Pricedive",
             color: UIColor.mainBlue,
             font: UIFont(name: "HelveticaNeue-MediumItalic", size: 30)!,
-            lineHeight: 0,
+            lineHeight: 0.6,
             kern: -0.41
         )
     }

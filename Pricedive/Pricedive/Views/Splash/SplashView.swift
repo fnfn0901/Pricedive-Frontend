@@ -92,6 +92,7 @@ class SplashView: UIView {
         logoLabel.snp.makeConstraints { make in
             make.top.equalTo(safeAreaLayoutGuide.snp.top).offset(97)
             make.centerX.equalToSuperview()
+            make.height.equalTo(60)
         }
 
         descriptionLabel.snp.makeConstraints { make in
