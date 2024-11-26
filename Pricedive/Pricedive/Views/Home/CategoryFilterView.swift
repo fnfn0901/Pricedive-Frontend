@@ -60,11 +60,24 @@ class CategoryFilterView: UIView {
     }
 
     private func configureButtons() {
-        stackView.arrangedSubviews.forEach { $0.removeFromSuperview() } // Clear existing buttons
-        for category in categories {
+        stackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+
+        for (index, category) in categories.enumerated() {
             let button = UIButton.createUnselectedCategoryButton(title: category)
             button.addTarget(self, action: #selector(categoryButtonTapped(_:)), for: .touchUpInside)
             stackView.addArrangedSubview(button)
+            
+            if index == 0 {
+                button.snp.makeConstraints { make in
+                    make.leading.equalToSuperview().offset(20)
+                }
+            }
+
+            if index == categories.count - 1 {
+                button.snp.makeConstraints { make in
+                    make.trailing.equalTo(scrollView.snp.trailing).offset(-20)
+                }
+            }
         }
     }
 
