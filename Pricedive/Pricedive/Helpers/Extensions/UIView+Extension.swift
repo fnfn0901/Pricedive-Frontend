@@ -61,7 +61,7 @@ extension UIView {
     // 디데이 뷰 생성
     static func createDDayView(
         text: String,
-        backgroundColor: UIColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.05),
+        backgroundColor: UIColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.60),
         size: CGSize = CGSize(width: 54, height: 29)
     ) -> UIView {
         let dDayView = UIView()
@@ -69,14 +69,13 @@ extension UIView {
         dDayView.layer.backgroundColor = backgroundColor.cgColor
         dDayView.widthAnchor.constraint(equalToConstant: size.width).isActive = true
         dDayView.heightAnchor.constraint(equalToConstant: size.height).isActive = true
-        dDayView.layer.cornerRadius = size.height / 2
         dDayView.clipsToBounds = true
         
         let label = UILabel.createCustomLabel(
-            text: "D - \(text)",
+            text: "D-\(text)",
             color: UIColor.mainRed,
             font: UIFont(name: "Pretendard-Bold", size: 16)!,
-            lineHeight: 1.15,
+            lineHeight: 0,
             kern: 1.5
         )
         label.translatesAutoresizingMaskIntoConstraints = false
