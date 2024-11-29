@@ -16,7 +16,7 @@ extension UIButton {
         button.contentHorizontalAlignment = .center
         button.contentVerticalAlignment = .center
         button.snp.makeConstraints { make in
-            make.width.height.equalTo(44)
+            make.height.equalTo(24)
         }
         if let target = target, let action = action {
             button.addTarget(target, action: action, for: .touchUpInside)
