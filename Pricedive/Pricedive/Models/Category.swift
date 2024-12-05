@@ -7,7 +7,6 @@
 
 import Foundation
 
-struct Category: Codable {
-    let categoryId: Int          // 카테고리 고유 ID
-    let categoryName: String     // 카테고리 이름
+struct Category {
+    let name: String
 }
