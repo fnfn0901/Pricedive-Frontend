@@ -45,7 +45,6 @@ class TopFixedFrameView: UIView {
         searchIconButton.snp.makeConstraints { make in
             make.trailing.equalToSuperview().offset(-8)
             make.centerY.equalToSuperview()
-            make.width.height.equalTo(44)
         }
     }
 }

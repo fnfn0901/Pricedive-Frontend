@@ -87,9 +87,9 @@ class EventCell: UICollectionViewCell {
         
         // Heart Button
         heartButton.snp.makeConstraints { make in
+            make.bottom.equalTo(imageView.snp.bottom).offset(-5)
             make.trailing.equalTo(imageView.snp.trailing).offset(-5)
             make.centerY.equalTo(dDayView.snp.centerY)
-            make.width.height.equalTo(44)
         }
         
         // Title Label
@@ -119,8 +119,8 @@ class EventCell: UICollectionViewCell {
         dDayView = UIView.createDDayView(text: dDayText)
         imageView.addSubview(dDayView)
         dDayView.snp.makeConstraints { make in
-            make.leading.equalTo(imageView.snp.leading).offset(5)
-            make.bottom.equalTo(imageView.snp.bottom).offset(-5)
+            make.leading.equalToSuperview()
+            make.bottom.equalToSuperview()
             make.width.equalTo(54)
             make.height.equalTo(29)
         }
