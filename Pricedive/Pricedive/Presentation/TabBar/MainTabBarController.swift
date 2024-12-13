@@ -7,11 +7,12 @@
 
 import UIKit
 
-class MainTabBarController: UITabBarController {
+class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        delegate = self
         setupTabBarAppearance()
         setupViewControllers()
     }
@@ -39,7 +40,6 @@ class MainTabBarController: UITabBarController {
     }
 
     private func setupViewControllers() {
-        // ViewModel 생성
         let sampleEvents: [Event] = (1...20).map { index in
             Event(
                 eventId: index,
@@ -53,22 +53,28 @@ class MainTabBarController: UITabBarController {
         }
         let sharedViewModel = HomeViewModel(events: sampleEvents)
 
-        // 뷰 컨트롤러 생성
         let categoryController = CategoryViewController()
         let homeViewController = HomeViewController(viewModel: sharedViewModel)
         let searchViewController = SearchViewController(viewModel: sharedViewModel)
         let myPageViewController = MyPageViewController()
 
-        // 탭 바 아이템 설정
         categoryController.tabBarItem = UITabBarItem(title: "Category", image: UIImage(systemName: "line.3.horizontal"), tag: 0)
         homeViewController.tabBarItem = UITabBarItem(title: "Home", image: UIImage(systemName: "house"), tag: 1)
         searchViewController.tabBarItem = UITabBarItem(title: "Search", image: UIImage(systemName: "magnifyingglass"), tag: 2)
         myPageViewController.tabBarItem = UITabBarItem(title: "MyPage", image: UIImage(systemName: "person.crop.circle"), tag: 3)
 
-        // 탭 바 컨트롤러에 뷰 컨트롤러 설정
         viewControllers = [categoryController, homeViewController, searchViewController, myPageViewController]
-        
-        // 기본 선택된 탭 설정
         selectedIndex = 1
+    }
+
+    func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
+        guard let fromView = selectedViewController?.view,
+              let toView = viewController.view,
+              fromView != toView else {
+            return true
+        }
+
+        UIView.transition(from: fromView, to: toView, duration: 0, options: [], completion: nil)
+        return true
     }
 }
