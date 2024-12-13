@@ -63,7 +63,7 @@ class HomeViewController: UIViewController, UICollectionViewDataSource {
         let event = viewModel.events.value[indexPath.row]
         cell.configureCell(
             title: event.eventTitle,
-            imageUrl: event.eventImage ?? "",
+            imageUrl: event.eventImage,
             profileImageUrl: event.youtuberProfileImage,
             dDayText: "3"
         )
