@@ -78,7 +78,7 @@ class CategoryView: UIView {
         topView.snp.makeConstraints { make in
             make.top.equalTo(safeAreaLayoutGuide.snp.top)
             make.leading.trailing.equalToSuperview()
-            make.height.equalTo(60)
+            make.height.equalTo(52)
         }
         
         titleLabel.snp.makeConstraints { make in
