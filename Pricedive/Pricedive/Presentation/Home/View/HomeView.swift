@@ -35,7 +35,7 @@ class HomeView: BaseView {
         contentView.addSubview(carouselView)
         carouselView.snp.makeConstraints { make in
             make.top.equalTo(categoryFilterView.snp.bottom).offset(12)
-            make.leading.trailing.equalToSuperview().inset(20)
+            make.leading.trailing.equalToSuperview()
             make.height.equalTo(150)
         }
     }
