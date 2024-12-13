@@ -10,11 +10,13 @@ import UIKit
 class HomeView: BaseView {
     let topFixedFrame = TopFixedFrameView()
     let carouselView = CarouselView()
+    let searchBarView = SearchBarView()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupTopFixedFrame()
         setupCarouselView()
+        setupSearchBarView()
         setupConstraints()
     }
 
@@ -29,6 +31,8 @@ class HomeView: BaseView {
             make.leading.trailing.equalToSuperview().inset(20)
             make.height.equalTo(52)
         }
+        
+        topFixedFrame.searchIconButton.addTarget(self, action: #selector(toggleSearchBar), for: .touchUpInside)
     }
 
     private func setupCarouselView() {
@@ -38,6 +42,18 @@ class HomeView: BaseView {
             make.leading.trailing.equalToSuperview()
             make.height.equalTo(150)
         }
+    }
+
+    private func setupSearchBarView() {
+        addSubview(searchBarView)
+        searchBarView.snp.makeConstraints { make in
+            make.top.equalTo(safeAreaLayoutGuide.snp.top).offset(8)
+            make.leading.trailing.equalToSuperview().inset(20)
+            make.height.equalTo(48)
+        }
+        searchBarView.alpha = 0
+        
+        searchBarView.xMarkButton.addTarget(self, action: #selector(resetToTopFixedFrame), for: .touchUpInside)
     }
 
     private func setupConstraints() {
@@ -63,5 +79,15 @@ class HomeView: BaseView {
             make.bottom.equalToSuperview()
             make.height.equalTo(0)
         }
+    }
+    
+    @objc private func toggleSearchBar() {
+        self.topFixedFrame.alpha = 0
+        self.searchBarView.alpha = 1
+    }
+    
+    @objc private func resetToTopFixedFrame() {
+        self.topFixedFrame.alpha = 1
+        self.searchBarView.alpha = 0
     }
 }

@@ -36,7 +36,7 @@ class SearchBarView: UIView {
         return button
     }()
 
-    private lazy var xMarkButton: UIButton = {
+    lazy var xMarkButton: UIButton = {
         let button = UIButton.createIconButton(
             image: UIImage(systemName: "xmark"),
             target: nil,

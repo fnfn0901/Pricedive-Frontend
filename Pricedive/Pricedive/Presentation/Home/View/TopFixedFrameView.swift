@@ -14,7 +14,7 @@ class TopFixedFrameView: UIView {
 
     private let logoLabel: UILabel = CustomStyles.logoText()
 
-    private let searchIconButton: UIButton = {
+    let searchIconButton: UIButton = {
         let image = UIImage(systemName: "magnifyingglass")
         return UIButton.createIconButton(image: image, target: nil, action: nil)
     }()
