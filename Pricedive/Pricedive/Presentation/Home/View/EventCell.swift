@@ -89,7 +89,6 @@ class EventCell: UICollectionViewCell {
         heartButton.snp.makeConstraints { make in
             make.bottom.equalTo(imageView.snp.bottom).offset(-5)
             make.trailing.equalTo(imageView.snp.trailing).offset(-5)
-            make.centerY.equalTo(dDayView.snp.centerY)
         }
         
         // Title Label

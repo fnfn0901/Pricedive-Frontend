@@ -70,12 +70,11 @@ extension UIButton {
     static func createUnselectedCategoryButton(title: String, size: CGSize = CGSize(width: 100, height: 40)) -> UIButton {
         let button = UIButton(type: .system)
         button.layer.backgroundColor = UIColor.mainWhite.cgColor
-        button.layer.cornerRadius = size.height / 2
+        button.layer.cornerRadius = 20
         button.setTitle(title, for: .normal)
         button.setTitleColor(.mainBlack, for: .normal)
         button.titleLabel?.font = UIFont(name: "Pretendard-Regular", size: 14)
         button.titleLabel?.adjustsFontForContentSizeCategory = true
-        button.layer.cornerRadius = 20
         button.snp.makeConstraints { make in
             make.width.equalTo(size.width)
             make.height.equalTo(size.height)

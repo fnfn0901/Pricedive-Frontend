@@ -24,6 +24,8 @@ class CategoryFilterView: UIView {
         stackView.axis = .horizontal
         stackView.spacing = 8
         stackView.alignment = .center
+        stackView.isLayoutMarginsRelativeArrangement = true
+        stackView.layoutMargins = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
         return stackView
     }()
 
