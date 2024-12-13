@@ -56,7 +56,7 @@ class BaseView: UIView {
         }
 
         collectionView.snp.makeConstraints { make in
-            make.top.equalTo(categoryFilterView.snp.bottom).offset(15)
+            make.top.equalTo(categoryFilterView.snp.bottom).offset(12)
             make.leading.trailing.equalToSuperview()
             make.bottom.equalToSuperview()
             make.height.equalTo(0)

@@ -70,7 +70,7 @@ class SearchView: BaseView {
         searchContainerView.addSubview(xMarkButton)
 
         searchContainerView.snp.makeConstraints { make in
-            make.top.equalTo(safeAreaLayoutGuide.snp.top).offset(8)
+            make.top.equalTo(safeAreaLayoutGuide.snp.top).offset(4)
             make.leading.trailing.equalToSuperview().inset(9)
             make.height.equalTo(48)
         }
@@ -78,7 +78,7 @@ class SearchView: BaseView {
         magnifyingGlassButton.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
             make.leading.equalToSuperview().offset(15)
-            make.width.height.equalTo(24)
+            make.width.equalTo(24)
         }
 
         searchTextField.snp.makeConstraints { make in
@@ -94,7 +94,7 @@ class SearchView: BaseView {
         }
 
         scrollView.snp.remakeConstraints { make in
-            make.top.equalTo(searchContainerView.snp.bottom).offset(8)
+            make.top.equalTo(searchContainerView.snp.bottom).offset(16)
             make.leading.trailing.bottom.equalToSuperview()
         }
     }

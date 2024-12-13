@@ -24,11 +24,11 @@ class HomeView: BaseView {
         topFixedFrame.snp.makeConstraints { make in
             make.top.equalTo(safeAreaLayoutGuide.snp.top).offset(8)
             make.leading.trailing.equalToSuperview().inset(20)
-            make.height.equalTo(48)
+            make.height.equalTo(52)
         }
 
         scrollView.snp.remakeConstraints { make in
-            make.top.equalTo(topFixedFrame.snp.bottom).offset(17)
+            make.top.equalTo(topFixedFrame.snp.bottom).offset(8)
             make.leading.trailing.bottom.equalToSuperview()
         }
     }
