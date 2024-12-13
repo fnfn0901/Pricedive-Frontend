@@ -1,5 +1,5 @@
 //
-//  UIView+Extension.swift
+//  UIView+.swift
 //  Pricedive
 //
 //  Created by 신호연 on 11/26/24.
