@@ -33,7 +33,7 @@ class SearchViewController: UIViewController, UICollectionViewDataSource {
     }
 
     private func setupBindings() {
-        NotificationCenter.default.publisher(for: UITextField.textDidChangeNotification, object: searchView.searchTextField)
+        NotificationCenter.default.publisher(for: UITextField.textDidChangeNotification, object: searchView.searchBarView.searchTextField)
             .compactMap { ($0.object as? UITextField)?.text }
             .assign(to: \.searchQuery, on: viewModel)
             .store(in: &cancellables)
