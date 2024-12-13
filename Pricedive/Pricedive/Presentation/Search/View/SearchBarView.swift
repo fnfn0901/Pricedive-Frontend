@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-class SearchBarView: UIView {
+class SearchBarView: UIView, UITextFieldDelegate {
     
     let searchTextField: UITextField = {
         let textField = UITextField()
@@ -29,8 +29,8 @@ class SearchBarView: UIView {
     lazy var magnifyingGlassButton: UIButton = {
         let button = UIButton.createIconButton(
             image: UIImage(systemName: "magnifyingglass"),
-            target: nil,
-            action: nil
+            target: self,
+            action: #selector(handleMagnifyingGlassClick)
         )
         button.tintColor = .placeholderGray
         return button
@@ -39,8 +39,8 @@ class SearchBarView: UIView {
     lazy var xMarkButton: UIButton = {
         let button = UIButton.createIconButton(
             image: UIImage(systemName: "xmark"),
-            target: nil,
-            action: nil
+            target: self,
+            action: #selector(handleXMarkClick)
         )
         button.tintColor = .mainBlue
         return button
@@ -57,6 +57,7 @@ class SearchBarView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupSearchBar()
+        searchTextField.delegate = self // `UITextFieldDelegate` 설정
     }
 
     required init?(coder: NSCoder) {
@@ -85,13 +86,27 @@ class SearchBarView: UIView {
             make.leading.equalTo(magnifyingGlassButton.snp.trailing).offset(12)
             make.trailing.equalTo(xMarkButton.snp.leading).offset(-12)
         }
+        
         searchTextField.isUserInteractionEnabled = true
         searchTextField.returnKeyType = .search
-        
+
         xMarkButton.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
             make.trailing.equalToSuperview().offset(-15)
             make.width.height.equalTo(24)
+        }
+    }
+
+    @objc private func handleMagnifyingGlassClick() {
+        print("검색 아이콘 클릭")
+        searchTextField.resignFirstResponder()
+    }
+
+    @objc private func handleXMarkClick() {
+        searchTextField.text = ""
+        searchTextField.resignFirstResponder()
+        if let homeView = self.superview as? HomeView {
+            homeView.resetToTopFixedFrame()
         }
     }
     

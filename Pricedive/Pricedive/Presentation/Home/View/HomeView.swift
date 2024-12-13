@@ -54,8 +54,6 @@ class HomeView: BaseView, UITextFieldDelegate {
         searchBarView.alpha = 0
         
         searchBarView.searchTextField.delegate = self
-        searchBarView.magnifyingGlassButton.addTarget(self, action: #selector(hideKeyboard), for: .touchUpInside)
-        searchBarView.xMarkButton.addTarget(self, action: #selector(resetToTopFixedFrame), for: .touchUpInside)
         
         scrollView.keyboardDismissMode = .onDrag
     }
@@ -91,7 +89,7 @@ class HomeView: BaseView, UITextFieldDelegate {
         searchBarView.searchTextField.becomeFirstResponder()
     }
     
-    @objc private func resetToTopFixedFrame() {
+    @objc func resetToTopFixedFrame() {
         searchBarView.searchTextField.text = ""
         hideKeyboard()
         self.topFixedFrame.alpha = 1
