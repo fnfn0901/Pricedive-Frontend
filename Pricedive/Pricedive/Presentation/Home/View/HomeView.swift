@@ -9,10 +9,13 @@ import UIKit
 
 class HomeView: BaseView {
     let topFixedFrame = TopFixedFrameView()
+    private let carouselView = CarouselView()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupTopFixedFrame()
+        setupCarouselView()
+        setupConstraints()
     }
 
     required init?(coder: NSCoder) {
@@ -26,10 +29,39 @@ class HomeView: BaseView {
             make.leading.trailing.equalToSuperview().inset(20)
             make.height.equalTo(52)
         }
+    }
 
+    private func setupCarouselView() {
+        contentView.addSubview(carouselView)
+        carouselView.snp.makeConstraints { make in
+            make.top.equalTo(categoryFilterView.snp.bottom).offset(12)
+            make.leading.trailing.equalToSuperview().inset(20)
+            make.height.equalTo(150)
+        }
+    }
+
+    private func setupConstraints() {
         scrollView.snp.remakeConstraints { make in
             make.top.equalTo(topFixedFrame.snp.bottom).offset(8)
             make.leading.trailing.bottom.equalToSuperview()
+        }
+
+        contentView.snp.updateConstraints { make in
+            make.edges.equalToSuperview()
+            make.width.equalToSuperview()
+        }
+
+        categoryFilterView.snp.remakeConstraints { make in
+            make.top.equalToSuperview()
+            make.leading.trailing.equalToSuperview()
+            make.height.equalTo(40)
+        }
+
+        collectionView.snp.remakeConstraints { make in
+            make.top.equalTo(carouselView.snp.bottom).offset(18)
+            make.leading.trailing.equalToSuperview()
+            make.bottom.equalToSuperview()
+            make.height.equalTo(0)
         }
     }
 }
