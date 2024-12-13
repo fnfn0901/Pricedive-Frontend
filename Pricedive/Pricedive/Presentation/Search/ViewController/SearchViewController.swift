@@ -55,7 +55,7 @@ extension SearchViewController: UICollectionViewDataSource {
         let event = viewModel.filteredEvents.value[indexPath.row]
         cell.configureCell(
             title: event.eventTitle,
-            imageUrl: event.eventDescription ?? "",
+            imageUrl: event.eventImage ?? "",
             profileImageUrl: event.youtuberProfileImage,
             dDayText: "3"
         )

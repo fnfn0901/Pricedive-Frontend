@@ -19,10 +19,11 @@ class SearchViewModel {
     private let events: [Event] = (0..<10).map { _ in
         Event(
             eventId: Int.random(in: 1...1000),
+            eventImage: "https://m-goods.sivillage.com/goods/getGoodDescCont.siv?goods_no=2303705383/proxy/src/http://www.bioderma.co.kr/img/detail/Ato_UCR_img3.jpg/dims/optimize",
             youtuberProfileImage: "https://yt3.googleusercontent.com/Oh7Fb_JBhkVUB1y0671PeYNSYJbxouMd6DEQzcN9JHaVDgp5b4DlKfRt0ehW53Ol7UxMD0xkJts=s900-c-k-c0x00ffffff-no-rj",
             eventEndDate: Date(),
             eventTitle: "아토덤 인텐시브밤 200ml + 울트라 크림 추가 증정",
-            eventDescription: "https://m-goods.sivillage.com/goods/getGoodDescCont.siv?goods_no=2303705383/proxy/src/http://www.bioderma.co.kr/img/detail/Ato_UCR_img3.jpg/dims/optimize",
+            eventDescription: "설명설명",
             isLiked: false
         )
     }
