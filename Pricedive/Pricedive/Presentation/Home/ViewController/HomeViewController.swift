@@ -31,6 +31,14 @@ class HomeViewController: UIViewController, UICollectionViewDataSource {
         homeView.collectionView.dataSource = self
         homeView.reloadCollectionView()
         setupBindings()
+        
+        homeView.carouselView.imageUrls = [
+            "https://cdn.011st.com/11dims/resize/1240x400/quality/100/11src/browsing/space/banner/2024/12/10/2412101132499001264_10.jpg",
+            "https://cdn.011st.com/11dims/resize/1240x400/quality/100/11src/browsing/space/banner/2024/12/5/2412051442589701186_720.jpg",
+            "https://cdn.011st.com/11dims/resize/1240x400/quality/100/11src/browsing/space/banner/2024/12/10/2412101509211100954_27.png",
+            "https://cdn.011st.com/11dims/resize/1240x400/quality/100/11src/browsing/space/banner/2024/12/4/2412041454203801216_690.jpg",
+            "https://cdn.011st.com/11dims/resize/1240x400/quality/100/11src/browsing/space/banner/2024/12/10/2412101141100201264_8.jpg"
+        ]
     }
 
     private func setupBindings() {
