@@ -86,11 +86,17 @@ class SearchBarView: UIView {
             make.trailing.equalTo(xMarkButton.snp.leading).offset(-12)
         }
         searchTextField.isUserInteractionEnabled = true
+        searchTextField.returnKeyType = .search
         
         xMarkButton.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
             make.trailing.equalToSuperview().offset(-15)
             make.width.height.equalTo(24)
         }
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
     }
 }
