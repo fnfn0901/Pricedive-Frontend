@@ -20,8 +20,8 @@ class HomeView: UIView {
     override init(frame: CGRect) {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
-        layout.minimumLineSpacing = 20
-        layout.itemSize = CGSize(width: 160, height: 173)
+        layout.minimumLineSpacing = 20 // 행 간의 간격
+        layout.minimumInteritemSpacing = 20 // 열 간의 간격
 
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         super.init(frame: frame)
@@ -31,8 +31,8 @@ class HomeView: UIView {
     required init?(coder: NSCoder) {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
-        layout.minimumLineSpacing = 20
-        layout.itemSize = CGSize(width: 160, height: 173)
+        layout.minimumLineSpacing = 20 // 행 간의 간격
+        layout.minimumInteritemSpacing = 20 // 열 간의 간격
 
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         super.init(coder: coder)
@@ -88,9 +88,8 @@ class HomeView: UIView {
         contentView.addSubview(collectionView)
         collectionView.snp.makeConstraints { make in
             make.top.equalTo(carouselView.snp.bottom).offset(15)
-            make.leading.trailing.equalToSuperview().inset(20)
-            make.bottom.equalToSuperview()
-            make.height.equalTo(1000)
+            make.leading.trailing.bottom.equalToSuperview()
+            make.height.equalTo(0)
         }
     }
 
@@ -98,19 +97,40 @@ class HomeView: UIView {
         collectionView.backgroundColor = .white
         collectionView.isScrollEnabled = false
         collectionView.register(EventCell.self, forCellWithReuseIdentifier: "EventProductCell")
+        
+        if let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
+            let screenWidth = UIScreen.main.bounds.width
+            let cellSpacing: CGFloat = 20
+            let sectionInset: CGFloat = 20
+            let totalSpacing = cellSpacing + (sectionInset * 2)
+            let cellWidth = (screenWidth - totalSpacing) / 2
+            
+            let imageViewHeight = cellWidth * 0.75
+            let cellHeight = imageViewHeight * 1.25
+            
+            layout.itemSize = CGSize(width: cellWidth, height: cellHeight)
+            layout.minimumLineSpacing = 20
+            layout.minimumInteritemSpacing = 20
+            layout.sectionInset = UIEdgeInsets(top: 0, left: sectionInset, bottom: 0, right: sectionInset)
+        }
     }
 
     func updateCollectionViewHeight() {
         collectionView.layoutIfNeeded()
+        let contentHeight = collectionView.contentSize.height + 20
+
+        guard contentHeight > 0 else { return }
+
         collectionView.snp.updateConstraints { make in
-            make.height.equalTo(collectionView.contentSize.height)
+            make.height.equalTo(contentHeight)
         }
         contentView.layoutIfNeeded()
     }
 
     func reloadCollectionView() {
         collectionView.reloadData()
-        collectionView.layoutIfNeeded()
-        updateCollectionViewHeight()
+        DispatchQueue.main.async { [weak self] in
+            self?.updateCollectionViewHeight()
+        }
     }
 }
