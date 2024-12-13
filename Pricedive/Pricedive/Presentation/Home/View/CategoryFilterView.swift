@@ -86,7 +86,6 @@ class CategoryFilterView: UIView {
     // MARK: - Button Actions
     @objc private func categoryButtonTapped(_ sender: UIButton) {
         guard let title = sender.title(for: .normal) else { return }
-        print("Selected Category: \(title)")
 
         // animateNaturalTouch 호출
         sender.animateNaturalTouch { [weak self] in
