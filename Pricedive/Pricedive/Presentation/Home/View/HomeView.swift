@@ -7,7 +7,7 @@
 
 import UIKit
 
-class HomeView: BaseView {
+class HomeView: BaseView, UITextFieldDelegate {
     let topFixedFrame = TopFixedFrameView()
     let carouselView = CarouselView()
     let searchBarView = SearchBarView()
@@ -53,6 +53,8 @@ class HomeView: BaseView {
         }
         searchBarView.alpha = 0
         
+        searchBarView.searchTextField.delegate = self
+        searchBarView.magnifyingGlassButton.addTarget(self, action: #selector(hideKeyboard), for: .touchUpInside)
         searchBarView.xMarkButton.addTarget(self, action: #selector(resetToTopFixedFrame), for: .touchUpInside)
     }
 
@@ -87,7 +89,18 @@ class HomeView: BaseView {
     }
     
     @objc private func resetToTopFixedFrame() {
+        searchBarView.searchTextField.text = ""
+        hideKeyboard()
         self.topFixedFrame.alpha = 1
         self.searchBarView.alpha = 0
     }
+    
+    @objc private func hideKeyboard() {
+        searchBarView.searchTextField.resignFirstResponder()
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+       textField.resignFirstResponder()
+       return true
+   }
 }

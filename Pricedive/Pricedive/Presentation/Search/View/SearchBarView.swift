@@ -26,7 +26,7 @@ class SearchBarView: UIView {
         return textField
     }()
 
-    private lazy var magnifyingGlassButton: UIButton = {
+    lazy var magnifyingGlassButton: UIButton = {
         let button = UIButton.createIconButton(
             image: UIImage(systemName: "magnifyingglass"),
             target: nil,
@@ -85,7 +85,8 @@ class SearchBarView: UIView {
             make.leading.equalTo(magnifyingGlassButton.snp.trailing).offset(12)
             make.trailing.equalTo(xMarkButton.snp.leading).offset(-12)
         }
-
+        searchTextField.isUserInteractionEnabled = true
+        
         xMarkButton.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
             make.trailing.equalToSuperview().offset(-15)
