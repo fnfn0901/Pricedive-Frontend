@@ -74,15 +74,14 @@ class CarouselView: UIView {
         var previousImageView: UIImageView? = nil
         for (index, urlString) in imageUrls.enumerated() {
             let imageView = UIImageView()
-            imageView.contentMode = .scaleAspectFill
+            imageView.contentMode = .scaleToFill
             imageView.clipsToBounds = true
             imageView.kf.setImage(with: URL(string: urlString))
             scrollView.addSubview(imageView)
             imageViews.append(imageView)
 
             imageView.snp.makeConstraints { make in
-                make.top.bottom.equalToSuperview()
-                make.width.equalToSuperview()
+                make.width.height.equalToSuperview()
                 if let previous = previousImageView {
                     make.leading.equalTo(previous.snp.trailing)
                 } else {

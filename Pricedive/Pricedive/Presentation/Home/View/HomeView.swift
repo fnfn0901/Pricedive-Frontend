@@ -9,7 +9,7 @@ import UIKit
 
 class HomeView: BaseView {
     let topFixedFrame = TopFixedFrameView()
-    private let carouselView = CarouselView()
+    let carouselView = CarouselView()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
