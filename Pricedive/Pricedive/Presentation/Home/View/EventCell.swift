@@ -11,13 +11,13 @@ import Kingfisher
 
 class EventCell: UICollectionViewCell {
     // MARK: - Properties
-    let imageView: UIView = {
+    private let imageView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
-    let titleLabel: UILabel = {
+    private let titleLabel: UILabel = {
         let label = CustomStyles.productTitle()
         label.text = ""
         label.numberOfLines = 0
@@ -27,12 +27,13 @@ class EventCell: UICollectionViewCell {
         return label
     }()
     
-    private lazy var profileView: UIView = {
+    private let profileView: UIView = {
         UIView.createYoutuberProfileView(imageUrl: "")
     }()
     
-    private lazy var dDayView: UIView = {
-        UIView.createDDayView(text: "0")
+    private let dDayView: UIView = {
+        let view = UIView.createDDayView(text: "0")
+        return view
     }()
     
     private lazy var heartButton: UIButton = {
@@ -101,27 +102,31 @@ class EventCell: UICollectionViewCell {
     
     // MARK: - Configure Method
     func configureCell(title: String, imageUrl: String, profileImageUrl: String, dDayText: String) {
-        titleLabel.text = title
-        
-        // 이미지 뷰에 이미지 로드
+        updateTitleLabel(with: title)
+        updateImageView(with: imageUrl)
+        updateProfileView(with: profileImageUrl)
+        updateDDayView(with: dDayText)
+    }
+    
+    private func updateTitleLabel(with text: String) {
+        titleLabel.text = text
+    }
+    
+    private func updateImageView(with urlString: String) {
         if let imageView = imageView.subviews.first as? UIImageView {
-            imageView.kf.setImage(with: URL(string: imageUrl))
+            imageView.kf.setImage(with: URL(string: urlString))
         }
-        
-        // 프로필 뷰에 이미지 로드
+    }
+    
+    private func updateProfileView(with urlString: String) {
         if let profileImageView = profileView.subviews.first as? UIImageView {
-            profileImageView.kf.setImage(with: URL(string: profileImageUrl))
+            profileImageView.kf.setImage(with: URL(string: urlString))
         }
-        
-        // D-Day 뷰 업데이트
-        dDayView.removeFromSuperview()
-        dDayView = UIView.createDDayView(text: dDayText)
-        imageView.addSubview(dDayView)
-        dDayView.snp.makeConstraints { make in
-            make.leading.equalToSuperview()
-            make.bottom.equalToSuperview()
-            make.width.equalTo(54)
-            make.height.equalTo(29)
+    }
+    
+    private func updateDDayView(with text: String) {
+        if let dDayLabel = dDayView.subviews.first(where: { $0 is UILabel }) as? UILabel {
+            dDayLabel.text = "D-\(text)"
         }
     }
     

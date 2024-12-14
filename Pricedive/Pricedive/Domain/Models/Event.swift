@@ -15,4 +15,12 @@ struct Event: Codable {
     let eventTitle: String         // 이벤트 제목
     let eventDescription: String?  // 이벤트 상세 설명
     var isLiked: Bool?             // 좋아요 여부
+    
+    var dDay: Int {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        let endDate = calendar.startOfDay(for: eventEndDate)
+        let components = calendar.dateComponents([.day], from: today, to: endDate)
+        return components.day ?? 0
+    }
 }

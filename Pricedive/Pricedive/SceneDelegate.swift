@@ -14,11 +14,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
 
-        let splashViewModel = SplashViewModel()
-        let splashViewController = SplashViewController(viewModel: splashViewModel)
-
+        let mainTabBarController = MainTabBarController()
         window = UIWindow(windowScene: windowScene)
-        window?.rootViewController = splashViewController
+        window?.rootViewController = mainTabBarController
         window?.makeKeyAndVisible()
     }
 }

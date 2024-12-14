@@ -67,9 +67,9 @@ extension UIView {
         dDayView.translatesAutoresizingMaskIntoConstraints = false
         dDayView.layer.backgroundColor = backgroundColor.cgColor
         dDayView.clipsToBounds = true
-        
+
         let label = UILabel.createCustomLabel(
-            text: "D-\(text)",
+            text: "\(text)",
             color: UIColor.mainRed,
             font: UIFont(name: "Pretendard-Bold", size: 16)!,
             lineHeight: 0,
@@ -77,10 +77,10 @@ extension UIView {
         )
         label.translatesAutoresizingMaskIntoConstraints = false
         dDayView.addSubview(label)
-        
+
         label.centerXAnchor.constraint(equalTo: dDayView.centerXAnchor).isActive = true
         label.centerYAnchor.constraint(equalTo: dDayView.centerYAnchor).isActive = true
-        
+
         return dDayView
     }
 }

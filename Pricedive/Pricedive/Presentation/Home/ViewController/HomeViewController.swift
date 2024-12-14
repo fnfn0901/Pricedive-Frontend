@@ -8,7 +8,7 @@
 import UIKit
 import Combine
 
-class HomeViewController: UIViewController, UICollectionViewDataSource {
+class HomeViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
     private let homeView = HomeView()
     private let viewModel: HomeViewModel
     private var cancellables = Set<AnyCancellable>()
@@ -25,11 +25,23 @@ class HomeViewController: UIViewController, UICollectionViewDataSource {
     override func loadView() {
         view = homeView
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.isNavigationBarHidden = true
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.isNavigationBarHidden = false
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationController?.isNavigationBarHidden = true
         homeView.collectionView.dataSource = self
-        homeView.reloadCollectionView()
+        homeView.collectionView.delegate = self
+        homeView.collectionView.register(EventCell.self, forCellWithReuseIdentifier: "EventProductCell")
         setupBindings()
         
         homeView.carouselView.imageUrls = [
@@ -39,12 +51,14 @@ class HomeViewController: UIViewController, UICollectionViewDataSource {
             "https://cdn.011st.com/11dims/resize/1240x400/quality/100/11src/browsing/space/banner/2024/12/4/2412041454203801216_690.jpg",
             "https://cdn.011st.com/11dims/resize/1240x400/quality/100/11src/browsing/space/banner/2024/12/10/2412101141100201264_8.jpg"
         ]
+
+        homeView.reloadCollectionView()
     }
 
     private func setupBindings() {
         viewModel.events
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
+            .sink { [weak self] events in
                 self?.homeView.reloadCollectionView()
             }
             .store(in: &cancellables)
@@ -65,8 +79,14 @@ class HomeViewController: UIViewController, UICollectionViewDataSource {
             title: event.eventTitle,
             imageUrl: event.eventImage,
             profileImageUrl: event.youtuberProfileImage,
-            dDayText: "3"
+            dDayText: "\(event.dDay)"
         )
         return cell
+    }
+
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let event = viewModel.events.value[indexPath.row]
+        let detailViewController = EventDetailViewController(event: event)
+        navigationController?.pushViewController(detailViewController, animated: true)
     }
 }

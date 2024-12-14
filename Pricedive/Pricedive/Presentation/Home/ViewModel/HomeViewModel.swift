@@ -16,6 +16,7 @@ class HomeViewModel {
 
     init(events: [Event]) {
         self.allEvents = events
+        self.events.send(events)
         setupBindings()
     }
 

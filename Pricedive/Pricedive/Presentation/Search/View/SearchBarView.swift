@@ -98,7 +98,6 @@ class SearchBarView: UIView, UITextFieldDelegate {
     }
 
     @objc private func handleMagnifyingGlassClick() {
-        print("검색 아이콘 클릭")
         searchTextField.resignFirstResponder()
     }
 

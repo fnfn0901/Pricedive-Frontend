@@ -40,7 +40,7 @@ class SearchViewController: UIViewController, UICollectionViewDataSource {
 
         viewModel.events
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
+            .sink { [weak self] events in
                 self?.searchView.reloadCollectionView()
             }
             .store(in: &cancellables)
