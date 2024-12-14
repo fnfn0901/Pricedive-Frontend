@@ -41,7 +41,7 @@ class EventCell: UICollectionViewCell {
     private func setupConstraints() {
         imageView.snp.makeConstraints {
             $0.top.leading.trailing.equalToSuperview()
-            $0.height.equalTo(124)
+            $0.height.equalTo(self.snp.width).multipliedBy(0.65)
         }
 
         profileView.snp.makeConstraints {
@@ -60,7 +60,7 @@ class EventCell: UICollectionViewCell {
 
         titleLabel.snp.makeConstraints {
             $0.top.equalTo(imageView.snp.bottom).offset(5)
-            $0.leading.trailing.bottom.equalToSuperview()
+            $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(44)
         }
     }
