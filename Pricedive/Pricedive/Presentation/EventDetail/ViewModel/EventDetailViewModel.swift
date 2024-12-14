@@ -8,44 +8,53 @@
 import Foundation
 
 class EventDetailViewModel {
-    private var event: Event
+    private let homeViewModel: HomeViewModel
+    public let eventId: Int
 
-    init(event: Event) {
-        self.event = event
+    init(eventId: Int, homeViewModel: HomeViewModel) {
+        self.eventId = eventId
+        self.homeViewModel = homeViewModel
     }
 
     var eventTitle: String {
-        return event.eventTitle
+        return event?.eventTitle ?? ""
     }
 
     var eventDescription: String? {
-        return event.eventDescription
+        return event?.eventDescription
     }
 
     var eventEndDateText: String {
+        guard let endDate = event?.eventEndDate else { return "" }
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
-        return formatter.string(from: event.eventEndDate)
+        return formatter.string(from: endDate)
     }
 
     var dDayText: String {
-        let dDay = event.dDay
+        guard let dDay = event?.dDay else { return "Event Ended" }
         return dDay > 0 ? "\(dDay)" : "Event Ended"
     }
 
     var isLiked: Bool {
-        return event.isLiked ?? false
+        return homeViewModel.isLiked(for: eventId)
     }
 
     var eventImageURL: URL? {
-        return URL(string: event.eventImage)
+        guard let urlString = event?.eventImage else { return nil }
+        return URL(string: urlString)
     }
 
     var youtuberProfileImageURL: URL? {
-        return URL(string: event.youtuberProfileImage)
+        guard let urlString = event?.youtuberProfileImage else { return nil }
+        return URL(string: urlString)
     }
 
     func toggleLikeStatus() {
-        event.isLiked?.toggle()
+        homeViewModel.toggleLike(for: eventId)
+    }
+
+    private var event: Event? {
+        return homeViewModel.events.first(where: { $0.eventId == eventId })
     }
 }

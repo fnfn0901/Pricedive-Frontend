@@ -10,13 +10,13 @@ import Foundation
 
 class HomeViewModel {
     @Published var searchQuery: String = ""
-    let events = CurrentValueSubject<[Event], Never>([])
-    private let allEvents: [Event]
+    @Published var events: [Event] = []
+    private var allEvents: [Event]
     private var cancellables = Set<AnyCancellable>()
 
     init(events: [Event]) {
         self.allEvents = events
-        self.events.send(events)
+        self.events = events
         setupBindings()
     }
 
@@ -26,8 +26,18 @@ class HomeViewModel {
                 self?.allEvents.filter { query.isEmpty || $0.eventTitle.contains(query) } ?? []
             }
             .sink { [weak self] filtered in
-                self?.events.send(filtered)
+                self?.events = filtered
             }
             .store(in: &cancellables)
+    }
+
+    func toggleLike(for eventId: Int) {
+        guard let index = allEvents.firstIndex(where: { $0.eventId == eventId }) else { return }
+        allEvents[index].isLiked.toggle()
+        events = allEvents
+    }
+
+    func isLiked(for eventId: Int) -> Bool {
+        return allEvents.first(where: { $0.eventId == eventId })?.isLiked ?? false
     }
 }

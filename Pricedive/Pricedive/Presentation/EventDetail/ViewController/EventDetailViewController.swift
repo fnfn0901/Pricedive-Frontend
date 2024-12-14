@@ -23,9 +23,11 @@ class EventDetailViewController: UIViewController {
     }
 
     override func loadView() {
+        detailView.eventId = viewModel.eventId
+        detailView.viewModel = homeViewModel
         view = detailView
     }
-    
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.isNavigationBarHidden = true
@@ -38,14 +40,8 @@ class EventDetailViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationController?.isNavigationBarHidden = true
-        setupBindings()
         setupActions()
-        updateView() // 데이터 업데이트
-    }
-
-    private func setupBindings() {
-        // 데이터 바인딩 로직 추가 가능
+        updateView()
     }
 
     private func setupActions() {

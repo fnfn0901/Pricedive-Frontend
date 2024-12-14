@@ -10,6 +10,9 @@ import SnapKit
 
 class EventDetailView: UIView {
 
+    var eventId: Int?
+    var viewModel: HomeViewModel?
+    
     let navigationBar: UIView = {
         let view = UIView()
         view.backgroundColor = .white
@@ -19,19 +22,24 @@ class EventDetailView: UIView {
     let logoLabel: UILabel = CustomStyles.logoText()
 
     let backIconButton: UIButton = {
+        let button = UIButton(type: .system)
         let image = UIImage(systemName: "chevron.backward")
-        return UIButton.createIconButton(image: image, target: nil, action: nil)
+        button.setImage(image, for: .normal)
+        button.tintColor = .black
+        return button
     }()
 
     let searchIconButton: UIButton = {
+        let button = UIButton(type: .system)
         let image = UIImage(systemName: "magnifyingglass")
-        return UIButton.createIconButton(image: image, target: nil, action: nil)
+        button.setImage(image, for: .normal)
+        button.tintColor = .black
+        return button
     }()
 
-    
     let scrollView = UIScrollView()
     let contentView = UIView()
-    
+
     private let imageView = UIImageView()
     private let titleLabel: UILabel = {
         let label = CustomStyles.productTitle()
@@ -55,21 +63,17 @@ class EventDetailView: UIView {
     }()
     private lazy var heartButton: UIButton = {
         let button = UIButton(type: .system)
-        
         var config = UIButton.Configuration.plain()
         config.image = UIImage(systemName: "heart")
         config.imagePadding = 0
         config.baseForegroundColor = .mainBlack
         config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(pointSize: 24, weight: .regular)
-
         button.configuration = config
-        button.addTarget(self, action: #selector(handleHeartTapped), for: .touchUpInside)
-        
         return button
     }()
-    
+
     private var isHeartSelected = false
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupViews()
@@ -86,10 +90,10 @@ class EventDetailView: UIView {
         navigationBar.addSubview(logoLabel)
         navigationBar.addSubview(backIconButton)
         navigationBar.addSubview(searchIconButton)
-        
+
         addSubview(scrollView)
         scrollView.addSubview(contentView)
-        
+
         contentView.addSubviews([imageView, titleLabel])
         imageView.addSubviews([profileView, dDayView, heartButton])
         imageView.contentMode = .scaleAspectFill
@@ -118,7 +122,7 @@ class EventDetailView: UIView {
             make.trailing.equalTo(navigationBar).offset(-20)
             make.centerY.equalTo(navigationBar)
         }
-        
+
         scrollView.snp.makeConstraints { make in
             make.top.equalTo(navigationBar.snp.bottom).offset(6)
             make.leading.trailing.bottom.equalToSuperview()
@@ -166,12 +170,17 @@ class EventDetailView: UIView {
             dDayLabel.text = "D-\(dDayText)"
         }
     }
-
-    @objc private func handleHeartTapped() {
-        isHeartSelected.toggle()
-        let imageName = isHeartSelected ? "heart.fill" : "heart"
-        let tintColor = isHeartSelected ? UIColor.mainRed : UIColor.mainBlack
+    
+    private func updateHeartButton(isLiked: Bool) {
+        let imageName = isLiked ? "heart.fill" : "heart"
+        let tintColor = isLiked ? UIColor.mainRed : UIColor.mainBlack
         heartButton.setImage(UIImage(systemName: imageName), for: .normal)
         heartButton.tintColor = tintColor
+    }
+    
+    @objc private func handleHeartTapped() {
+        guard let viewModel = viewModel, let eventId = eventId else { return }
+        viewModel.toggleLike(for: eventId)
+        updateHeartButton(isLiked: viewModel.isLiked(for: eventId))
     }
 }

@@ -25,7 +25,7 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
     override func loadView() {
         view = homeView
     }
-    
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.isNavigationBarHidden = true
@@ -38,12 +38,11 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationController?.isNavigationBarHidden = true
         homeView.collectionView.dataSource = self
         homeView.collectionView.delegate = self
         homeView.collectionView.register(EventCell.self, forCellWithReuseIdentifier: "EventProductCell")
         setupBindings()
-        
+
         homeView.carouselView.imageUrls = [
             "https://cdn.011st.com/11dims/resize/1240x400/quality/100/11src/browsing/space/banner/2024/12/10/2412101132499001264_10.jpg",
             "https://cdn.011st.com/11dims/resize/1240x400/quality/100/11src/browsing/space/banner/2024/12/5/2412051442589701186_720.jpg",
@@ -56,9 +55,9 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
     }
 
     private func setupBindings() {
-        viewModel.events
+        viewModel.$events
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] events in
+            .sink { [weak self] _ in
                 self?.homeView.reloadCollectionView()
             }
             .store(in: &cancellables)
@@ -66,27 +65,22 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
 
     // MARK: - UICollectionViewDataSource
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return viewModel.events.value.count
+        return viewModel.events.count
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "EventProductCell", for: indexPath) as? EventCell else {
             return UICollectionViewCell()
         }
-        
-        let event = viewModel.events.value[indexPath.row]
-        cell.configureCell(
-            title: event.eventTitle,
-            imageUrl: event.eventImage,
-            profileImageUrl: event.youtuberProfileImage,
-            dDayText: "\(event.dDay)"
-        )
+
+        let event = viewModel.events[indexPath.row]
+        cell.configureCell(event: event, viewModel: viewModel)
         return cell
     }
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let event = viewModel.events.value[indexPath.row]
-        let detailViewModel = EventDetailViewModel(event: event)
+        let event = viewModel.events[indexPath.row]
+        let detailViewModel = EventDetailViewModel(eventId: event.eventId, homeViewModel: viewModel)
         let detailViewController = EventDetailViewController(viewModel: detailViewModel, homeViewModel: viewModel)
         navigationController?.pushViewController(detailViewController, animated: true)
     }

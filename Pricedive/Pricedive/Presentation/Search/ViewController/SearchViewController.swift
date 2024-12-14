@@ -29,7 +29,7 @@ class SearchViewController: UIViewController {
     override func loadView() {
         view = searchView
     }
-    
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.isNavigationBarHidden = true
@@ -42,7 +42,6 @@ class SearchViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationController?.isNavigationBarHidden = true
         configureCollectionView()
         setupBindings()
     }
@@ -62,7 +61,7 @@ class SearchViewController: UIViewController {
             .store(in: &cancellables)
 
         // Events binding
-        viewModel.events
+        viewModel.$events
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.searchView.reloadCollectionView()
@@ -75,7 +74,7 @@ class SearchViewController: UIViewController {
 extension SearchViewController: UICollectionViewDataSource {
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return viewModel.events.value.count
+        return viewModel.events.count
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -83,13 +82,8 @@ extension SearchViewController: UICollectionViewDataSource {
             return UICollectionViewCell()
         }
 
-        let event = viewModel.events.value[indexPath.row]
-        cell.configureCell(
-            title: event.eventTitle,
-            imageUrl: event.eventImage,
-            profileImageUrl: event.youtuberProfileImage,
-            dDayText: "\(event.dDay)"
-        )
+        let event = viewModel.events[indexPath.row]
+        cell.configureCell(event: event, viewModel: viewModel)
         return cell
     }
 }
