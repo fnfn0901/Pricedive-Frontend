@@ -8,7 +8,7 @@
 import UIKit
 import SafariServices
 
-class EventDetailViewController: UIViewController {
+class EventDetailViewController: UIViewController, UIGestureRecognizerDelegate {
     private let viewModel: EventDetailViewModel
     private let detailView = EventDetailView()
     private let homeViewModel: HomeViewModel
@@ -45,6 +45,11 @@ class EventDetailViewController: UIViewController {
         super.viewDidLoad()
         setupActions()
         updateView()
+        enableSwipeBackGesture()
+    }
+
+    private func enableSwipeBackGesture() {
+        navigationController?.interactivePopGestureRecognizer?.delegate = self
     }
 
     private func setupActions() {
