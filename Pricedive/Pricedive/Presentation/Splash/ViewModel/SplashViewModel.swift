@@ -11,14 +11,18 @@ import Combine
 class SplashViewModel {
     @Published var isSplashCompleted: Bool = false
     private let splashDuration: TimeInterval
+    private var cancellables = Set<AnyCancellable>()
 
     init(splashDuration: TimeInterval = 3.0) {
         self.splashDuration = splashDuration
     }
 
     func startSplashTimer() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + splashDuration) {
-            self.isSplashCompleted = true
-        }
+        Just(true)
+            .delay(for: .seconds(splashDuration), scheduler: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.isSplashCompleted = true
+            }
+            .store(in: &cancellables)
     }
 }

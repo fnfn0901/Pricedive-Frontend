@@ -8,8 +8,24 @@
 import UIKit
 
 struct CustomStyles {
-    static func productTitle() -> UILabel {
+    static func customLabel(
+        text: String,
+        color: UIColor,
+        font: UIFont,
+        lineHeight: CGFloat,
+        kern: CGFloat
+    ) -> UILabel {
         return UILabel.createCustomLabel(
+            text: text,
+            color: color,
+            font: font,
+            lineHeight: lineHeight,
+            kern: kern
+        )
+    }
+
+    static func productTitle() -> UILabel {
+        return customLabel(
             text: "",
             color: UIColor.mainBlack,
             font: UIFont(name: "Pretendard-SemiBold", size: 14)!,
@@ -19,7 +35,7 @@ struct CustomStyles {
     }
 
     static func categoryUnselected() -> UILabel {
-        return UILabel.createCustomLabel(
+        return customLabel(
             text: "",
             color: UIColor.mainBlack,
             font: UIFont(name: "Pretendard-Regular", size: 14)!,
@@ -29,7 +45,7 @@ struct CustomStyles {
     }
 
     static func categorySelected() -> UILabel {
-        return UILabel.createCustomLabel(
+        return customLabel(
             text: "",
             color: UIColor.mainWhite,
             font: UIFont(name: "Pretendard-Regular", size: 14)!,
@@ -39,7 +55,7 @@ struct CustomStyles {
     }
 
     static func dDayText() -> UILabel {
-        return UILabel.createCustomLabel(
+        return customLabel(
             text: "",
             color: UIColor.mainRed,
             font: UIFont(name: "Pretendard-Bold", size: 16)!,
@@ -49,7 +65,7 @@ struct CustomStyles {
     }
 
     static func navigationText() -> UILabel {
-        return UILabel.createCustomLabel(
+        return customLabel(
             text: "",
             color: UIColor.mainBlack,
             font: UIFont(name: "Pretendard-Bold", size: 18)!,
@@ -57,9 +73,9 @@ struct CustomStyles {
             kern: -0.41
         )
     }
-    
+
     static func logoText() -> UILabel {
-        return UILabel.createCustomLabel(
+        return customLabel(
             text: "Pricedive",
             color: UIColor.mainBlue,
             font: UIFont(name: "HelveticaNeue-MediumItalic", size: 30)!,
@@ -67,9 +83,9 @@ struct CustomStyles {
             kern: -0.41
         )
     }
-    
+
     static func splashDescriptionText() -> UILabel {
-        return UILabel.createCustomLabel(
+        return customLabel(
             text: "",
             color: UIColor.white,
             font: UIFont(name: "NotoSans-Bold", size: 24)!,
@@ -77,5 +93,4 @@ struct CustomStyles {
             kern: -0.41
         )
     }
-
 }

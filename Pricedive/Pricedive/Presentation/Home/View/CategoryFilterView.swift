@@ -36,19 +36,18 @@ class CategoryFilterView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupView()
-        configureButtons()
+        setupCategories()
     }
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         setupView()
-        configureButtons()
+        setupCategories()
     }
 
     // MARK: - Setup Methods
 
     private func setupView() {
-
         addSubview(scrollView)
         scrollView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
@@ -61,44 +60,55 @@ class CategoryFilterView: UIView {
         }
     }
 
-    private func configureButtons() {
-        stackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+    private func setupCategories() {
+        updateCategoryButtons(with: categories)
+    }
 
-        for (index, category) in categories.enumerated() {
+    private func updateCategoryButtons(with categories: [String]) {
+        stackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        
+        for category in categories {
             let button = UIButton.createUnselectedCategoryButton(title: category)
             button.addTarget(self, action: #selector(categoryButtonTapped(_:)), for: .touchUpInside)
             stackView.addArrangedSubview(button)
-            
-            if index == 0 {
-                button.snp.makeConstraints { make in
-                    make.leading.equalToSuperview().offset(20)
-                }
-            }
+        }
 
-            if index == categories.count - 1 {
-                button.snp.makeConstraints { make in
-                    make.trailing.equalTo(scrollView.snp.trailing).offset(-20)
-                }
+        adjustFirstAndLastButtonConstraints()
+    }
+
+    private func adjustFirstAndLastButtonConstraints() {
+        if let firstButton = stackView.arrangedSubviews.first {
+            firstButton.snp.makeConstraints { make in
+                make.leading.equalToSuperview().offset(20)
+            }
+        }
+
+        if let lastButton = stackView.arrangedSubviews.last {
+            lastButton.snp.makeConstraints { make in
+                make.trailing.equalToSuperview().offset(-20)
             }
         }
     }
 
     // MARK: - Button Actions
+
     @objc private func categoryButtonTapped(_ sender: UIButton) {
         guard sender.title(for: .normal) != nil else { return }
 
-        // animateNaturalTouch 호출
         sender.animateNaturalTouch { [weak self] in
-            guard let self = self else { return }
-            self.stackView.arrangedSubviews.forEach {
-                guard let button = $0 as? UIButton else { return }
-                if button == sender {
-                    button.layer.backgroundColor = UIColor.mainBlue.cgColor
-                    button.setTitleColor(.mainWhite, for: .normal)
-                } else {
-                    button.layer.backgroundColor = UIColor.mainWhite.cgColor
-                    button.setTitleColor(.mainBlack, for: .normal)
-                }
+            self?.updateButtonStyles(selectedButton: sender)
+        }
+    }
+
+    private func updateButtonStyles(selectedButton: UIButton) {
+        stackView.arrangedSubviews.forEach {
+            guard let button = $0 as? UIButton else { return }
+            if button == selectedButton {
+                button.layer.backgroundColor = UIColor.mainBlue.cgColor
+                button.setTitleColor(.mainWhite, for: .normal)
+            } else {
+                button.layer.backgroundColor = UIColor.mainWhite.cgColor
+                button.setTitleColor(.mainBlack, for: .normal)
             }
         }
     }
@@ -106,7 +116,7 @@ class CategoryFilterView: UIView {
     // MARK: - Public Methods
 
     func updateCategories(_ newCategories: [String]) {
-        self.categories = newCategories
-        configureButtons()
+        categories = newCategories
+        updateCategoryButtons(with: newCategories)
     }
 }

@@ -77,7 +77,7 @@ class SearchBarView: UIView, UITextFieldDelegate {
 
         magnifyingGlassButton.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
-            make.leading.equalToSuperview().offset(15)
+            make.leading.equalToSuperview().offset(12)
             make.width.equalTo(24)
         }
 
@@ -92,7 +92,7 @@ class SearchBarView: UIView, UITextFieldDelegate {
 
         xMarkButton.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
-            make.trailing.equalToSuperview().offset(-15)
+            make.trailing.equalToSuperview().offset(-12)
             make.width.height.equalTo(24)
         }
     }

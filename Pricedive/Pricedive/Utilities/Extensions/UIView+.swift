@@ -83,4 +83,23 @@ extension UIView {
 
         return dDayView
     }
+    
+    func clearSubviews() {
+        subviews.forEach { $0.removeFromSuperview() }
+    }
+    
+    func addSubviews(_ views: [UIView]) {
+        for view in views {
+            addSubview(view)
+        }
+    }
+    
+    func addArrangedSubviewWithSpacing(_ subview: UIView, index: Int) {
+        addSubview(subview)
+        subview.snp.makeConstraints { make in
+            make.leading.trailing.equalToSuperview()
+            make.height.equalTo(50)
+            make.top.equalTo(index == 0 ? self.snp.top : self.subviews[index - 1].snp.bottom)
+        }
+    }
 }

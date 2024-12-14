@@ -37,13 +37,13 @@ class TopFixedFrameView: UIView {
 
         addSubview(logoLabel)
         logoLabel.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(8)
+            make.leading.equalToSuperview()
             make.centerY.equalToSuperview()
         }
 
         addSubview(searchIconButton)
         searchIconButton.snp.makeConstraints { make in
-            make.trailing.equalToSuperview().offset(-8)
+            make.trailing.equalToSuperview()
             make.centerY.equalToSuperview()
         }
     }

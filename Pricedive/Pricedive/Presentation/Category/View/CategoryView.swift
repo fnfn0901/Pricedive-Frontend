@@ -17,19 +17,12 @@ class CategoryView: UIView {
     weak var delegate: CategoryViewDelegate?
     
     private let titleLabel: UILabel = {
-        let label = UILabel()
+        let label = CustomStyles.navigationText()
         label.text = "카테고리"
-        label.font = UIFont(name: "Pretendard-Bold", size: 18)
-        label.textColor = .mainBlack
-        label.textAlignment = .center
         return label
     }()
 
-    private let topView: UIView = {
-        let view = UIView()
-        return view
-    }()
-    
+    private let topView = UIView()
     private let bottomView: UIView = {
         let view = UIView()
         view.backgroundColor = .white
@@ -47,24 +40,12 @@ class CategoryView: UIView {
     }
     
     func updateCategories(_ categories: [Category]) {
-        bottomView.subviews.forEach { $0.removeFromSuperview() }
+        bottomView.clearSubviews()
         
         for (index, category) in categories.enumerated() {
             let itemView = CategoryItemView()
-            let isLast = index == categories.count - 1
-            itemView.configure(with: category, isLast: isLast)
-            bottomView.addSubview(itemView)
-            
-            itemView.snp.makeConstraints { make in
-                make.leading.trailing.equalToSuperview()
-                make.height.equalTo(50)
-                
-                if index == 0 {
-                    make.top.equalToSuperview()
-                } else {
-                    make.top.equalTo(bottomView.subviews[index - 1].snp.bottom)
-                }
-            }
+            itemView.configure(with: category, isLast: index == categories.count - 1)
+            bottomView.addArrangedSubviewWithSpacing(itemView, index: index)
         }
     }
     

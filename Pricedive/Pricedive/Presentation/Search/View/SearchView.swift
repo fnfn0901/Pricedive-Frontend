@@ -23,15 +23,14 @@ class SearchView: BaseView {
 
     private func setupSearchBarView() {
         addSubview(searchBarView)
-
         searchBarView.snp.makeConstraints { make in
-            make.top.equalTo(safeAreaLayoutGuide.snp.top).offset(4)
-            make.leading.trailing.equalToSuperview().inset(9)
+            make.top.equalTo(safeAreaLayoutGuide.snp.top).offset(8)
+            make.leading.trailing.equalToSuperview().inset(20)
             make.height.equalTo(48)
         }
 
         scrollView.snp.remakeConstraints { make in
-            make.top.equalTo(searchBarView.snp.bottom).offset(16)
+            make.top.equalTo(searchBarView.snp.bottom).offset(6)
             make.leading.trailing.bottom.equalToSuperview()
         }
     }

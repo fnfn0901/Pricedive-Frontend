@@ -18,8 +18,7 @@ class CarouselView: UIView {
 
     var imageUrls: [String] = [] {
         didSet {
-            configureCarousel()
-            setupAutoSlide()
+            setupCarousel()
         }
     }
 
@@ -35,78 +34,52 @@ class CarouselView: UIView {
 
     private func setupView() {
         backgroundColor = .mainWhite
-        setupScrollView()
-        setupPageControl()
-    }
 
-    private func setupScrollView() {
+        addSubview(scrollView)
         scrollView.isPagingEnabled = true
         scrollView.showsHorizontalScrollIndicator = false
         scrollView.delegate = self
-        addSubview(scrollView)
-        scrollView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
-    }
+        scrollView.snp.makeConstraints { $0.edges.equalToSuperview() }
 
-    private func setupPageControl() {
-        pageControl.hidesForSinglePage = true
         addSubview(pageControl)
-        pageControl.snp.makeConstraints { make in
-            make.bottom.equalToSuperview().offset(-10)
-            make.centerX.equalToSuperview()
+        pageControl.hidesForSinglePage = true
+        pageControl.snp.makeConstraints {
+            $0.bottom.equalToSuperview().offset(-10)
+            $0.centerX.equalToSuperview()
         }
     }
 
-    private func configureCarousel() {
-        // 기존 뷰 초기화
-        imageViews.forEach { $0.removeFromSuperview() }
-        imageViews = []
-        pageControl.numberOfPages = 0
+    private func setupCarousel() {
+        scrollView.clearSubviews()
+        imageViews.removeAll()
+        pageControl.numberOfPages = imageUrls.count
+        pageControl.isHidden = imageUrls.count <= 1
         timer?.invalidate()
 
-        guard !imageUrls.isEmpty else {
-            scrollView.contentSize = .zero
-            return
-        }
+        guard !imageUrls.isEmpty else { return }
 
-        // 이미지 추가
         var previousImageView: UIImageView? = nil
-        for (index, urlString) in imageUrls.enumerated() {
+        for url in imageUrls {
             let imageView = UIImageView()
             imageView.contentMode = .scaleToFill
             imageView.clipsToBounds = true
-            imageView.kf.setImage(with: URL(string: urlString))
+            imageView.kf.setImage(with: URL(string: url))
             scrollView.addSubview(imageView)
-            imageViews.append(imageView)
-
-            imageView.snp.makeConstraints { make in
-                make.width.height.equalToSuperview()
-                if let previous = previousImageView {
-                    make.leading.equalTo(previous.snp.trailing)
-                } else {
-                    make.leading.equalToSuperview()
-                }
-                if index == imageUrls.count - 1 {
-                    make.trailing.equalToSuperview()
-                }
+            imageView.snp.makeConstraints {
+                $0.width.height.equalToSuperview()
+                $0.leading.equalTo(previousImageView?.snp.trailing ?? scrollView.snp.leading)
+                $0.top.bottom.equalToSuperview()
             }
-
             previousImageView = imageView
         }
 
-        // 페이지 컨트롤 설정
-        if imageUrls.count > 1 {
-            pageControl.numberOfPages = imageUrls.count
-            pageControl.isHidden = false
-        } else {
-            pageControl.isHidden = true
-        }
+        previousImageView?.snp.makeConstraints { $0.trailing.equalToSuperview() }
+
+        setupAutoSlide()
     }
 
     private func setupAutoSlide() {
         guard imageUrls.count > 1 else { return }
-
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: true) { [weak self] _ in
             self?.autoSlide()
@@ -115,11 +88,8 @@ class CarouselView: UIView {
 
     private func autoSlide() {
         guard !imageUrls.isEmpty else { return }
-
-        let currentPage = pageControl.currentPage
-        let nextPage = (currentPage + 1) % imageUrls.count
+        let nextPage = (pageControl.currentPage + 1) % imageUrls.count
         let offsetX = CGFloat(nextPage) * frame.width
-
         scrollView.setContentOffset(CGPoint(x: offsetX, y: 0), animated: true)
         pageControl.currentPage = nextPage
     }
@@ -136,12 +106,10 @@ extension CarouselView: UIScrollViewDelegate {
     }
 
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        // 사용자 인터랙션 중에는 자동 슬라이드 일시 정지
         timer?.invalidate()
     }
 
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        // 사용자 인터랙션 후 자동 슬라이드 재시작
         setupAutoSlide()
     }
 }

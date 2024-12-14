@@ -12,11 +12,10 @@ class HomeView: BaseView, UITextFieldDelegate {
     let carouselView = CarouselView()
     let searchBarView = SearchBarView()
 
+    // MARK: - Initializers
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setupTopFixedFrame()
-        setupCarouselView()
-        setupSearchBarView()
+        setupUI()
         setupConstraints()
     }
 
@@ -24,43 +23,50 @@ class HomeView: BaseView, UITextFieldDelegate {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private func setupTopFixedFrame() {
+    // MARK: - Setup Methods
+    private func setupUI() {
+        configureTopFixedFrame()
+        configureCarouselView()
+        configureSearchBarView()
+    }
+
+    private func configureTopFixedFrame() {
         addSubview(topFixedFrame)
+        topFixedFrame.searchIconButton.addTarget(self, action: #selector(toggleSearchBar), for: .touchUpInside)
+    }
+
+    private func configureCarouselView() {
+        contentView.addSubview(carouselView)
+    }
+
+    private func configureSearchBarView() {
+        addSubview(searchBarView)
+        searchBarView.alpha = 0
+        searchBarView.searchTextField.delegate = self
+        scrollView.keyboardDismissMode = .onDrag
+    }
+
+    private func setupConstraints() {
         topFixedFrame.snp.makeConstraints { make in
             make.top.equalTo(safeAreaLayoutGuide.snp.top).offset(8)
             make.leading.trailing.equalToSuperview().inset(20)
             make.height.equalTo(52)
         }
-        
-        topFixedFrame.searchIconButton.addTarget(self, action: #selector(toggleSearchBar), for: .touchUpInside)
-    }
 
-    private func setupCarouselView() {
-        contentView.addSubview(carouselView)
         carouselView.snp.makeConstraints { make in
             make.top.equalTo(categoryFilterView.snp.bottom).offset(12)
             make.leading.trailing.equalToSuperview()
             make.height.equalTo(150)
         }
-    }
 
-    private func setupSearchBarView() {
-        addSubview(searchBarView)
         searchBarView.snp.makeConstraints { make in
             make.top.equalTo(safeAreaLayoutGuide.snp.top).offset(8)
             make.leading.trailing.equalToSuperview().inset(20)
             make.height.equalTo(48)
         }
-        searchBarView.alpha = 0
-        
-        searchBarView.searchTextField.delegate = self
-        
-        scrollView.keyboardDismissMode = .onDrag
-    }
 
-    private func setupConstraints() {
         scrollView.snp.remakeConstraints { make in
-            make.top.equalTo(topFixedFrame.snp.bottom).offset(8)
+            make.top.equalTo(topFixedFrame.snp.bottom).offset(2)
             make.leading.trailing.bottom.equalToSuperview()
         }
 
@@ -70,8 +76,7 @@ class HomeView: BaseView, UITextFieldDelegate {
         }
 
         categoryFilterView.snp.remakeConstraints { make in
-            make.top.equalToSuperview()
-            make.leading.trailing.equalToSuperview()
+            make.top.leading.trailing.equalToSuperview()
             make.height.equalTo(40)
         }
 
@@ -82,26 +87,32 @@ class HomeView: BaseView, UITextFieldDelegate {
             make.height.equalTo(0)
         }
     }
-    
+
+    // MARK: - Actions
     @objc private func toggleSearchBar() {
-        self.topFixedFrame.alpha = 0
-        self.searchBarView.alpha = 1
+        toggleVisibility(viewToShow: searchBarView, viewToHide: topFixedFrame)
         searchBarView.searchTextField.becomeFirstResponder()
     }
-    
+
     @objc func resetToTopFixedFrame() {
         searchBarView.searchTextField.text = ""
         hideKeyboard()
-        self.topFixedFrame.alpha = 1
-        self.searchBarView.alpha = 0
+        toggleVisibility(viewToShow: topFixedFrame, viewToHide: searchBarView)
     }
-    
+
     @objc private func hideKeyboard() {
         searchBarView.searchTextField.resignFirstResponder()
     }
-    
+
+    private func toggleVisibility(viewToShow: UIView, viewToHide: UIView) {
+        viewToHide.alpha = 0
+        viewToShow.alpha = 1
+        self.layoutIfNeeded()
+    }
+
+    // MARK: - UITextFieldDelegate
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-       textField.resignFirstResponder()
-       return true
-   }
+        textField.resignFirstResponder()
+        return true
+    }
 }

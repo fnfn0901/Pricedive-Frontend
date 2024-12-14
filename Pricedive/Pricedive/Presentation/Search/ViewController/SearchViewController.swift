@@ -8,11 +8,14 @@
 import UIKit
 import Combine
 
-class SearchViewController: UIViewController, UICollectionViewDataSource {
+class SearchViewController: UIViewController {
+
+    // MARK: - Properties
     private let searchView = SearchView()
     private let viewModel: HomeViewModel
     private var cancellables = Set<AnyCancellable>()
 
+    // MARK: - Initializers
     init(viewModel: HomeViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -22,31 +25,44 @@ class SearchViewController: UIViewController, UICollectionViewDataSource {
         fatalError("init(coder:) has not been implemented")
     }
 
+    // MARK: - Lifecycle
     override func loadView() {
         view = searchView
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        searchView.collectionView.dataSource = self
+        configureCollectionView()
         setupBindings()
     }
 
+    // MARK: - Setup Methods
+    private func configureCollectionView() {
+        searchView.collectionView.dataSource = self
+        searchView.collectionView.register(EventCell.self, forCellWithReuseIdentifier: "EventProductCell")
+    }
+
     private func setupBindings() {
+        // Search query binding
         NotificationCenter.default.publisher(for: UITextField.textDidChangeNotification, object: searchView.searchBarView.searchTextField)
             .compactMap { ($0.object as? UITextField)?.text }
+            .removeDuplicates()
             .assign(to: \.searchQuery, on: viewModel)
             .store(in: &cancellables)
 
+        // Events binding
         viewModel.events
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] events in
+            .sink { [weak self] _ in
                 self?.searchView.reloadCollectionView()
             }
             .store(in: &cancellables)
     }
+}
 
-    // MARK: - UICollectionViewDataSource
+// MARK: - UICollectionViewDataSource
+extension SearchViewController: UICollectionViewDataSource {
+
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return viewModel.events.value.count
     }
@@ -61,7 +77,7 @@ class SearchViewController: UIViewController, UICollectionViewDataSource {
             title: event.eventTitle,
             imageUrl: event.eventImage,
             profileImageUrl: event.youtuberProfileImage,
-            dDayText: "3"
+            dDayText: "\(event.dDay)"
         )
         return cell
     }

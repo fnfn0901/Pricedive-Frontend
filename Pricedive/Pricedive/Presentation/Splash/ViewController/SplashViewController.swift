@@ -10,8 +10,8 @@ import Combine
 
 class SplashViewController: UIViewController {
 
-    private var splashView: SplashView!
-    private var viewModel: SplashViewModel!
+    private var splashView = SplashView()
+    private var viewModel: SplashViewModel
     private var cancellables = Set<AnyCancellable>()
 
     init(viewModel: SplashViewModel) {
@@ -23,25 +23,22 @@ class SplashViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
+    override func loadView() {
+        view = splashView
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupView()
         bindViewModel()
         viewModel.startSplashTimer()
     }
 
-    private func setupView() {
-        splashView = SplashView(frame: self.view.bounds)
-        view.addSubview(splashView)
-    }
-
     private func bindViewModel() {
         viewModel.$isSplashCompleted
-            .receive(on: RunLoop.main)
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] isCompleted in
-                if isCompleted {
-                    self?.navigateToNextScreen()
-                }
+                guard isCompleted else { return }
+                self?.navigateToNextScreen()
             }
             .store(in: &cancellables)
     }

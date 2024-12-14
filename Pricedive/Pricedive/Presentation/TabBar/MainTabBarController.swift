@@ -11,36 +11,61 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
         delegate = self
         setupTabBarAppearance()
         setupViewControllers()
     }
 
+    // MARK: - TabBar Appearance
     private func setupTabBarAppearance() {
-        let topBorder = CALayer()
-        topBorder.backgroundColor = UIColor.mainWhite.cgColor
-        topBorder.frame = CGRect(x: 0, y: 0, width: tabBar.bounds.width, height: 1)
-        tabBar.layer.addSublayer(topBorder)
-
+        addTopBorderToTabBar()
+        
         let appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = .white
-
-        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor.mainBlue]
-        appearance.stackedLayoutAppearance.selected.iconColor = UIColor.mainBlue
-
-        appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor(hex: "5F6368")!]
-        appearance.stackedLayoutAppearance.normal.iconColor = UIColor(hex: "5F6368")!
-
+        
+        let selectedColor = UIColor.mainBlue
+        let normalColor = UIColor(hex: "5F6368")!
+        
+        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: selectedColor]
+        appearance.stackedLayoutAppearance.selected.iconColor = selectedColor
+        
+        appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: normalColor]
+        appearance.stackedLayoutAppearance.normal.iconColor = normalColor
+        
         tabBar.standardAppearance = appearance
         if #available(iOS 15.0, *) {
             tabBar.scrollEdgeAppearance = appearance
         }
     }
+    
+    private func addTopBorderToTabBar() {
+        let topBorder = CALayer()
+        topBorder.backgroundColor = UIColor.mainWhite.cgColor
+        topBorder.frame = CGRect(x: 0, y: 0, width: tabBar.bounds.width, height: 1)
+        tabBar.layer.addSublayer(topBorder)
+    }
 
+    // MARK: - View Controllers Setup
     private func setupViewControllers() {
-        let sampleEvents: [Event] = (1...20).map { index in
+        let sharedViewModel = HomeViewModel(events: createSampleEvents())
+        
+        let categoryController = createViewController(CategoryViewController(), title: "Category", image: "line.3.horizontal", tag: 0)
+        let homeViewController = createViewController(UINavigationController(rootViewController: HomeViewController(viewModel: sharedViewModel)), title: "Home", image: "house", tag: 1)
+        let searchViewController = createViewController(SearchViewController(viewModel: sharedViewModel), title: "Search", image: "magnifyingglass", tag: 2)
+        let myPageViewController = createViewController(MyPageViewController(), title: "MyPage", image: "person.crop.circle", tag: 3)
+
+        viewControllers = [categoryController, homeViewController, searchViewController, myPageViewController]
+        selectedIndex = 1
+    }
+
+    private func createViewController(_ controller: UIViewController, title: String, image: String, tag: Int) -> UIViewController {
+        controller.tabBarItem = UITabBarItem(title: title, image: UIImage(systemName: image), tag: tag)
+        return controller
+    }
+
+    private func createSampleEvents() -> [Event] {
+        return (1...20).map { index in
             Event(
                 eventId: index,
                 eventImage: "https://m-goods.sivillage.com/goods/getGoodDescCont.siv?goods_no=2303705383/proxy/src/http://www.bioderma.co.kr/img/detail/Ato_UCR_img3.jpg/dims/optimize",
@@ -51,22 +76,9 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
                 isLiked: false
             )
         }
-        let sharedViewModel = HomeViewModel(events: sampleEvents)
-
-        let categoryController = CategoryViewController()
-        let homeViewController = UINavigationController(rootViewController: HomeViewController(viewModel: sharedViewModel))
-        let searchViewController = SearchViewController(viewModel: sharedViewModel)
-        let myPageViewController = MyPageViewController()
-
-        categoryController.tabBarItem = UITabBarItem(title: "Category", image: UIImage(systemName: "line.3.horizontal"), tag: 0)
-        homeViewController.tabBarItem = UITabBarItem(title: "Home", image: UIImage(systemName: "house"), tag: 1)
-        searchViewController.tabBarItem = UITabBarItem(title: "Search", image: UIImage(systemName: "magnifyingglass"), tag: 2)
-        myPageViewController.tabBarItem = UITabBarItem(title: "MyPage", image: UIImage(systemName: "person.crop.circle"), tag: 3)
-
-        viewControllers = [categoryController, homeViewController, searchViewController, myPageViewController]
-        selectedIndex = 1
     }
 
+    // MARK: - UITabBarControllerDelegate
     func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
         guard let fromView = selectedViewController?.view,
               let toView = viewController.view,
@@ -74,7 +86,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
             return true
         }
 
-        UIView.transition(from: fromView, to: toView, duration: 0, options: [], completion: nil)
+        UIView.transition(from: fromView, to: toView, duration: 0, options: .transitionCrossDissolve, completion: nil)
         return true
     }
 }

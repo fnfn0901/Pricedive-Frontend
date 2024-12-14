@@ -21,8 +21,10 @@ class CategoryViewController: UIViewController {
     }
     
     private func setupView() {
-        categoryView = CategoryView(frame: view.bounds)
         view.addSubview(categoryView)
+        categoryView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
     }
     
     private func bindViewModel() {
@@ -33,5 +35,4 @@ class CategoryViewController: UIViewController {
             }
             .store(in: &cancellables)
     }
-    
 }

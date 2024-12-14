@@ -11,23 +11,21 @@ import SnapKit
 class CategoryItemView: UIView {
     
     private let categoryLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont(name: "NotoSans-Regular", size: 14)
-        label.textColor = .mainBlack
+        let label = CustomStyles.customLabel(
+            text: "",
+            color: .mainBlack,
+            font: UIFont(name: "NotoSans-Regular", size: 14)!,
+            lineHeight: 1.0,
+            kern: 0
+        )
         label.textAlignment = .center
         return label
     }()
     
-    private let topBorder: UIView = {
-        let view = UIView()
-        view.backgroundColor = .mainWhite
-        return view
-    }()
-    
+    private let topBorder = UIView.createBorderView(color: .mainWhite)
     private let bottomBorder: UIView = {
-        let view = UIView()
-        view.backgroundColor = .mainWhite
-        view.isHidden = true // 기본적으로 숨김
+        let view = UIView.createBorderView(color: .mainWhite)
+        view.isHidden = true
         return view
     }()
     
@@ -43,7 +41,7 @@ class CategoryItemView: UIView {
     
     func configure(with category: Category, isLast: Bool) {
         categoryLabel.text = category.name
-        bottomBorder.isHidden = !isLast // 마지막 요소일 때만 하단 스트로크 표시
+        bottomBorder.isHidden = !isLast
     }
     
     private func setupView() {
@@ -67,5 +65,13 @@ class CategoryItemView: UIView {
             make.bottom.leading.trailing.equalToSuperview()
             make.height.equalTo(1)
         }
+    }
+}
+
+private extension UIView {
+    static func createBorderView(color: UIColor) -> UIView {
+        let view = UIView()
+        view.backgroundColor = color
+        return view
     }
 }
