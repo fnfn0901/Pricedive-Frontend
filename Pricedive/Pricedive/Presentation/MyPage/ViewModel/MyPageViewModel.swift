@@ -8,7 +8,9 @@
 import Foundation
 
 class MyPageViewModel {
-    init() {
-        // 데이터 없이 초기화
+    @Published var events: [Event]
+    
+    init(events: [Event] = []) {
+        self.events = events
     }
 }
