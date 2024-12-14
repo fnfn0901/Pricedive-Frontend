@@ -104,6 +104,63 @@ class EventDetailView: UIView {
         return label
     }()
     
+    private let goToButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setCustomStyle(
+            title: "바로가기",
+            font: UIFont(name: "Pretendard-Medium", size: 14)!,
+            textColor: .white,
+            backgroundColor: UIColor.mainBlue,
+            cornerRadius: 10
+        )
+        return button
+    }()
+    
+    private let gptContentView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .white
+        view.layer.cornerRadius = 4
+        view.clipsToBounds = true
+        view.layer.borderWidth = 1
+        view.layer.borderColor = UIColor(hex: "#E0E0E0")?.cgColor
+        return view
+    }()
+    
+    private let gptLabel: UILabel = {
+        let label = CustomStyles.customLabel(
+            text: "생성 버튼을 눌러보세요. GPT가 자동으로 댓글을 작성해드립니다!",
+            color: UIColor(hex: "#AAAAAA")!,
+            font: UIFont(name: "Pretendard-Regular", size: 16)!,
+            lineHeight: 1.2,
+            kern: 0
+        )
+        return label
+    }()
+    
+    private let copyButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setCustomStyle(
+            title: "복사",
+            font: UIFont(name: "Pretendard-Medium", size: 14)!,
+            textColor: .white,
+            backgroundColor: UIColor(hex: "#4A90E2")!,
+            cornerRadius: 4
+        )
+        return button
+    }()
+    
+    private let makeButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setCustomStyle(
+            title: "생성",
+            font: UIFont(name: "Pretendard-Medium", size: 14)!,
+            textColor: .white,
+            backgroundColor: UIColor(hex: "#7ED321")!,
+            cornerRadius: 4
+        )
+        return button
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupViews()
@@ -124,12 +181,14 @@ class EventDetailView: UIView {
         addSubview(scrollView)
         scrollView.addSubview(contentView)
         
-        contentView.addSubviews([imageView, titleLabel, eventContentView])
+        contentView.addSubviews([imageView, titleLabel, eventContentView, goToButton, gptContentView])
         eventContentView.addSubviews([eventContentTitleLabel, eventDescriptionLabel])
         
         imageView.addSubviews([profileView, dDayView, heartButton])
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
+        
+        gptContentView.addSubviews([gptLabel, copyButton, makeButton])
         
         setupConstraints()
     }
@@ -164,6 +223,10 @@ class EventDetailView: UIView {
             make.edges.equalToSuperview()
             make.width.equalToSuperview()
         }
+
+        contentView.snp.makeConstraints { make in
+            make.height.equalToSuperview().priority(.low)
+        }
         
         imageView.snp.makeConstraints {
             $0.top.leading.trailing.equalToSuperview()
@@ -188,7 +251,6 @@ class EventDetailView: UIView {
         titleLabel.snp.makeConstraints {
             $0.top.equalTo(imageView.snp.bottom).offset(20)
             $0.leading.trailing.equalToSuperview().inset(20)
-            $0.height.equalTo(46)
         }
         
         eventContentView.snp.makeConstraints {
@@ -204,6 +266,39 @@ class EventDetailView: UIView {
             $0.top.equalTo(eventContentTitleLabel.snp.bottom).offset(10)
             $0.leading.trailing.equalToSuperview().inset(20)
             $0.bottom.equalToSuperview().offset(-20)
+        }
+        
+        goToButton.snp.makeConstraints {
+            $0.top.equalTo(eventContentView.snp.bottom).offset(20)
+            $0.leading.trailing.equalToSuperview().inset(20)
+            $0.height.equalTo(48)
+        }
+        
+        gptContentView.snp.makeConstraints {
+            $0.top.equalTo(goToButton.snp.bottom).offset(20)
+            $0.leading.trailing.equalToSuperview().inset(20)
+            $0.height.lessThanOrEqualTo(352)
+            $0.bottom.equalToSuperview().offset(-20)
+        }
+        
+        gptLabel.snp.makeConstraints{
+            $0.top.equalToSuperview().inset(8)
+            $0.leading.trailing.equalToSuperview().inset(12)
+        }
+        
+        copyButton.snp.makeConstraints {
+            $0.bottom.equalToSuperview().inset(5)
+            $0.trailing.equalTo(makeButton.snp.leading).offset(-4)
+            $0.height.equalTo(36)
+            $0.width.equalTo(80)
+        }
+        
+        makeButton.snp.makeConstraints{
+            $0.top.equalTo(gptLabel.snp.bottom).offset(50)
+            $0.bottom.equalToSuperview().inset(5)
+            $0.trailing.equalToSuperview().inset(5)
+            $0.height.equalTo(36)
+            $0.width.equalTo(80)
         }
     }
     
