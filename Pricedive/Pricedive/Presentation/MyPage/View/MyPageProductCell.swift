@@ -36,11 +36,6 @@ final class MyPageProductCell: UITableViewCell {
     }
 
     private func setupConstraints() {
-        contentView.snp.makeConstraints { make in
-            make.top.bottom.equalToSuperview().inset(8)
-            make.leading.trailing.equalToSuperview()
-        }
-
         productInfoLabel.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(16)
             make.leading.equalToSuperview().offset(16)
@@ -70,6 +65,12 @@ final class MyPageProductCell: UITableViewCell {
         contentView.layer.masksToBounds = true
         contentView.layer.borderWidth = 1
         contentView.layer.borderColor = UIColor.mainWhite.cgColor
+        
+        let selectedBackground = UIView()
+        selectedBackground.backgroundColor = UIColor(hex: "#E5E7EB") // 원하는 어두운 색상
+        selectedBackground.layer.cornerRadius = 12
+        selectedBackground.layer.masksToBounds = true
+        self.selectedBackgroundView = selectedBackground
 
         productInfoLabel.font = UIFont(name: "Pretendard-SemiBold", size: 14)
         productInfoLabel.textColor = UIColor.mainBlack
