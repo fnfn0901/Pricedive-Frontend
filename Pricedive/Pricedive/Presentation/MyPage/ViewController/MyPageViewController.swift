@@ -10,7 +10,12 @@ import UIKit
 class MyPageViewController: UIViewController {
     private let myPageView = MyPageView()
     
-    // 간단한 초기화 메서드 제공
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        setupActions()
+    }
+    
     init() {
         super.init(nibName: nil, bundle: nil)
     }
@@ -23,8 +28,21 @@ class MyPageViewController: UIViewController {
         self.view = myPageView
     }
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // 현재 데이터 바인딩은 없음
+    private func setupActions() {
+        let tapGesture1 = UITapGestureRecognizer(target: self, action: #selector(didTapSavedItems))
+        myPageView.savedItemsLabel.isUserInteractionEnabled = true
+        myPageView.savedItemsLabel.addGestureRecognizer(tapGesture1)
+        
+        let tapGesture2 = UITapGestureRecognizer(target: self, action: #selector(didTapInProgress))
+        myPageView.inProgressLabel.isUserInteractionEnabled = true
+        myPageView.inProgressLabel.addGestureRecognizer(tapGesture2)
+    }
+    
+    @objc private func didTapSavedItems() {
+        myPageView.animateBlueBox(to: 0)
+    }
+    
+    @objc private func didTapInProgress() {
+        myPageView.animateBlueBox(to: 1)
     }
 }
