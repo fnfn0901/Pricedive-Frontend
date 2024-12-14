@@ -13,33 +13,28 @@ extension UIView {
     // 유튜버 프로필 뷰 생성
     static func createYoutuberProfileView(
         imageUrl: String,
-        size: CGFloat = 36,
         cornerRadius: CGFloat = 20,
         borderColor: UIColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.15),
         borderWidth: CGFloat = 1
     ) -> UIView {
         let profileView = UIView()
-        profileView.translatesAutoresizingMaskIntoConstraints = false
-        profileView.widthAnchor.constraint(equalToConstant: size).isActive = true
-        profileView.heightAnchor.constraint(equalToConstant: size).isActive = true
-        
         profileView.layer.cornerRadius = cornerRadius
         profileView.layer.borderWidth = borderWidth
         profileView.layer.borderColor = borderColor.cgColor
         profileView.clipsToBounds = true
-        
+
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.kf.setImage(with: URL(string: imageUrl))
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         profileView.addSubview(imageView)
-        
+
         imageView.topAnchor.constraint(equalTo: profileView.topAnchor).isActive = true
         imageView.leadingAnchor.constraint(equalTo: profileView.leadingAnchor).isActive = true
         imageView.trailingAnchor.constraint(equalTo: profileView.trailingAnchor).isActive = true
         imageView.bottomAnchor.constraint(equalTo: profileView.bottomAnchor).isActive = true
-        
+
         return profileView
     }
     

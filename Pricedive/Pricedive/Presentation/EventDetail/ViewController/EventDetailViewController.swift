@@ -41,9 +41,11 @@ class EventDetailViewController: UIViewController {
         navigationController?.isNavigationBarHidden = true
         setupBindings()
         setupActions()
+        updateView() // 데이터 업데이트
     }
 
     private func setupBindings() {
+        // 데이터 바인딩 로직 추가 가능
     }
 
     private func setupActions() {
@@ -51,12 +53,21 @@ class EventDetailViewController: UIViewController {
         detailView.searchIconButton.addTarget(self, action: #selector(didTapSearch), for: .touchUpInside)
     }
 
+    private func updateView() {
+        detailView.configureCell(
+            title: viewModel.eventTitle,
+            imageUrl: viewModel.eventImageURL?.absoluteString ?? "",
+            profileImageUrl: viewModel.youtuberProfileImageURL?.absoluteString ?? "",
+            dDayText: viewModel.dDayText
+        )
+    }
+
     @objc private func didTapBack() {
         navigationController?.popViewController(animated: true)
     }
 
     @objc private func didTapSearch() {
-        let searchViewController = SearchViewController(viewModel: homeViewModel) // HomeViewModel을 사용
+        let searchViewController = SearchViewController(viewModel: homeViewModel)
         navigationController?.pushViewController(searchViewController, animated: true)
     }
 }

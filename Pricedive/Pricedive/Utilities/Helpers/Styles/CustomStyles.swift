@@ -25,13 +25,27 @@ struct CustomStyles {
     }
 
     static func productTitle() -> UILabel {
-        return customLabel(
-            text: "",
-            color: UIColor.mainBlack,
-            font: UIFont(name: "Pretendard-SemiBold", size: 14)!,
-            lineHeight: 1.32,
-            kern: -0.41
+        let label = TopAlignedLabel()
+
+        label.textColor = UIColor.mainBlack
+        label.font = UIFont(name: "Pretendard-SemiBold", size: 14)!
+        label.numberOfLines = 2
+        label.textAlignment = .left
+
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineSpacing = 1.32
+        paragraphStyle.alignment = .left
+
+        let attributedString = NSAttributedString(
+            string: "",
+            attributes: [
+                .paragraphStyle: paragraphStyle,
+                .kern: -0.41
+            ]
         )
+        label.attributedText = attributedString
+
+        return label
     }
 
     static func categoryUnselected() -> UILabel {

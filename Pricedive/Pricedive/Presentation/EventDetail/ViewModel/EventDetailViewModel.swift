@@ -30,7 +30,7 @@ class EventDetailViewModel {
 
     var dDayText: String {
         let dDay = event.dDay
-        return dDay > 0 ? "D-\(dDay)" : "Event Ended"
+        return dDay > 0 ? "\(dDay)" : "Event Ended"
     }
 
     var isLiked: Bool {

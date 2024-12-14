@@ -61,6 +61,7 @@ class EventCell: UICollectionViewCell {
         titleLabel.snp.makeConstraints {
             $0.top.equalTo(imageView.snp.bottom).offset(5)
             $0.leading.trailing.bottom.equalToSuperview()
+            $0.height.equalTo(44)
         }
     }
 

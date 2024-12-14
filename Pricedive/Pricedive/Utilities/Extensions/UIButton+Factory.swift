@@ -15,9 +15,6 @@ extension UIButton {
         button.tintColor = .mainBlack
         button.contentHorizontalAlignment = .center
         button.contentVerticalAlignment = .center
-        button.snp.makeConstraints { make in
-            make.height.equalTo(24)
-        }
         if let target = target, let action = action {
             button.addTarget(target, action: action, for: .touchUpInside)
         }
