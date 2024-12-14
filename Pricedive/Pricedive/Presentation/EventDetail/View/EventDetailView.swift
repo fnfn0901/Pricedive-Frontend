@@ -104,7 +104,7 @@ class EventDetailView: UIView {
         return label
     }()
     
-    private let goToButton: UIButton = {
+    let goToButton: UIButton = {
         let button = UIButton(type: .system)
         button.setCustomStyle(
             title: "바로가기",

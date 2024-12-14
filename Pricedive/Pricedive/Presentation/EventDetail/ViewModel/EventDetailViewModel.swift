@@ -16,6 +16,10 @@ class EventDetailViewModel {
         self.homeViewModel = homeViewModel
     }
 
+    var eventLink: String? {
+        return event?.eventLink
+    }
+    
     var eventTitle: String {
         return event?.eventTitle ?? ""
     }

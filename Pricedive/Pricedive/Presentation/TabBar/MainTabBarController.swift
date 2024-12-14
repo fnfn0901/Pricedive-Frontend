@@ -68,6 +68,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
         return (1...20).map { index in
             Event(
                 eventId: index,
+                eventLink: "https://www.youtube.com/watch?v=Kg7_J70MANo",
                 eventImage: "https://m-goods.sivillage.com/goods/getGoodDescCont.siv?goods_no=2303705383/proxy/src/http://www.bioderma.co.kr/img/detail/Ato_UCR_img3.jpg/dims/optimize",
                 youtuberProfileImage: "https://yt3.googleusercontent.com/Oh7Fb_JBhkVUB1y0671PeYNSYJbxouMd6DEQzcN9JHaVDgp5b4DlKfRt0ehW53Ol7UxMD0xkJts=s900-c-k-c0x00ffffff-no-rj",
                 eventEndDate: DateComponents(calendar: Calendar.current, year: 2024, month: 12, day: 31).date!,

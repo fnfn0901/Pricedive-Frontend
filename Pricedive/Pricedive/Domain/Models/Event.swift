@@ -9,6 +9,7 @@ import Foundation
 
 struct Event: Codable {
     let eventId: Int
+    let eventLink: String
     let eventImage: String
     let youtuberProfileImage: String
     let eventEndDate: Date

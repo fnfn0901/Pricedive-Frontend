@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SafariServices
 
 class EventDetailViewController: UIViewController {
     private let viewModel: EventDetailViewModel
@@ -49,6 +50,7 @@ class EventDetailViewController: UIViewController {
     private func setupActions() {
         detailView.backIconButton.addTarget(self, action: #selector(didTapBack), for: .touchUpInside)
         detailView.searchIconButton.addTarget(self, action: #selector(didTapSearch), for: .touchUpInside)
+        detailView.goToButton.addTarget(self, action: #selector(didTapGoToButton), for: .touchUpInside)
     }
 
     private func updateView() {
@@ -68,5 +70,17 @@ class EventDetailViewController: UIViewController {
     @objc private func didTapSearch() {
         let searchViewController = SearchViewController(viewModel: homeViewModel)
         navigationController?.pushViewController(searchViewController, animated: true)
+    }
+
+    @objc private func didTapGoToButton() {
+        guard let eventLink = viewModel.eventLink, let url = URL(string: eventLink) else {
+            let alert = UIAlertController(title: "Error", message: "Invalid link.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default))
+            present(alert, animated: true)
+            return
+        }
+        
+        let safariVC = SFSafariViewController(url: url)
+        present(safariVC, animated: true)
     }
 }
