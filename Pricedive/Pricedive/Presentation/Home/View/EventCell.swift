@@ -29,6 +29,7 @@ class EventCell: UICollectionViewCell {
         let button = UIButton(type: .system)
         button.setImage(UIImage(systemName: "heart"), for: .normal)
         button.tintColor = .mainBlack
+        button.imageView?.contentMode = .scaleAspectFit
         button.addTarget(self, action: #selector(handleHeartTapped), for: .touchUpInside)
         return button
     }()
