@@ -86,7 +86,8 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let event = viewModel.events.value[indexPath.row]
-        let detailViewController = EventDetailViewController(event: event)
+        let detailViewModel = EventDetailViewModel(event: event)
+        let detailViewController = EventDetailViewController(viewModel: detailViewModel, homeViewModel: viewModel)
         navigationController?.pushViewController(detailViewController, animated: true)
     }
 }

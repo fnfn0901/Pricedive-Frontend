@@ -8,10 +8,13 @@
 import UIKit
 
 class EventDetailViewController: UIViewController {
-    private let event: Event
+    private let viewModel: EventDetailViewModel
+    private let detailView = EventDetailView()
+    private let homeViewModel: HomeViewModel
 
-    init(event: Event) {
-        self.event = event
+    init(viewModel: EventDetailViewModel, homeViewModel: HomeViewModel) {
+        self.viewModel = viewModel
+        self.homeViewModel = homeViewModel
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -19,8 +22,41 @@ class EventDetailViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
+    override func loadView() {
+        view = detailView
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.isNavigationBarHidden = true
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.isNavigationBarHidden = false
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+        navigationController?.isNavigationBarHidden = true
+        setupBindings()
+        setupActions()
+    }
+
+    private func setupBindings() {
+    }
+
+    private func setupActions() {
+        detailView.backIconButton.addTarget(self, action: #selector(didTapBack), for: .touchUpInside)
+        detailView.searchIconButton.addTarget(self, action: #selector(didTapSearch), for: .touchUpInside)
+    }
+
+    @objc private func didTapBack() {
+        navigationController?.popViewController(animated: true)
+    }
+
+    @objc private func didTapSearch() {
+        let searchViewController = SearchViewController(viewModel: homeViewModel) // HomeViewModel을 사용
+        navigationController?.pushViewController(searchViewController, animated: true)
     }
 }
