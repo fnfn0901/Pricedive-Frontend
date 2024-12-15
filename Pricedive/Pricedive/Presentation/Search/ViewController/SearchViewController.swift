@@ -8,7 +8,7 @@
 import UIKit
 import Combine
 
-class SearchViewController: UIViewController {
+class SearchViewController: UIViewController, UITextFieldDelegate {
 
     // MARK: - Properties
     private let searchView = SearchView()
@@ -47,6 +47,7 @@ class SearchViewController: UIViewController {
         searchView.viewModel = categoryViewModel
         configureCollectionView()
         setupBindings()
+        setupSearchBar()
     }
 
     // MARK: - Setup Methods
@@ -56,7 +57,7 @@ class SearchViewController: UIViewController {
     }
 
     private func setupBindings() {
-        // Search query binding
+        // Search query binding using Combine
         NotificationCenter.default.publisher(for: UITextField.textDidChangeNotification, object: searchView.searchBarView.searchTextField)
             .compactMap { ($0.object as? UITextField)?.text }
             .removeDuplicates()
@@ -70,6 +71,29 @@ class SearchViewController: UIViewController {
                 self?.searchView.reloadCollectionView()
             }
             .store(in: &cancellables)
+    }
+
+    private func setupSearchBar() {
+        searchView.searchBarView.searchTextField.delegate = self
+    }
+
+    // MARK: - UITextFieldDelegate
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        // Enter 키를 눌렀을 때 키보드 숨기기
+        textField.resignFirstResponder()
+        return true
+    }
+
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        // 텍스트 입력이 완료되었을 때 추가 로직 처리 가능
+        guard let text = textField.text else { return }
+        print("User finished typing: \(text)")
+    }
+
+    func textFieldShouldClear(_ textField: UITextField) -> Bool {
+        // Clear 버튼을 눌렀을 때 뷰 모델의 검색 쿼리 초기화
+        viewModel.searchQuery = ""
+        return true
     }
 }
 
