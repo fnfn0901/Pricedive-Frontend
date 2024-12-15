@@ -13,6 +13,7 @@ class SearchViewController: UIViewController {
     // MARK: - Properties
     private let searchView = SearchView()
     private let viewModel: HomeViewModel
+    private var categoryViewModel = CategoryViewModel()
     private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Initializers
@@ -42,6 +43,8 @@ class SearchViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        searchView.viewModel = categoryViewModel
         configureCollectionView()
         setupBindings()
     }

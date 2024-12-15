@@ -40,7 +40,7 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        homeView.viewModel = categoryViewModel // 연결
+        homeView.viewModel = categoryViewModel
         homeView.collectionView.dataSource = self
         homeView.collectionView.delegate = self
         homeView.collectionView.register(EventCell.self, forCellWithReuseIdentifier: "EventProductCell")
