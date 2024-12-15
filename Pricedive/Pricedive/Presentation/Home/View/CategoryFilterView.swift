@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import Combine
 
 class CategoryFilterView: UIView {
 
@@ -29,20 +30,19 @@ class CategoryFilterView: UIView {
         return stackView
     }()
 
-    private var categories: [String] = ["의류", "가방", "전자기기", "뷰티"]
+    private var cancellables = Set<AnyCancellable>()
+    private var viewModel: CategoryViewModel?
 
     // MARK: - Initializers
 
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupView()
-        setupCategories()
     }
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         setupView()
-        setupCategories()
     }
 
     // MARK: - Setup Methods
@@ -60,15 +60,11 @@ class CategoryFilterView: UIView {
         }
     }
 
-    private func setupCategories() {
-        updateCategoryButtons(with: categories)
-    }
-
-    private func updateCategoryButtons(with categories: [String]) {
+    private func updateCategoryButtons(with categories: [Category]) {
         stackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
         
         for category in categories {
-            let button = UIButton.createUnselectedCategoryButton(title: category)
+            let button = UIButton.createUnselectedCategoryButton(title: category.name)
             button.addTarget(self, action: #selector(categoryButtonTapped(_:)), for: .touchUpInside)
             stackView.addArrangedSubview(button)
         }
@@ -115,8 +111,13 @@ class CategoryFilterView: UIView {
 
     // MARK: - Public Methods
 
-    func updateCategories(_ newCategories: [String]) {
-        categories = newCategories
-        updateCategoryButtons(with: newCategories)
+    func bind(to viewModel: CategoryViewModel) {
+        self.viewModel = viewModel
+        viewModel.$categories
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] categories in
+                self?.updateCategoryButtons(with: categories)
+            }
+            .store(in: &cancellables)
     }
 }

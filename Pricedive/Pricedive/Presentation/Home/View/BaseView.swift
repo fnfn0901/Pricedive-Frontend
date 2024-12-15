@@ -15,6 +15,14 @@ class BaseView: UIView {
     let categoryFilterView = CategoryFilterView()
     let collectionView: UICollectionView
 
+    var viewModel: CategoryViewModel? {
+        didSet {
+            if let viewModel = viewModel {
+                categoryFilterView.bind(to: viewModel)
+            }
+        }
+    }
+
     override init(frame: CGRect) {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
@@ -81,7 +89,7 @@ class BaseView: UIView {
             layout.sectionInset = UIEdgeInsets(top: 0, left: sectionInset, bottom: 0, right: sectionInset)
         }
     }
-
+    
     func updateCollectionViewHeight() {
         collectionView.layoutIfNeeded()
         let contentHeight = collectionView.contentSize.height + 20

@@ -11,6 +11,7 @@ import Combine
 class HomeViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
     private let homeView = HomeView()
     private let viewModel: HomeViewModel
+    private var categoryViewModel = CategoryViewModel()
     private var cancellables = Set<AnyCancellable>()
 
     init(viewModel: HomeViewModel) {
@@ -28,21 +29,23 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        navigationController?.isNavigationBarHidden = true
+        navigationController?.setNavigationBarHidden(true, animated: animated)
     }
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        navigationController?.isNavigationBarHidden = false
+        navigationController?.setNavigationBarHidden(false, animated: animated)
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        homeView.viewModel = categoryViewModel // 연결
         homeView.collectionView.dataSource = self
         homeView.collectionView.delegate = self
         homeView.collectionView.register(EventCell.self, forCellWithReuseIdentifier: "EventProductCell")
-        setupBindings()
 
+        // 캐러셀 이미지 설정
         homeView.carouselView.imageUrls = [
             "https://cdn.011st.com/11dims/resize/1240x400/quality/100/11src/browsing/space/banner/2024/12/10/2412101132499001264_10.jpg",
             "https://cdn.011st.com/11dims/resize/1240x400/quality/100/11src/browsing/space/banner/2024/12/5/2412051442589701186_720.jpg",
@@ -51,6 +54,7 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
             "https://cdn.011st.com/11dims/resize/1240x400/quality/100/11src/browsing/space/banner/2024/12/10/2412101141100201264_8.jpg"
         ]
 
+        setupBindings()
         homeView.reloadCollectionView()
     }
 
@@ -76,12 +80,5 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
         let event = viewModel.events[indexPath.row]
         cell.configureCell(event: event, viewModel: viewModel)
         return cell
-    }
-
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let event = viewModel.events[indexPath.row]
-        let detailViewModel = EventDetailViewModel(eventId: event.eventId, homeViewModel: viewModel)
-        let detailViewController = EventDetailViewController(viewModel: detailViewModel, homeViewModel: viewModel)
-        navigationController?.pushViewController(detailViewController, animated: true)
     }
 }
