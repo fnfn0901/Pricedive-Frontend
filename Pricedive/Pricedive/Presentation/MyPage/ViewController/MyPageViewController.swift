@@ -2,16 +2,17 @@
 //  MyPageViewController.swift
 //  Pricedive
 //
-//  Created by 신호연 on 11/25/24.
+//  Created by 신호연 on 12/14/24.
 //
 
 import UIKit
+import SnapKit
 
 final class MyPageViewController: UIViewController {
     private let myPageView = MyPageView()
     private let viewModel: MyPageViewModel
 
-    // Initializer
+    // MARK: - Initializer
     init(viewModel: MyPageViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -21,6 +22,7 @@ final class MyPageViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
+    // MARK: - Lifecycle
     override func loadView() {
         self.view = myPageView
     }
@@ -29,6 +31,7 @@ final class MyPageViewController: UIViewController {
         super.viewDidLoad()
         setupTableView()
         setupActions()
+        setupSearchBarActions()
     }
 
     // MARK: - Setup Methods
@@ -51,6 +54,24 @@ final class MyPageViewController: UIViewController {
         myPageView.inProgressLabel.addGestureRecognizer(inProgressTapGesture)
     }
 
+    private func setupSearchBarActions() {
+        myPageView.topFixedFrameView.searchIconButton.addTarget(self, action: #selector(toggleSearchBar), for: .touchUpInside)
+        myPageView.searchBarView.xMarkButton.addTarget(self, action: #selector(resetToTopFixedFrame), for: .touchUpInside)
+    }
+
+    // MARK: - Search Bar Actions
+    @objc private func toggleSearchBar() {
+        myPageView.toggleVisibility(viewToShow: myPageView.searchBarView, viewToHide: myPageView.topFixedFrameView)
+        myPageView.searchBarView.searchTextField.becomeFirstResponder()
+    }
+
+    @objc private func resetToTopFixedFrame() {
+        myPageView.searchBarView.searchTextField.text = ""
+        myPageView.searchBarView.searchTextField.resignFirstResponder()
+        myPageView.toggleVisibility(viewToShow: myPageView.topFixedFrameView, viewToHide: myPageView.searchBarView)
+    }
+
+    // MARK: - Actions
     @objc private func didTapSavedItems() {
         myPageView.animateBlueBox(to: 0)
         // Implement saved items filtering logic if needed

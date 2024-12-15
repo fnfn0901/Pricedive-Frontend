@@ -2,7 +2,7 @@
 //  MyPageView.swift
 //  Pricedive
 //
-//  Created by 신호연 on 12/14/24.
+//  Created by 신호연 on 11/25/24.
 //
 
 import UIKit
@@ -11,6 +11,8 @@ import SnapKit
 final class MyPageView: UIView {
     // MARK: - UI Elements
     let topFixedFrameView = TopFixedFrameView()
+    let searchBarView = SearchBarView()
+    
     let savedItemsLabel = UILabel.createCustomLabel(
         text: "찜한 상품",
         color: .white,
@@ -48,15 +50,18 @@ final class MyPageView: UIView {
     private func setupUI() {
         backgroundColor = .white
         addSubview(topFixedFrameView)
+        addSubview(searchBarView)
         addSubview(baseView)
         baseView.addSubview(blueBox)
         baseView.addSubview(savedItemsLabel)
         baseView.addSubview(inProgressLabel)
         addSubview(tableView)
 
+        searchBarView.alpha = 0
+        
         savedItemsLabel.textAlignment = .center
         inProgressLabel.textAlignment = .center
-        
+
         setupConstraints()
     }
 
@@ -65,6 +70,12 @@ final class MyPageView: UIView {
             make.top.equalTo(safeAreaLayoutGuide).offset(8)
             make.leading.trailing.equalToSuperview().inset(20)
             make.height.equalTo(52)
+        }
+
+        searchBarView.snp.makeConstraints { make in
+            make.top.equalTo(safeAreaLayoutGuide).offset(8)
+            make.leading.trailing.equalToSuperview().inset(20)
+            make.height.equalTo(48)
         }
 
         baseView.snp.makeConstraints { make in
@@ -100,9 +111,15 @@ final class MyPageView: UIView {
     }
 
     // MARK: - Helpers
+    func toggleVisibility(viewToShow: UIView, viewToHide: UIView) {
+        viewToHide.alpha = 0
+        viewToShow.alpha = 1
+        layoutIfNeeded()
+    }
+
     func animateBlueBox(to index: Int) {
         blueBoxLeadingConstraint?.update(offset: index == 0 ? 4 : 161)
-        
+
         savedItemsLabel.textColor = index == 0 ? .white : UIColor(hex: "#6B7280")!
         inProgressLabel.textColor = index == 1 ? .white : UIColor(hex: "#6B7280")!
 
