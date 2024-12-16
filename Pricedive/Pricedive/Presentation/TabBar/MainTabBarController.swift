@@ -51,9 +51,9 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
         let sharedViewModel = HomeViewModel(events: createSampleEvents())
         let myPageViewModel = MyPageViewModel(events: createSampleEvents())
         
-        let categoryController = createViewController(CategoryViewController(), title: "Category", image: "line.3.horizontal", tag: 0)
+        let categoryController = createViewController(SearchViewController(viewModel: sharedViewModel), title: "Category", image: "line.3.horizontal", tag: 0)
         let homeViewController = createViewController(UINavigationController(rootViewController: HomeViewController(viewModel: sharedViewModel)), title: "Home", image: "house", tag: 1)
-        let searchViewController = createViewController(SearchViewController(viewModel: sharedViewModel), title: "Search", image: "magnifyingglass", tag: 2)
+        let searchViewController = createViewController(CategoryViewController(), title: "Search", image: "magnifyingglass", tag: 2)
         let myPageViewController = createViewController(MyPageViewController(viewModel: myPageViewModel), title: "MyPage", image: "person.crop.circle", tag: 3)
         
         viewControllers = [categoryController, homeViewController, searchViewController, myPageViewController]
