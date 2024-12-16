@@ -104,18 +104,6 @@ class EventDetailView: UIView {
         return label
     }()
     
-    let goToButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setCustomStyle(
-            title: "바로가기",
-            font: UIFont(name: "Pretendard-Medium", size: 14)!,
-            textColor: .white,
-            backgroundColor: UIColor.mainBlue,
-            cornerRadius: 10
-        )
-        return button
-    }()
-    
     private let gptContentView: UIView = {
         let view = UIView()
         view.backgroundColor = .white
@@ -161,6 +149,23 @@ class EventDetailView: UIView {
         return button
     }()
     
+    let bottomView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .white
+        return view
+    }()
+    let goToButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setCustomStyle(
+            title: "바로가기",
+            font: UIFont(name: "Pretendard-Medium", size: 14)!,
+            textColor: .white,
+            backgroundColor: UIColor.mainBlue,
+            cornerRadius: 10
+        )
+        return button
+    }()
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupViews()
@@ -181,7 +186,7 @@ class EventDetailView: UIView {
         addSubview(scrollView)
         scrollView.addSubview(contentView)
         
-        contentView.addSubviews([imageView, titleLabel, eventContentView, goToButton, gptContentView])
+        contentView.addSubviews([imageView, titleLabel, eventContentView, gptContentView])
         eventContentView.addSubviews([eventContentTitleLabel, eventDescriptionLabel])
         
         imageView.addSubviews([profileView, dDayView, heartButton])
@@ -189,6 +194,9 @@ class EventDetailView: UIView {
         imageView.clipsToBounds = true
         
         gptContentView.addSubviews([gptLabel, copyButton, makeButton])
+        
+        addSubview(bottomView)
+        bottomView.addSubviews([goToButton])
         
         setupConstraints()
     }
@@ -216,7 +224,8 @@ class EventDetailView: UIView {
         
         scrollView.snp.makeConstraints { make in
             make.top.equalTo(navigationBar.snp.bottom).offset(2)
-            make.leading.trailing.bottom.equalToSuperview()
+            make.leading.trailing.equalToSuperview()
+            make.bottom.equalTo(goToButton.snp.top)
         }
         
         contentView.snp.makeConstraints { make in
@@ -268,14 +277,8 @@ class EventDetailView: UIView {
             $0.bottom.equalToSuperview().offset(-20)
         }
         
-        goToButton.snp.makeConstraints {
-            $0.top.equalTo(eventContentView.snp.bottom).offset(20)
-            $0.leading.trailing.equalToSuperview().inset(20)
-            $0.height.equalTo(48)
-        }
-        
         gptContentView.snp.makeConstraints {
-            $0.top.equalTo(goToButton.snp.bottom).offset(20)
+            $0.top.equalTo(eventContentView.snp.bottom).offset(20)
             $0.leading.trailing.equalToSuperview().inset(20)
             $0.height.lessThanOrEqualTo(352)
             $0.bottom.equalToSuperview().offset(-20)
@@ -299,6 +302,17 @@ class EventDetailView: UIView {
             $0.trailing.equalToSuperview().inset(5)
             $0.height.equalTo(36)
             $0.width.equalTo(80)
+        }
+        
+        bottomView.snp.makeConstraints{
+            $0.bottom.leading.trailing.equalToSuperview()
+            $0.height.equalTo(75)
+        }
+        
+        goToButton.snp.makeConstraints {
+            $0.top.equalToSuperview().offset(5)
+            $0.leading.trailing.equalToSuperview().inset(20)
+            $0.height.equalTo(48)
         }
     }
     
