@@ -1,6 +1,6 @@
 ---
 name: Default Issue Template
-about: 워크멍 FE 기본 이슈 템플릿
+about: 기본 이슈 템플릿
 title: "[분류] 작업내용"
 labels: ''
 assignees: ''
