@@ -8,14 +8,8 @@
 import UIKit
 import SnapKit
 
-protocol CategoryViewDelegate: AnyObject {
-    func didTapXButton()
-}
-
 class CategoryView: UIView {
-    
-    weak var delegate: CategoryViewDelegate?
-    
+
     private let titleLabel: UILabel = {
         let label = CustomStyles.navigationText()
         label.text = "카테고리"
