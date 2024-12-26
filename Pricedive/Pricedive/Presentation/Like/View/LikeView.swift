@@ -49,13 +49,8 @@ final class LikeView: UIView {
     // MARK: - Setup Methods
     private func setupUI() {
         backgroundColor = .white
-        addSubview(topFixedFrameView)
-        addSubview(searchBarView)
-        addSubview(baseView)
-        baseView.addSubview(blueBox)
-        baseView.addSubview(savedItemsLabel)
-        baseView.addSubview(inProgressLabel)
-        addSubview(tableView)
+        addSubviews(topFixedFrameView, searchBarView, baseView, tableView)
+        baseView.addSubviews(blueBox, savedItemsLabel, inProgressLabel)
 
         searchBarView.alpha = 0
         

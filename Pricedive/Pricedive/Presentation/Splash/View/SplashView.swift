@@ -87,9 +87,7 @@ class SplashView: UIView {
     }
     
     private func setupSubviews() {
-        addSubview(splashImageView)
-        addSubview(logoLabel)
-        addSubview(descriptionLabel)
+        addSubviews(splashImageView, logoLabel, descriptionLabel)
     }
     
     private func setupConstraints() {

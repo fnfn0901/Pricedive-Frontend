@@ -66,9 +66,7 @@ class SearchBarView: UIView, UITextFieldDelegate {
 
     private func setupSearchBar() {
         addSubview(searchContainerView)
-        searchContainerView.addSubview(magnifyingGlassButton)
-        searchContainerView.addSubview(searchTextField)
-        searchContainerView.addSubview(xMarkButton)
+        searchContainerView.addSubviews(magnifyingGlassButton, searchTextField, xMarkButton)
 
         searchContainerView.snp.makeConstraints { make in
             make.edges.equalToSuperview()

@@ -177,26 +177,22 @@ class EventDetailView: UIView {
     
     private func setupViews() {
         backgroundColor = .white
-        addSubview(navigationBar)
+        addSubviews(navigationBar, scrollView, bottomView)
         
-        navigationBar.addSubview(logoLabel)
-        navigationBar.addSubview(backIconButton)
-        navigationBar.addSubview(searchIconButton)
+        navigationBar.addSubviews(logoLabel, backIconButton, searchIconButton)
         
-        addSubview(scrollView)
         scrollView.addSubview(contentView)
         
-        contentView.addSubviews([imageView, titleLabel, eventContentView, gptContentView])
-        eventContentView.addSubviews([eventContentTitleLabel, eventDescriptionLabel])
+        contentView.addSubviews(imageView, titleLabel, eventContentView, gptContentView)
+        eventContentView.addSubviews(eventContentTitleLabel, eventDescriptionLabel)
         
-        imageView.addSubviews([profileView, dDayView, heartButton])
+        imageView.addSubviews(profileView, dDayView, heartButton)
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         
-        gptContentView.addSubviews([gptLabel, copyButton, makeButton])
+        gptContentView.addSubviews(gptLabel, copyButton, makeButton)
         
-        addSubview(bottomView)
-        bottomView.addSubviews([goToButton])
+        bottomView.addSubviews(goToButton)
         
         setupConstraints()
     }

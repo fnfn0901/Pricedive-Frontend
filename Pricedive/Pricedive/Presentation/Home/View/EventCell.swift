@@ -50,8 +50,8 @@ class EventCell: UICollectionViewCell {
 
     // MARK: - Setup Methods
     private func setupViews() {
-        contentView.addSubviews([imageView, titleLabel])
-        imageView.addSubviews([profileView, dDayView, heartButton])
+        contentView.addSubviews(imageView, titleLabel)
+        imageView.addSubviews(profileView, dDayView, heartButton)
     }
 
     private func setupConstraints() {

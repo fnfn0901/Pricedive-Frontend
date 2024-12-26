@@ -83,7 +83,7 @@ extension UIView {
         subviews.forEach { $0.removeFromSuperview() }
     }
     
-    func addSubviews(_ views: [UIView]) {
+    func addSubviews(_ views: UIView...) {
         for view in views {
             addSubview(view)
         }

@@ -44,8 +44,7 @@ class BaseView: UIView {
         backgroundColor = .white
         addSubview(scrollView)
         scrollView.addSubview(contentView)
-        contentView.addSubview(categoryFilterView)
-        contentView.addSubview(collectionView)
+        contentView.addSubviews(categoryFilterView, collectionView)
     }
 
     private func setupConstraints() {

@@ -50,9 +50,8 @@ class CategoryView: UIView {
     }
     
     private func setupViews() {
-        addSubview(topView)
+        addSubviews(topView, bottomView)
         topView.addSubview(titleLabel)
-        addSubview(bottomView)
     }
     
     private func setupConstraints() {

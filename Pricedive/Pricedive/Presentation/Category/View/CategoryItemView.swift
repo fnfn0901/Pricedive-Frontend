@@ -45,9 +45,7 @@ class CategoryItemView: UIView {
     }
     
     private func setupView() {
-        addSubview(categoryLabel)
-        addSubview(topBorder)
-        addSubview(bottomBorder)
+        addSubviews(categoryLabel, topBorder, bottomBorder)
         backgroundColor = .white
     }
     
