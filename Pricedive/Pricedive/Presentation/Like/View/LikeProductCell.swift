@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import Kingfisher
 
 final class LikeProductCell: UITableViewCell {
     // MARK: - UI Components
@@ -41,31 +42,31 @@ final class LikeProductCell: UITableViewCell {
     
     private func setupConstraints() {
         productImage.snp.makeConstraints { make in
-            make.centerY.equalToSuperview()
+            make.top.equalToSuperview().offset(8)
+            make.bottom.equalToSuperview().offset(-8)
             make.leading.equalToSuperview().offset(12)
             make.height.width.equalTo(80)
         }
         
         eventTitleLabel.snp.makeConstraints { make in
+            make.top.equalTo(productImage.snp.top)
             make.leading.equalTo(productImage.snp.trailing).offset(12)
-            make.top.equalToSuperview().offset(16)
         }
 
         dDayLabel.snp.makeConstraints { make in
             make.leading.equalTo(eventTitleLabel.snp.leading)
-            make.top.equalTo(eventTitleLabel.snp.bottom).offset(6)
+            make.bottom.equalTo(clockIcon.snp.top).offset(-4)
         }
         
         clockIcon.snp.makeConstraints { make in
+            make.bottom.equalTo(productImage.snp.bottom)
             make.leading.equalTo(dDayLabel.snp.leading)
-            make.top.equalTo(dDayLabel.snp.bottom).offset(6)
             make.size.equalTo(16)
         }
         
         endDateLabel.snp.makeConstraints { make in
             make.leading.equalTo(clockIcon.snp.trailing).offset(4)
             make.centerY.equalTo(clockIcon.snp.centerY)
-            make.bottom.equalToSuperview().offset(-16)
         }
         
         heartButton.snp.makeConstraints { make in
@@ -91,7 +92,7 @@ final class LikeProductCell: UITableViewCell {
         dDayLabel.font = UIFont(name: "Pretendard-SemiBold", size: 14)
         dDayLabel.textColor = UIColor.mainRed
         
-        eventTitleLabel.font = UIFont(name: "Pretendard-SemiBold", size: 14)
+        eventTitleLabel.font = UIFont(name: "Pretendard-SemiBold", size: 16)
         eventTitleLabel.textColor = UIColor.mainBlack
         
         heartButton.setImage(UIImage(systemName: "heart"), for: .normal)
@@ -114,6 +115,19 @@ final class LikeProductCell: UITableViewCell {
             UIImage(systemName: event.isLiked ? "heart.fill" : "heart"),
             for: .normal
         )
+        
+        // 이미지 로드
+        if let imageURL = URL(string: event.eventImage) {
+            DispatchQueue.global().async {
+                if let data = try? Data(contentsOf: imageURL), let image = UIImage(data: data) {
+                    DispatchQueue.main.async {
+                        self.productImage.image = image
+                    }
+                }
+            }
+        } else {
+            productImage.image = nil // 기본값 설정 (옵션)
+        }
     }
     
     private func formattedDate(_ date: Date) -> String {

@@ -6,14 +6,16 @@
 //
 
 import UIKit
+import Combine
 import SnapKit
 
 final class LikeViewController: UIViewController {
     private let likeView = LikeView()
-    private let viewModel: LikeViewModel
+    private let viewModel: HomeViewModel
+    private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Initializer
-    init(viewModel: LikeViewModel) {
+    init(viewModel: HomeViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
@@ -30,8 +32,17 @@ final class LikeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTableView()
-        setupActions()
-        setupSearchBarActions()
+        bindViewModel()
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        likeView.tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 0, right: 0)
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        likeView.tableView.setContentOffset(CGPoint(x: 0, y: -12), animated: false)
     }
 
     // MARK: - Setup Methods
@@ -40,46 +51,16 @@ final class LikeViewController: UIViewController {
         likeView.tableView.dataSource = self
         likeView.tableView.separatorStyle = .none
         likeView.tableView.showsVerticalScrollIndicator = false
-        likeView.tableView.contentInset = UIEdgeInsets(top: 14, left: 0, bottom: 0, right: 0)
+        likeView.tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 0, right: 0)
     }
 
-    private func setupActions() {
-        likeView.savedItemsLabel.isUserInteractionEnabled = true
-        likeView.inProgressLabel.isUserInteractionEnabled = true
-
-        let savedTapGesture = UITapGestureRecognizer(target: self, action: #selector(didTapSavedItems))
-        likeView.savedItemsLabel.addGestureRecognizer(savedTapGesture)
-
-        let inProgressTapGesture = UITapGestureRecognizer(target: self, action: #selector(didTapInProgress))
-        likeView.inProgressLabel.addGestureRecognizer(inProgressTapGesture)
-    }
-
-    private func setupSearchBarActions() {
-        likeView.topFixedFrameView.searchIconButton.addTarget(self, action: #selector(toggleSearchBar), for: .touchUpInside)
-        likeView.searchBarView.xMarkButton.addTarget(self, action: #selector(resetToTopFixedFrame), for: .touchUpInside)
-    }
-
-    // MARK: - Search Bar Actions
-    @objc private func toggleSearchBar() {
-        likeView.toggleVisibility(viewToShow: likeView.searchBarView, viewToHide: likeView.topFixedFrameView)
-        likeView.searchBarView.searchTextField.becomeFirstResponder()
-    }
-
-    @objc private func resetToTopFixedFrame() {
-        likeView.searchBarView.searchTextField.text = ""
-        likeView.searchBarView.searchTextField.resignFirstResponder()
-        likeView.toggleVisibility(viewToShow: likeView.topFixedFrameView, viewToHide: likeView.searchBarView)
-    }
-
-    // MARK: - Actions
-    @objc private func didTapSavedItems() {
-        likeView.animateBlueBox(to: 0)
-        // Implement saved items filtering logic if needed
-    }
-
-    @objc private func didTapInProgress() {
-        likeView.animateBlueBox(to: 1)
-        // Implement in-progress filtering logic if needed
+    private func bindViewModel() {
+        viewModel.$events
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in
+                self?.likeView.tableView.reloadData()
+            }
+            .store(in: &cancellables)
     }
 }
 
@@ -105,7 +86,6 @@ extension LikeViewController: UITableViewDataSource {
 
 // MARK: - UITableViewDelegate
 extension LikeViewController: UITableViewDelegate {
-
     func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         return 16
     }
@@ -118,6 +98,5 @@ extension LikeViewController: UITableViewDelegate {
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        // Handle row selection if needed
     }
 }
