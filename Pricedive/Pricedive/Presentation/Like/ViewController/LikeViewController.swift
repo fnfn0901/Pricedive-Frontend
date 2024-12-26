@@ -32,6 +32,7 @@ final class LikeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTableView()
+        setupActions()
         bindViewModel()
     }
     
@@ -54,6 +55,17 @@ final class LikeViewController: UIViewController {
         likeView.tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 0, right: 0)
     }
 
+    private func setupActions() {
+        likeView.savedItemsLabel.isUserInteractionEnabled = true
+        likeView.inProgressLabel.isUserInteractionEnabled = true
+
+        let savedTapGesture = UITapGestureRecognizer(target: self, action: #selector(didTapSavedItems))
+        likeView.savedItemsLabel.addGestureRecognizer(savedTapGesture)
+
+        let inProgressTapGesture = UITapGestureRecognizer(target: self, action: #selector(didTapInProgress))
+        likeView.inProgressLabel.addGestureRecognizer(inProgressTapGesture)
+    }
+
     private func bindViewModel() {
         viewModel.$events
             .receive(on: RunLoop.main)
@@ -61,6 +73,17 @@ final class LikeViewController: UIViewController {
                 self?.likeView.tableView.reloadData()
             }
             .store(in: &cancellables)
+    }
+
+    // MARK: - Actions
+    @objc private func didTapSavedItems() {
+        likeView.animateBlueBox(to: 0)
+        // 필요한 경우 ViewModel 업데이트 로직 추가
+    }
+
+    @objc private func didTapInProgress() {
+        likeView.animateBlueBox(to: 1)
+        // 필요한 경우 ViewModel 업데이트 로직 추가
     }
 }
 
