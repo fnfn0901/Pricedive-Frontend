@@ -1,5 +1,5 @@
 //
-//  MyPageProductCell.swift
+//  LikeProductCell.swift
 //  Pricedive
 //
 //  Created by 신호연 on 12/14/24.
@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-final class MyPageProductCell: UITableViewCell {
+final class LikeProductCell: UITableViewCell {
     // MARK: - UI Components
     private let productInfoLabel = UILabel()
     private let heartButton = UIButton()

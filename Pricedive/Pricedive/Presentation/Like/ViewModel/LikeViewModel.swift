@@ -1,5 +1,5 @@
 //
-//  MyPageViewModel.swift
+//  LikeViewModel.swift
 //  Pricedive
 //
 //  Created by 신호연 on 12/14/24.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-class MyPageViewModel {
+class LikeViewModel {
     @Published var events: [Event]
     
     init(events: [Event] = []) {

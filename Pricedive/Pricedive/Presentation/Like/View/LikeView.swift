@@ -1,5 +1,5 @@
 //
-//  MyPageView.swift
+//  LikeView.swift
 //  Pricedive
 //
 //  Created by 신호연 on 11/25/24.
@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-final class MyPageView: UIView {
+final class LikeView: UIView {
     // MARK: - UI Elements
     let topFixedFrameView = TopFixedFrameView()
     let searchBarView = SearchBarView()
@@ -31,7 +31,7 @@ final class MyPageView: UIView {
     private lazy var blueBox = createRoundedView(cornerRadius: 6, backgroundColor: .mainBlue)
     lazy var tableView: UITableView = {
         let tableView = UITableView()
-        tableView.register(MyPageProductCell.self, forCellReuseIdentifier: "MyPageProductCell")
+        tableView.register(LikeProductCell.self, forCellReuseIdentifier: "LikeProductCell")
         return tableView
     }()
     private var blueBoxLeadingConstraint: Constraint?
