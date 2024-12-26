@@ -10,6 +10,11 @@ import SnapKit
 import Kingfisher
 
 final class LikeProductCell: UITableViewCell {
+    enum EventStyle {
+        case like
+        case myPage
+    }
+    
     // MARK: - UI Components
     private let productImage: UIImageView = {
         let imageView = UIImageView()
@@ -19,7 +24,7 @@ final class LikeProductCell: UITableViewCell {
     }()
     private let dDayLabel = UILabel()
     private let eventTitleLabel = UILabel()
-    private let heartButton = UIButton()
+    private let actionButton = UIButton()
     private let clockIcon = UIImageView()
     private let endDateLabel = UILabel()
     
@@ -37,7 +42,7 @@ final class LikeProductCell: UITableViewCell {
     
     // MARK: - Setup Methods
     private func setupViews() {
-        contentView.addSubviews(productImage, dDayLabel, eventTitleLabel, heartButton, clockIcon, endDateLabel)
+        contentView.addSubviews(productImage, dDayLabel, eventTitleLabel, actionButton, clockIcon, endDateLabel)
     }
     
     private func setupConstraints() {
@@ -69,7 +74,7 @@ final class LikeProductCell: UITableViewCell {
             make.centerY.equalTo(clockIcon.snp.centerY)
         }
         
-        heartButton.snp.makeConstraints { make in
+        actionButton.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
             make.trailing.equalToSuperview().offset(-12)
             make.size.equalTo(24)
@@ -95,9 +100,6 @@ final class LikeProductCell: UITableViewCell {
         eventTitleLabel.font = UIFont(name: "Pretendard-SemiBold", size: 16)
         eventTitleLabel.textColor = UIColor.mainBlack
         
-        heartButton.setImage(UIImage(systemName: "heart"), for: .normal)
-        heartButton.tintColor = UIColor.mainBlack
-        
         clockIcon.image = UIImage(systemName: "clock")
         clockIcon.tintColor = UIColor.placeholderGray
         clockIcon.contentMode = .scaleAspectFit
@@ -107,14 +109,10 @@ final class LikeProductCell: UITableViewCell {
     }
     
     // MARK: - Configuration Method
-    func configure(with event: Event) {
+    func configure(with event: Event, style: EventStyle) {
         dDayLabel.text = "D-\(event.dDay)"
         eventTitleLabel.text = event.eventTitle
         endDateLabel.text = "이벤트 마감: \(formattedDate(event.eventEndDate))"
-        heartButton.setImage(
-            UIImage(systemName: event.isLiked ? "heart.fill" : "heart"),
-            for: .normal
-        )
         
         // 이미지 로드
         if let imageURL = URL(string: event.eventImage) {
@@ -126,7 +124,16 @@ final class LikeProductCell: UITableViewCell {
                 }
             }
         } else {
-            productImage.image = nil // 기본값 설정 (옵션)
+            productImage.image = nil
+        }
+        
+        switch style {
+        case .like:
+            actionButton.setImage(UIImage(systemName: event.isLiked ? "heart.fill" : "heart"), for: .normal)
+            actionButton.tintColor = UIColor.mainBlack
+        case .myPage:
+            actionButton.setImage(UIImage(systemName: "xmark"), for: .normal)
+            actionButton.tintColor = UIColor.mainRed
         }
     }
     

@@ -24,11 +24,14 @@ class MyPageView: UIView {
         return label
     }()
     
-    private let scrollView: UIScrollView = {
+    let scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.backgroundColor = UIColor(hex: "F9FAFB")
+        scrollView.showsVerticalScrollIndicator = false
         return scrollView
     }()
+    
+    let contentView = UIView()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -42,6 +45,7 @@ class MyPageView: UIView {
     
     private func setupView() {
         addSubviews(navigationBarLabel, clearAllLabel, scrollView)
+        scrollView.addSubview(contentView)
     }
     
     private func setupConstraints() {
@@ -58,6 +62,49 @@ class MyPageView: UIView {
         scrollView.snp.makeConstraints { make in
             make.top.equalTo(navigationBarLabel.snp.bottom).offset(16)
             make.leading.trailing.bottom.equalToSuperview()
+        }
+        
+        contentView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+            make.width.equalToSuperview()
+        }
+    }
+    
+    func addSection(title: String, cells: [UIView]) {
+        let sectionLabel = UILabel()
+        sectionLabel.text = title
+        sectionLabel.font = UIFont(name: "Pretendard-Medium", size: 12)
+        sectionLabel.textColor = UIColor(named: "PlaceholderGray")
+        
+        contentView.addSubview(sectionLabel)
+        sectionLabel.snp.makeConstraints { make in
+            if contentView.subviews.count > 1 {
+                make.top.equalTo(contentView.subviews[contentView.subviews.count - 2].snp.bottom).offset(16)
+            } else {
+                make.top.equalToSuperview().offset(16)
+            }
+            make.leading.equalToSuperview().offset(16)
+            make.trailing.equalToSuperview().offset(-16)
+        }
+        
+        var previousCell: UIView?
+        for cell in cells {
+            contentView.addSubview(cell)
+            cell.snp.makeConstraints { make in
+                make.top.equalTo(previousCell?.snp.bottom ?? sectionLabel.snp.bottom).offset(8)
+                make.leading.trailing.equalToSuperview().inset(16)
+            }
+            previousCell = cell
+        }
+        
+        if let lastCell = cells.last {
+            lastCell.snp.makeConstraints { make in
+                make.bottom.equalToSuperview().offset(-16)
+            }
+        } else {
+            sectionLabel.snp.makeConstraints { make in
+                make.bottom.equalToSuperview().offset(-16)
+            }
         }
     }
 }

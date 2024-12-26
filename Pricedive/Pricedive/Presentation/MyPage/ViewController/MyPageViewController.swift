@@ -30,6 +30,7 @@ class MyPageViewController: UIViewController {
         super.viewDidLoad()
         setupNavigationBar()
         bindViewModel()
+        populateSections(with: createSampleViewedProducts())
     }
 
     private func setupNavigationBar() {
@@ -37,11 +38,60 @@ class MyPageViewController: UIViewController {
     }
 
     private func bindViewModel() {
-        viewModel.$events
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] events in
-                // 추후에 MyPageView에 데이터를 반영하는 로직 추가
+        // ViewModel과의 데이터 바인딩 로직 필요 시 추가
+    }
+
+    private func populateSections(with viewedProducts: [ViewedProduct]) {
+        let groupedProducts = groupProductsByDate(viewedProducts)
+
+        groupedProducts.forEach { (title, products) in
+            let cells = products.map { product -> UIView in
+                let cell = LikeProductCell()
+                cell.configure(with: product.toEvent(), style: .myPage) // 스타일: myPage
+                return cell
             }
-            .store(in: &cancellables)
+            myPageView.addSection(title: title, cells: cells)
+        }
+    }
+
+    private func groupProductsByDate(_ products: [ViewedProduct]) -> [(String, [ViewedProduct])] {
+        let calendar = Calendar.current
+        let today = Date()
+        let yesterday = calendar.date(byAdding: .day, value: -1, to: today)!
+        let startOfWeek = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: today))!
+
+        var todayProducts = [ViewedProduct]()
+        var yesterdayProducts = [ViewedProduct]()
+        var thisWeekProducts = [ViewedProduct]()
+
+        for product in products {
+            if calendar.isDate(product.viewedDate, inSameDayAs: today) {
+                todayProducts.append(product)
+            } else if calendar.isDate(product.viewedDate, inSameDayAs: yesterday) {
+                yesterdayProducts.append(product)
+            } else if product.viewedDate >= startOfWeek {
+                thisWeekProducts.append(product)
+            }
+        }
+
+        return [
+            ("오늘", todayProducts),
+            ("어제", yesterdayProducts),
+            ("이번 주", thisWeekProducts)
+        ].filter { !$0.1.isEmpty }
+    }
+
+    private func createSampleViewedProducts() -> [ViewedProduct] {
+        let calendar = Calendar.current
+        let today = Date()
+        let yesterday = calendar.date(byAdding: .day, value: -1, to: today)!
+        let earlierThisWeek = calendar.date(byAdding: .day, value: -3, to: today)!
+
+        return [
+            ViewedProduct(id: 1, title: "오늘 본 상품 1", imageUrl: "https://via.placeholder.com/150", viewedDate: today),
+            ViewedProduct(id: 2, title: "오늘 본 상품 2", imageUrl: "https://via.placeholder.com/150", viewedDate: today),
+            ViewedProduct(id: 3, title: "어제 본 상품 1", imageUrl: "https://via.placeholder.com/150", viewedDate: yesterday),
+            ViewedProduct(id: 4, title: "이번 주 본 상품 1", imageUrl: "https://via.placeholder.com/150", viewedDate: earlierThisWeek)
+        ]
     }
 }

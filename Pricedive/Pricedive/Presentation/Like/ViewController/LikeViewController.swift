@@ -102,7 +102,7 @@ extension LikeViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         let event = viewModel.events[indexPath.section]
-        cell.configure(with: event)
+        cell.configure(with: event, style: .like)
         return cell
     }
 }
