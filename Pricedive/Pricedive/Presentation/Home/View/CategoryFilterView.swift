@@ -63,13 +63,11 @@ class CategoryFilterView: UIView {
     private func updateCategoryButtons(with categories: [Category]) {
         stackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
         
-        for category in categories {
+        categories.forEach { category in
             let button = UIButton.createUnselectedCategoryButton(title: category.name)
             button.addTarget(self, action: #selector(categoryButtonTapped(_:)), for: .touchUpInside)
             stackView.addArrangedSubview(button)
         }
-
-        adjustFirstAndLastButtonConstraints()
     }
 
     private func adjustFirstAndLastButtonConstraints() {
@@ -99,13 +97,9 @@ class CategoryFilterView: UIView {
     private func updateButtonStyles(selectedButton: UIButton) {
         stackView.arrangedSubviews.forEach {
             guard let button = $0 as? UIButton else { return }
-            if button == selectedButton {
-                button.layer.backgroundColor = UIColor.mainBlue.cgColor
-                button.setTitleColor(.mainWhite, for: .normal)
-            } else {
-                button.layer.backgroundColor = UIColor.mainWhite.cgColor
-                button.setTitleColor(.mainBlack, for: .normal)
-            }
+            let isSelected = (button == selectedButton)
+            button.layer.backgroundColor = isSelected ? UIColor.mainBlue.cgColor : UIColor.mainWhite.cgColor
+            button.setTitleColor(isSelected ? .mainWhite : .mainBlack, for: .normal)
         }
     }
 

@@ -8,15 +8,9 @@
 import UIKit
 
 struct CustomStyles {
-    static func customLabel(
-        text: String,
-        color: UIColor,
-        font: UIFont,
-        lineHeight: CGFloat,
-        kern: CGFloat
-    ) -> UILabel {
+    static func createStyledLabel(color: UIColor, font: UIFont, lineHeight: CGFloat, kern: CGFloat) -> UILabel {
         return UILabel.createCustomLabel(
-            text: text,
+            text: "",
             color: color,
             font: font,
             lineHeight: lineHeight,
@@ -25,27 +19,13 @@ struct CustomStyles {
     }
 
     static func productTitle() -> UILabel {
-        let label = TopAlignedLabel()
-
-        label.textColor = UIColor.mainBlack
-        label.font = UIFont(name: "Pretendard-SemiBold", size: 14)!
-        label.numberOfLines = 2
-        label.textAlignment = .left
-
-        let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.lineSpacing = 1.32
-        paragraphStyle.alignment = .left
-
-        let attributedString = NSAttributedString(
-            string: "",
-            attributes: [
-                .paragraphStyle: paragraphStyle,
-                .kern: -0.41
-            ]
+        return customLabel(
+            text: "",
+            color: UIColor.mainBlack,
+            font: UIFont(name: "Pretendard-SemiBold", size: 14)!,
+            lineHeight: 1.32,
+            kern: -0.41
         )
-        label.attributedText = attributedString
-
-        return label
     }
 
     static func categoryUnselected() -> UILabel {
@@ -105,6 +85,24 @@ struct CustomStyles {
             font: UIFont(name: "NotoSans-Bold", size: 24)!,
             lineHeight: 1.1,
             kern: -0.41
+        )
+    }
+}
+
+extension CustomStyles {
+    static func customLabel(
+        text: String,
+        color: UIColor,
+        font: UIFont,
+        lineHeight: CGFloat,
+        kern: CGFloat
+    ) -> UILabel {
+        return UILabel.createCustomLabel(
+            text: text,
+            color: color,
+            font: font,
+            lineHeight: lineHeight,
+            kern: kern
         )
     }
 }

@@ -19,6 +19,10 @@ class TopFixedFrameView: UIView {
         return UIButton.createIconButton(image: image, target: nil, action: nil)
     }()
 
+    func setSearchButtonTarget(target: Any?, action: Selector) {
+        searchIconButton.addTarget(target, action: action, for: .touchUpInside)
+    }
+
     // MARK: - Initializers
 
     override init(frame: CGRect) {

@@ -15,7 +15,7 @@ class SplashView: UIView {
     
     private let logoLabel: UILabel = {
         let label = CustomStyles.logoText()
-        label.textColor = UIColor.white
+        label.textColor = .white
         label.font = UIFont(name: "HelveticaNeue-MediumItalic", size: 50)
         return label
     }()
@@ -36,51 +36,65 @@ class SplashView: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setupBackgroundGradient()
-        setupSpotlightGradient()
+        setupGradientLayers()
         setupSubviews()
         setupConstraints()
     }
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        setupBackgroundGradient()
-        setupSpotlightGradient()
+        setupGradientLayers()
         setupSubviews()
         setupConstraints()
     }
     
-    private func setupBackgroundGradient() {
-        backgroundGradientLayer.colors = [
-            UIColor.mainBlue.cgColor,
-            UIColor(hex: "5EA3FF")!.cgColor
-        ]
-        backgroundGradientLayer.locations = [0, 1]
-        backgroundGradientLayer.startPoint = CGPoint(x: 0.5, y: 0.0)
-        backgroundGradientLayer.endPoint = CGPoint(x: 0.5, y: 1.0)
+    private func setupGradientLayers() {
+        configureGradientLayer(
+            layer: backgroundGradientLayer,
+            colors: [UIColor.mainBlue.cgColor, UIColor(hex: "5EA3FF")!.cgColor],
+            locations: [0, 1],
+            startPoint: CGPoint(x: 0.5, y: 0.0),
+            endPoint: CGPoint(x: 0.5, y: 1.0)
+        )
         layer.insertSublayer(backgroundGradientLayer, at: 0)
+        
+        configureGradientLayer(
+            layer: spotlightGradientLayer,
+            colors: [
+                UIColor(hex: "A1FFFF")!.withAlphaComponent(1.0).cgColor,
+                UIColor(hex: "2C90EE")!.withAlphaComponent(0.0).cgColor
+            ],
+            locations: [0.0, 1.0],
+            startPoint: CGPoint(x: 0.5, y: 0.5),
+            endPoint: CGPoint(x: 1.0, y: 1.0),
+            type: .radial
+        )
+        layer.insertSublayer(spotlightGradientLayer, at: 1)
     }
     
-    private func setupSpotlightGradient() {
-        spotlightGradientLayer.type = .radial
-        spotlightGradientLayer.colors = [
-            UIColor(hex: "A1FFFF")!.withAlphaComponent(1.0).cgColor,
-            UIColor(hex: "2C90EE")!.withAlphaComponent(0.0).cgColor
-        ]
-        spotlightGradientLayer.locations = [0.0, 1.0]
-        spotlightGradientLayer.startPoint = CGPoint(x: 0.5, y: 0.5)
-        spotlightGradientLayer.endPoint = CGPoint(x: 1.0, y: 1.0)
-        layer.insertSublayer(spotlightGradientLayer, at: 1)
+    private func configureGradientLayer(
+        layer: CAGradientLayer,
+        colors: [CGColor],
+        locations: [NSNumber],
+        startPoint: CGPoint,
+        endPoint: CGPoint,
+        type: CAGradientLayerType = .axial
+    ) {
+        layer.colors = colors
+        layer.locations = locations
+        layer.startPoint = startPoint
+        layer.endPoint = endPoint
+        layer.type = type
     }
     
     override func layoutSubviews() {
         super.layoutSubviews()
         backgroundGradientLayer.frame = bounds
-        
+
         let spotlightSize = max(splashImageView.bounds.width, splashImageView.bounds.height) * 1.5
         spotlightGradientLayer.frame = CGRect(
-            x: splashImageView.frame.midX - (spotlightSize / 2),
-            y: splashImageView.frame.midY - (spotlightSize / 2),
+            x: splashImageView.frame.midX - spotlightSize / 2,
+            y: splashImageView.frame.midY - spotlightSize / 2,
             width: spotlightSize,
             height: spotlightSize
         )

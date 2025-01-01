@@ -87,16 +87,25 @@ class EventCell: UICollectionViewCell {
         self.viewModel = viewModel
         self.eventId = event.eventId
 
+        configureTitle(event: event)
+        configureImageView(event: event)
+        configureProfileView(event: event)
+        configureDDayView(event: event)
+        updateHeartButton(isLiked: viewModel.isLiked(for: event.eventId))
+    }
+    
+    private func configureTitle(event: Event) {
         titleLabel.text = event.eventTitle
+    }
+
+    private func configureImageView(event: Event) {
         imageView.kf.setImage(with: URL(string: event.eventImage))
+    }
+
+    private func configureProfileView(event: Event) {
         if let profileImageView = profileView.subviews.first as? UIImageView {
             profileImageView.kf.setImage(with: URL(string: event.youtuberProfileImage))
         }
-        if let dDayLabel = dDayView.subviews.first(where: { $0 is UILabel }) as? UILabel {
-            dDayLabel.text = "D-\(event.dDay)"
-        }
-
-        updateHeartButton(isLiked: viewModel.isLiked(for: event.eventId))
     }
     
     private func updateHeartButton(isLiked: Bool) {
@@ -104,6 +113,12 @@ class EventCell: UICollectionViewCell {
         let tintColor = isLiked ? UIColor.mainRed : UIColor.mainBlack
         heartButton.setImage(UIImage(systemName: imageName), for: .normal)
         heartButton.tintColor = tintColor
+    }
+    
+    private func configureDDayView(event: Event) {
+        if let dDayLabel = dDayView.subviews.first(where: { $0 is UILabel }) as? UILabel {
+            dDayLabel.text = event.dDayDescription
+        }
     }
 
     // MARK: - Actions

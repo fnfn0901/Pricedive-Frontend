@@ -54,10 +54,12 @@ class SearchBarView: UIView, UITextFieldDelegate {
         return view
     }()
 
+    var onCancelTapped: (() -> Void)?
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupSearchBar()
-        searchTextField.delegate = self // `UITextFieldDelegate` 설정
+        searchTextField.delegate = self
     }
 
     required init?(coder: NSCoder) {
@@ -65,13 +67,22 @@ class SearchBarView: UIView, UITextFieldDelegate {
     }
 
     private func setupSearchBar() {
-        addSubview(searchContainerView)
-        searchContainerView.addSubviews(magnifyingGlassButton, searchTextField, xMarkButton)
+        configureSearchContainer()
+        configureButtons()
+        configureTextField()
+        xMarkButton.addTarget(self, action: #selector(didTapCancel), for: .touchUpInside)
+    }
 
+    private func configureSearchContainer() {
+        addSubview(searchContainerView)
         searchContainerView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
             make.height.equalTo(48)
         }
+    }
+
+    private func configureButtons() {
+        searchContainerView.addSubviews(magnifyingGlassButton, xMarkButton)
 
         magnifyingGlassButton.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
@@ -79,20 +90,22 @@ class SearchBarView: UIView, UITextFieldDelegate {
             make.width.equalTo(24)
         }
 
-        searchTextField.snp.makeConstraints { make in
-            make.centerY.equalToSuperview()
-            make.leading.equalTo(magnifyingGlassButton.snp.trailing).offset(12)
-            make.trailing.equalTo(xMarkButton.snp.leading).offset(-12)
-        }
-        
-        searchTextField.isUserInteractionEnabled = true
-        searchTextField.returnKeyType = .search
-
         xMarkButton.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
             make.trailing.equalToSuperview().offset(-12)
             make.width.height.equalTo(24)
         }
+    }
+
+    private func configureTextField() {
+        searchContainerView.addSubview(searchTextField)
+        searchTextField.snp.makeConstraints { make in
+            make.centerY.equalToSuperview()
+            make.leading.equalTo(magnifyingGlassButton.snp.trailing).offset(12)
+            make.trailing.equalTo(xMarkButton.snp.leading).offset(-12)
+        }
+        searchTextField.isUserInteractionEnabled = true
+        searchTextField.returnKeyType = .search
     }
 
     @objc private func handleMagnifyingGlassClick() {
@@ -110,5 +123,9 @@ class SearchBarView: UIView, UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
+    }
+    
+    @objc private func didTapCancel() {
+        onCancelTapped?()
     }
 }

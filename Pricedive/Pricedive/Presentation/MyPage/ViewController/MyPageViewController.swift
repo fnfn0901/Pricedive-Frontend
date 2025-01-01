@@ -31,6 +31,7 @@ class MyPageViewController: UIViewController {
         setupNavigationBar()
         bindViewModel()
         populateSections(with: createSampleViewedProducts())
+        setupClearAllAction()
     }
 
     private func setupNavigationBar() {
@@ -38,7 +39,7 @@ class MyPageViewController: UIViewController {
     }
 
     private func bindViewModel() {
-        // ViewModel과의 데이터 바인딩 로직 필요 시 추가
+        // 필요 시 ViewModel 바인딩 로직 추가
     }
 
     private func populateSections(with viewedProducts: [ViewedProduct]) {
@@ -47,7 +48,7 @@ class MyPageViewController: UIViewController {
         groupedProducts.forEach { (title, products) in
             let cells = products.map { product -> UIView in
                 let cell = LikeProductCell()
-                cell.configure(with: product.toEvent(), style: .myPage) // 스타일: myPage
+                cell.configure(with: product.toEvent(), style: .myPage)
                 return cell
             }
             myPageView.addSection(title: title, cells: cells)
@@ -64,7 +65,7 @@ class MyPageViewController: UIViewController {
         var yesterdayProducts = [ViewedProduct]()
         var thisWeekProducts = [ViewedProduct]()
 
-        for product in products {
+        products.forEach { product in
             if calendar.isDate(product.viewedDate, inSameDayAs: today) {
                 todayProducts.append(product)
             } else if calendar.isDate(product.viewedDate, inSameDayAs: yesterday) {
@@ -79,6 +80,15 @@ class MyPageViewController: UIViewController {
             ("어제", yesterdayProducts),
             ("이번 주", thisWeekProducts)
         ].filter { !$0.1.isEmpty }
+    }
+
+    private func setupClearAllAction() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleClearAllTapped))
+        myPageView.clearAllLabel.addGestureRecognizer(tapGesture)
+    }
+
+    @objc private func handleClearAllTapped() {
+        myPageView.contentView.subviews.forEach { $0.removeFromSuperview() }
     }
 
     private func createSampleViewedProducts() -> [ViewedProduct] {

@@ -16,7 +16,7 @@ struct ViewedProduct {
     func toEvent() -> Event {
         return Event(
             eventId: id,
-            eventLink: "https://www.example.com",
+            eventLink: "",
             eventImage: imageUrl,
             youtuberProfileImage: "",
             eventEndDate: Date(),

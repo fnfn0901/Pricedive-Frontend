@@ -7,6 +7,6 @@
 
 import Foundation
 
-struct Category {
+struct Category: Hashable {
     let name: String
 }

@@ -51,8 +51,6 @@ final class LikeViewController: UIViewController {
         likeView.tableView.delegate = self
         likeView.tableView.dataSource = self
         likeView.tableView.separatorStyle = .none
-        likeView.tableView.showsVerticalScrollIndicator = false
-        likeView.tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 0, right: 0)
     }
 
     private func setupActions() {
@@ -68,11 +66,17 @@ final class LikeViewController: UIViewController {
 
     private func bindViewModel() {
         viewModel.$events
-            .receive(on: RunLoop.main)
-            .sink { [weak self] _ in
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] events in
+                self?.likeView.tableView.isHidden = events.isEmpty
                 self?.likeView.tableView.reloadData()
             }
             .store(in: &cancellables)
+    }
+
+    private func updateTableView(with events: [Event]) {
+        likeView.tableView.isHidden = events.isEmpty
+        likeView.tableView.reloadData()
     }
 
     // MARK: - Actions

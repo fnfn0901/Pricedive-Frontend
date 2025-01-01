@@ -70,23 +70,23 @@ class BaseView: UIView {
         }
     }
 
-    private func setupCollectionViewLayout() {
-        collectionView.backgroundColor = .white
-        collectionView.isScrollEnabled = false
-        collectionView.register(EventCell.self, forCellWithReuseIdentifier: "EventProductCell")
+    private func calculateLayout(for width: CGFloat, spacing: CGFloat, inset: CGFloat) -> UICollectionViewFlowLayout {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .vertical
+        layout.minimumLineSpacing = spacing
+        layout.minimumInteritemSpacing = spacing
 
-        if let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
-            let screenWidth = UIScreen.main.bounds.width
-            let cellSpacing: CGFloat = 20
-            let sectionInset: CGFloat = 20
-            let totalSpacing = cellSpacing + (sectionInset * 2)
-            let cellWidth = (screenWidth - totalSpacing) / 2
-            let imageViewHeight = cellWidth * 0.75
-            let cellHeight = imageViewHeight * 1.25
-            layout.itemSize = CGSize(width: cellWidth, height: cellHeight)
-            layout.minimumLineSpacing = 20
-            layout.sectionInset = UIEdgeInsets(top: 0, left: sectionInset, bottom: 0, right: sectionInset)
-        }
+        let totalSpacing = spacing + (inset * 2)
+        let cellWidth = (width - totalSpacing) / 2
+        layout.itemSize = CGSize(width: cellWidth, height: cellWidth * 1.25)
+        layout.sectionInset = UIEdgeInsets(top: 0, left: inset, bottom: 0, right: inset)
+
+        return layout
+    }
+
+    private func setupCollectionViewLayout() {
+        let layout = calculateLayout(for: UIScreen.main.bounds.width, spacing: 20, inset: 20)
+        collectionView.collectionViewLayout = layout
     }
     
     func updateCollectionViewHeight() {

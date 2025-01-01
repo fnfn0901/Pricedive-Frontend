@@ -18,8 +18,6 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
     
     // MARK: - TabBar Appearance
     private func setupTabBarAppearance() {
-        addTopBorderToTabBar()
-        
         let appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = .white
@@ -33,24 +31,22 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
         appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: normalColor]
         appearance.stackedLayoutAppearance.normal.iconColor = normalColor
         
+        let topBorder = UIView()
+        topBorder.backgroundColor = .mainWhite
+        topBorder.frame = CGRect(x: 0, y: 0, width: tabBar.bounds.width, height: 1)
+        tabBar.addSubview(topBorder)
+
         tabBar.standardAppearance = appearance
         if #available(iOS 15.0, *) {
             tabBar.scrollEdgeAppearance = appearance
         }
     }
     
-    private func addTopBorderToTabBar() {
-        let topBorder = CALayer()
-        topBorder.backgroundColor = UIColor.mainWhite.cgColor
-        topBorder.frame = CGRect(x: 0, y: 0, width: tabBar.bounds.width, height: 1)
-        tabBar.layer.addSublayer(topBorder)
-    }
-    
     // MARK: - View Controllers Setup
     private func setupViewControllers() {
         let homeViewModel = HomeViewModel(events: createSampleEvents())
 
-        let categoryController = createViewController(CategoryViewController(), title: "Category", image: "line.3.horizontal", tag: 0)
+        let categoryController = createViewController(CategoryViewController(viewModel: CategoryViewModel()), title: "Category", image: "line.3.horizontal", tag: 0)
         let homeViewController = createViewController(UINavigationController(rootViewController: HomeViewController(viewModel: homeViewModel)), title: "Home", image: "house", tag: 1)
         let likeViewController = createViewController(LikeViewController(viewModel: homeViewModel), title: "Like", image: "heart", tag: 2)
         let myPageViewController = createViewController(MyPageViewController(viewModel: homeViewModel), title: "MyPage", image: "person.crop.circle", tag: 3)

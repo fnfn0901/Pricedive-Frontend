@@ -20,6 +20,12 @@ class EventDetailView: UIView {
         view.backgroundColor = .white
         return view
     }()
+    
+    let searchBarView: SearchBarView = {
+        let view = SearchBarView()
+        view.isHidden = true
+        return view
+    }()
 
     let logoLabel: UILabel = CustomStyles.logoText()
 
@@ -330,7 +336,7 @@ class EventDetailView: UIView {
             profileImageView.kf.setImage(with: URL(string: profileImageUrl))
         }
         if let dDayLabel = dDayView.subviews.first(where: { $0 is UILabel }) as? UILabel {
-            dDayLabel.text = "D-\(dDayText)"
+            dDayLabel.text = dDayText
         }
         eventDescriptionLabel.text = eventDescription ?? ""
     }

@@ -50,20 +50,25 @@ class CarouselView: UIView {
     }
 
     private func setupCarousel() {
+        clearCarousel()
+        guard !imageUrls.isEmpty else { return }
+        
+        setupImageViews()
+        setupPageControl()
+        startAutoSlideTimer()
+    }
+
+    private func clearCarousel() {
         scrollView.clearSubviews()
         imageViews.removeAll()
-        pageControl.numberOfPages = imageUrls.count
-        pageControl.isHidden = imageUrls.count <= 1
+        pageControl.numberOfPages = 0
         timer?.invalidate()
+    }
 
-        guard !imageUrls.isEmpty else { return }
-
+    private func setupImageViews() {
         var previousImageView: UIImageView? = nil
         for url in imageUrls {
-            let imageView = UIImageView()
-            imageView.contentMode = .scaleToFill
-            imageView.clipsToBounds = true
-            imageView.kf.setImage(with: URL(string: url))
+            let imageView = createImageView(for: url)
             scrollView.addSubview(imageView)
             imageView.snp.makeConstraints {
                 $0.width.height.equalToSuperview()
@@ -72,10 +77,36 @@ class CarouselView: UIView {
             }
             previousImageView = imageView
         }
-
         previousImageView?.snp.makeConstraints { $0.trailing.equalToSuperview() }
+    }
 
-        setupAutoSlide()
+    private func createImageView(for url: String) -> UIImageView {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleToFill
+        imageView.clipsToBounds = true
+        imageView.kf.setImage(with: URL(string: url))
+        return imageView
+    }
+
+    private func setupPageControl() {
+        pageControl.numberOfPages = imageUrls.count
+        pageControl.isHidden = imageUrls.count <= 1
+    }
+
+    private func startAutoSlideTimer() {
+        guard imageUrls.count > 1 else { return }
+        timer?.invalidate()
+        timer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: true) { [weak self] _ in
+            self?.slideToNextPage()
+        }
+    }
+
+    private func slideToNextPage() {
+        guard !imageUrls.isEmpty else { return }
+        let nextPage = (pageControl.currentPage + 1) % imageUrls.count
+        let offsetX = CGFloat(nextPage) * frame.width
+        scrollView.setContentOffset(CGPoint(x: offsetX, y: 0), animated: true)
+        pageControl.currentPage = nextPage
     }
 
     private func setupAutoSlide() {
@@ -101,6 +132,7 @@ class CarouselView: UIView {
 
 extension CarouselView: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        guard frame.width > 0 else { return }
         let pageIndex = round(scrollView.contentOffset.x / frame.width)
         pageControl.currentPage = Int(pageIndex)
     }

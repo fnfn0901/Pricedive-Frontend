@@ -17,11 +17,12 @@ class SplashViewModel {
         self.splashDuration = splashDuration
     }
 
-    func startSplashTimer() {
+    func startSplashTimer(onComplete: (() -> Void)? = nil) {
         Just(true)
             .delay(for: .seconds(splashDuration), scheduler: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.isSplashCompleted = true
+                onComplete?()
             }
             .store(in: &cancellables)
     }

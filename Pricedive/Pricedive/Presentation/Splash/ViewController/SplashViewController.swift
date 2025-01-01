@@ -43,10 +43,13 @@ class SplashViewController: UIViewController {
             .store(in: &cancellables)
     }
 
-    private func navigateToNextScreen() {
+    private func navigateToNextScreen(
+        transitionStyle: UIModalTransitionStyle = .crossDissolve,
+        presentationStyle: UIModalPresentationStyle = .fullScreen
+    ) {
         let nextViewController = MainTabBarController()
-        nextViewController.modalTransitionStyle = .crossDissolve
-        nextViewController.modalPresentationStyle = .fullScreen
+        nextViewController.modalTransitionStyle = transitionStyle
+        nextViewController.modalPresentationStyle = presentationStyle
         present(nextViewController, animated: true)
     }
 }

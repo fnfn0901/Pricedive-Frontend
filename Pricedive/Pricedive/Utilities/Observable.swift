@@ -8,20 +8,20 @@
 import Foundation
 
 class Observable<T> {
+    private var observers: [(T) -> Void] = []
+
     var value: T {
         didSet {
-            observer?(value)
+            observers.forEach { $0(value) }
         }
     }
-
-    private var observer: ((T) -> Void)?
 
     init(_ value: T) {
         self.value = value
     }
 
     func bind(observer: @escaping (T) -> Void) {
-        self.observer = observer
+        observers.append(observer)
         observer(value)
     }
 }

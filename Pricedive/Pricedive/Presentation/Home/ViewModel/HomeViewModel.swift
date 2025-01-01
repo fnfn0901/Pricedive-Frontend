@@ -23,7 +23,10 @@ class HomeViewModel {
     private func setupBindings() {
         $searchQuery
             .map { [weak self] query in
-                self?.allEvents.filter { query.isEmpty || $0.eventTitle.contains(query) } ?? []
+                self?.allEvents.filter {
+                    query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+                    $0.eventTitle.range(of: query, options: .caseInsensitive) != nil
+                } ?? []
             }
             .sink { [weak self] filtered in
                 self?.events = filtered
@@ -34,7 +37,7 @@ class HomeViewModel {
     func toggleLike(for eventId: Int) {
         guard let index = allEvents.firstIndex(where: { $0.eventId == eventId }) else { return }
         allEvents[index].isLiked.toggle()
-        events = allEvents
+        events = allEvents.filter { $0.eventTitle.contains(searchQuery) || searchQuery.isEmpty }
     }
 
     func isLiked(for eventId: Int) -> Bool {

@@ -73,8 +73,23 @@ class EventDetailViewController: UIViewController, UIGestureRecognizerDelegate {
     }
 
     @objc private func didTapSearch() {
-        let searchViewController = SearchViewController(viewModel: homeViewModel)
-        navigationController?.pushViewController(searchViewController, animated: true)
+        detailView.navigationBar.isHidden = true
+        
+        if detailView.searchBarView.superview == nil {
+            detailView.addSubview(detailView.searchBarView)
+            detailView.searchBarView.snp.makeConstraints { make in
+                make.top.equalTo(self.view.safeAreaLayoutGuide.snp.top).offset(8)
+                make.leading.trailing.equalToSuperview().inset(20)
+                make.height.equalTo(48)
+            }
+        }
+        detailView.searchBarView.isHidden = false
+        
+        detailView.searchBarView.onCancelTapped = { [weak self] in
+            guard let self = self else { return }
+            self.detailView.searchBarView.isHidden = true
+            self.detailView.navigationBar.isHidden = false
+        }
     }
 
     @objc private func didTapGoToButton() {
@@ -88,4 +103,5 @@ class EventDetailViewController: UIViewController, UIGestureRecognizerDelegate {
         let safariVC = SFSafariViewController(url: url)
         present(safariVC, animated: true)
     }
+    
 }

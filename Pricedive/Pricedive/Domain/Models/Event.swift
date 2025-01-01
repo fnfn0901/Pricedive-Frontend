@@ -18,10 +18,17 @@ struct Event: Codable {
     var isLiked: Bool
     
     var dDay: Int {
-        let calendar = Calendar.current
-        let today = calendar.startOfDay(for: Date())
-        let endDate = calendar.startOfDay(for: eventEndDate)
-        let components = calendar.dateComponents([.day], from: today, to: endDate)
-        return components.day ?? 0
+        let daysLeft = Calendar.current.dateComponents([.day], from: Date(), to: eventEndDate).day ?? 0
+        return daysLeft
+    }
+    
+    var dDayDescription: String {
+        if dDay > 0 {
+            return "D-\(dDay)"
+        } else if dDay == 0 {
+            return "D-day"
+        } else {
+            return "종료"
+        }
     }
 }

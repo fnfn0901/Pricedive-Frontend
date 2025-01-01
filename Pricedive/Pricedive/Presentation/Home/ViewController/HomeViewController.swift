@@ -13,38 +13,38 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
     private let viewModel: HomeViewModel
     private var categoryViewModel = CategoryViewModel()
     private var cancellables = Set<AnyCancellable>()
-
+    
     init(viewModel: HomeViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
-
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
     override func loadView() {
         view = homeView
     }
-
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
     }
-
+    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         navigationController?.setNavigationBarHidden(false, animated: animated)
     }
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         homeView.viewModel = categoryViewModel
         homeView.collectionView.dataSource = self
         homeView.collectionView.delegate = self
         homeView.collectionView.register(EventCell.self, forCellWithReuseIdentifier: "EventProductCell")
-
+        
         // 캐러셀 이미지 설정
         homeView.carouselView.imageUrls = [
             "https://cdn.011st.com/11dims/resize/1240x400/quality/100/11src/browsing/space/banner/2024/12/10/2412101132499001264_10.jpg",
@@ -53,30 +53,68 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
             "https://cdn.011st.com/11dims/resize/1240x400/quality/100/11src/browsing/space/banner/2024/12/4/2412041454203801216_690.jpg",
             "https://cdn.011st.com/11dims/resize/1240x400/quality/100/11src/browsing/space/banner/2024/12/10/2412101141100201264_8.jpg"
         ]
-
+        
         setupBindings()
         homeView.reloadCollectionView()
+        
+        configureTopFixedFrameActions()
+        configureSearchBarActions()
     }
-
+    
     private func setupBindings() {
         viewModel.$events
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.homeView.reloadCollectionView()
+            .sink { [weak self] events in
+                guard let self = self else { return }
+                if events.isEmpty {
+                    self.homeView.collectionView.isHidden = true
+                } else {
+                    self.homeView.collectionView.isHidden = false
+                    self.updateUI()
+                }
             }
             .store(in: &cancellables)
     }
-
+    
+    @objc func resetToTopFixedFrame() {
+        homeView.searchBarView.searchTextField.text = ""
+        homeView.hideKeyboard()
+        homeView.toggleVisibility(viewToShow: homeView.topFixedFrame, viewToHide: homeView.searchBarView)
+        viewModel.searchQuery = ""
+    }
+    
+    private func updateUI() {
+        let visibleIndexPaths = homeView.collectionView.indexPathsForVisibleItems
+        homeView.collectionView.reloadItems(at: visibleIndexPaths)
+    }
+    
+    private func configureTopFixedFrameActions() {
+        homeView.topFixedFrame.setSearchButtonTarget(target: self, action: #selector(handleSearchButtonTap))
+    }
+    
+    private func configureSearchBarActions() {
+        homeView.searchBarView.xMarkButton.addTarget(self, action: #selector(handleXMarkButtonTap), for: .touchUpInside)
+    }
+    
+    @objc private func handleSearchButtonTap() {
+        homeView.toggleToSearchBar()
+    }
+    
+    @objc private func handleXMarkButtonTap() {
+        homeView.toggleToTopFrame()
+    }
+    
     // MARK: - UICollectionViewDataSource
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return viewModel.events.count
     }
-
+    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "EventProductCell", for: indexPath) as? EventCell else {
+        guard indexPath.row < viewModel.events.count,
+              let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "EventProductCell", for: indexPath) as? EventCell else {
             return UICollectionViewCell()
         }
-
+        
         let event = viewModel.events[indexPath.row]
         cell.configureCell(event: event, viewModel: viewModel)
         return cell
@@ -89,5 +127,5 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
         let detailViewController = EventDetailViewController(viewModel: detailViewModel, homeViewModel: viewModel)
         navigationController?.pushViewController(detailViewController, animated: true)
     }
-
+    
 }

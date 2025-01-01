@@ -36,8 +36,7 @@ class EventDetailViewModel {
     }
 
     var dDayText: String {
-        guard let dDay = event?.dDay else { return "Event Ended" }
-        return dDay > 0 ? "\(dDay)" : "Event Ended"
+        return event?.dDayDescription ?? "종료"
     }
 
     var isLiked: Bool {

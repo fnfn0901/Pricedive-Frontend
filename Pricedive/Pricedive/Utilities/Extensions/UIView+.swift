@@ -15,7 +15,8 @@ extension UIView {
         imageUrl: String,
         cornerRadius: CGFloat = 20,
         borderColor: UIColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.15),
-        borderWidth: CGFloat = 1
+        borderWidth: CGFloat = 1,
+        placeholderImage: UIImage? = UIImage(named: "defaultProfileImage")
     ) -> UIView {
         let profileView = UIView()
         profileView.layer.cornerRadius = cornerRadius
@@ -24,17 +25,14 @@ extension UIView {
         profileView.clipsToBounds = true
 
         let imageView = UIImageView()
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.kf.setImage(with: URL(string: imageUrl))
+        imageView.kf.setImage(with: URL(string: imageUrl), placeholder: placeholderImage)
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
+
         profileView.addSubview(imageView)
-
-        imageView.topAnchor.constraint(equalTo: profileView.topAnchor).isActive = true
-        imageView.leadingAnchor.constraint(equalTo: profileView.leadingAnchor).isActive = true
-        imageView.trailingAnchor.constraint(equalTo: profileView.trailingAnchor).isActive = true
-        imageView.bottomAnchor.constraint(equalTo: profileView.bottomAnchor).isActive = true
-
+        imageView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
         return profileView
     }
     
