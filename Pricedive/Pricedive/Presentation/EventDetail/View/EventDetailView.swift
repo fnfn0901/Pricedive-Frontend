@@ -52,6 +52,7 @@ class EventDetailView: UIView {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
+        imageView.isUserInteractionEnabled = true
         return imageView
     }()
 
@@ -86,6 +87,9 @@ class EventDetailView: UIView {
         config.baseForegroundColor = .mainBlack
         config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(pointSize: 24, weight: .regular)
         button.configuration = config
+        
+        button.addTarget(self, action: #selector(heartButtonTapped), for: .touchUpInside)
+        
         return button
     }()
 
@@ -264,7 +268,7 @@ class EventDetailView: UIView {
 
         heartButton.snp.makeConstraints {
             $0.trailing.bottom.equalToSuperview().offset(-12)
-            $0.size.equalTo(36)
+            $0.size.equalTo(24)
         }
 
         titleLabel.snp.makeConstraints {
@@ -341,10 +345,20 @@ class EventDetailView: UIView {
         eventDescriptionLabel.text = eventDescription ?? ""
     }
 
+    @objc private func heartButtonTapped() {
+        isHeartSelected.toggle()
+        updateHeartButton(isLiked: isHeartSelected)
+    }
+
     private func updateHeartButton(isLiked: Bool) {
         let imageName = isLiked ? "heart.fill" : "heart"
         let tintColor = isLiked ? UIColor.mainRed : UIColor.mainBlack
-        heartButton.setImage(UIImage(systemName: imageName), for: .normal)
-        heartButton.tintColor = tintColor
+
+        var config = UIButton.Configuration.plain()
+        config.image = UIImage(systemName: imageName)
+        config.baseForegroundColor = tintColor
+        config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(pointSize: 24, weight: .regular)
+        
+        heartButton.configuration = config
     }
 }

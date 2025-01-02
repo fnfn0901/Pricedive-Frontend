@@ -13,6 +13,7 @@ class HomeViewModel {
     @Published var events: [Event] = []
     private var allEvents: [Event]
     private var cancellables = Set<AnyCancellable>()
+    private var likedEvents = Set<Int>()
 
     init(events: [Event]) {
         self.allEvents = events
@@ -35,12 +36,15 @@ class HomeViewModel {
     }
 
     func toggleLike(for eventId: Int) {
-        guard let index = allEvents.firstIndex(where: { $0.eventId == eventId }) else { return }
-        allEvents[index].isLiked.toggle()
-        events = allEvents.filter { $0.eventTitle.contains(searchQuery) || searchQuery.isEmpty }
+        if likedEvents.contains(eventId) {
+            likedEvents.remove(eventId)
+        } else {
+            likedEvents.insert(eventId)
+        }
     }
 
     func isLiked(for eventId: Int) -> Bool {
-        return allEvents.first(where: { $0.eventId == eventId })?.isLiked ?? false
+        let result = likedEvents.contains(eventId)
+        return result
     }
 }

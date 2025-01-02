@@ -25,7 +25,7 @@ class EventCell: UICollectionViewCell {
     private let titleLabel: UILabel = CustomStyles.productTitle()
     private let profileView = UIView.createYoutuberProfileView(imageUrl: "")
     private let dDayView = UIView.createDDayView(text: "0")
-    private lazy var heartButton: UIButton = {
+    lazy var heartButton: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(systemName: "heart"), for: .normal)
         button.tintColor = .mainBlack
@@ -52,6 +52,12 @@ class EventCell: UICollectionViewCell {
     private func setupViews() {
         contentView.addSubviews(imageView, titleLabel)
         imageView.addSubviews(profileView, dDayView, heartButton)
+
+        contentView.bringSubviewToFront(heartButton)
+
+        imageView.isUserInteractionEnabled = false
+        profileView.isUserInteractionEnabled = false
+        dDayView.isUserInteractionEnabled = false
     }
 
     private func setupConstraints() {
@@ -108,11 +114,17 @@ class EventCell: UICollectionViewCell {
         }
     }
     
-    private func updateHeartButton(isLiked: Bool) {
-        let imageName = isLiked ? "heart.fill" : "heart"
-        let tintColor = isLiked ? UIColor.mainRed : UIColor.mainBlack
-        heartButton.setImage(UIImage(systemName: imageName), for: .normal)
-        heartButton.tintColor = tintColor
+    func updateHeartButton(isLiked: Bool) {
+        DispatchQueue.main.async {
+            let imageName = isLiked ? "heart.fill" : "heart"
+            let tintColor = isLiked ? UIColor.mainRed : UIColor.mainBlack
+            self.heartButton.setImage(UIImage(systemName: imageName), for: .normal)
+            self.heartButton.tintColor = tintColor
+
+            self.heartButton.setNeedsDisplay()
+            self.heartButton.setNeedsLayout()
+            self.heartButton.layoutIfNeeded()
+        }
     }
     
     private func configureDDayView(event: Event) {
@@ -123,8 +135,18 @@ class EventCell: UICollectionViewCell {
 
     // MARK: - Actions
     @objc private func handleHeartTapped() {
-        guard let viewModel = viewModel, let eventId = eventId else { return }
+        guard let viewModel = viewModel, let eventId = eventId else {
+            return
+        }
+        
         viewModel.toggleLike(for: eventId)
-        updateHeartButton(isLiked: viewModel.isLiked(for: eventId))
+        let isLiked = viewModel.isLiked(for: eventId)
+
+        updateHeartButton(isLiked: isLiked)
+        
+        if let collectionView = superview as? UICollectionView,
+           let indexPath = collectionView.indexPath(for: self) {
+            collectionView.reloadItems(at: [indexPath])
+        }
     }
 }

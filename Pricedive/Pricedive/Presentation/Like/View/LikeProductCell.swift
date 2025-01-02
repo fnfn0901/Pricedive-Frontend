@@ -10,6 +10,9 @@ import SnapKit
 import Kingfisher
 
 final class LikeProductCell: UITableViewCell {
+    // MARK: - Properties
+    private var isLiked: Bool = false
+    
     enum EventStyle {
         case like
         case myPage
@@ -22,9 +25,16 @@ final class LikeProductCell: UITableViewCell {
         imageView.clipsToBounds = true
         return imageView
     }()
+    
     private let dDayLabel = UILabel()
     private let eventTitleLabel = UILabel()
-    private let actionButton = UIButton()
+    
+    private let actionButton: UIButton = {
+        let button = UIButton()
+        button.imageView?.contentMode = .scaleAspectFit
+        return button
+    }()
+    
     private let clockIcon = UIImageView()
     private let endDateLabel = UILabel()
 
@@ -56,6 +66,7 @@ final class LikeProductCell: UITableViewCell {
         eventTitleLabel.snp.makeConstraints { make in
             make.top.equalTo(productImage.snp.top)
             make.leading.equalTo(productImage.snp.trailing).offset(12)
+            make.trailing.lessThanOrEqualTo(actionButton.snp.leading).offset(-8)
         }
 
         dDayLabel.snp.makeConstraints { make in
@@ -76,8 +87,8 @@ final class LikeProductCell: UITableViewCell {
 
         actionButton.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
-            make.trailing.equalToSuperview().offset(-12)
-            make.size.equalTo(24)
+            make.trailing.equalToSuperview().offset(-16)
+            make.size.equalTo(28)
         }
     }
 
@@ -110,7 +121,7 @@ final class LikeProductCell: UITableViewCell {
 
     // MARK: - Configuration Method
     func configure(with event: Event, style: EventStyle) {
-        dDayLabel.text = "D-\(event.dDay)"
+        dDayLabel.text = event.dDayDescription
         eventTitleLabel.text = event.eventTitle
         endDateLabel.text = "이벤트 마감: \(formattedDate(event.eventEndDate))"
 
@@ -122,11 +133,10 @@ final class LikeProductCell: UITableViewCell {
 
         switch style {
         case .like:
-            actionButton.setImage(UIImage(systemName: event.isLiked ? "heart.fill" : "heart"), for: .normal)
-            actionButton.tintColor = UIColor.mainBlack
+            configureActionButtonForLike(event.isLiked)
+            actionButton.addTarget(self, action: #selector(didTapLikeButton), for: .touchUpInside)
         case .myPage:
-            actionButton.setImage(UIImage(systemName: "xmark"), for: .normal)
-            actionButton.tintColor = UIColor.mainRed
+            configureActionButtonForMyPage()
         }
     }
 
@@ -134,5 +144,28 @@ final class LikeProductCell: UITableViewCell {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy. M. d."
         return formatter.string(from: date)
+    }
+    
+    // MARK: - Helper Methods
+    private func configureActionButtonForLike(_ isLiked: Bool) {
+        let imageName = isLiked ? "heart.fill" : "heart"
+        let configuration = UIImage.SymbolConfiguration(pointSize: 28, weight: .regular)
+        let image = UIImage(systemName: imageName, withConfiguration: configuration)
+        actionButton.setImage(image, for: .normal)
+        actionButton.tintColor = isLiked ? UIColor.mainRed : UIColor.mainBlack
+    }
+    
+    private func configureActionButtonForMyPage() {
+        let configuration = UIImage.SymbolConfiguration(pointSize: 28, weight: .regular)
+        let image = UIImage(systemName: "xmark", withConfiguration: configuration)
+        actionButton.setImage(image, for: .normal)
+        actionButton.tintColor = UIColor.mainBlack
+        actionButton.removeTarget(self, action: #selector(didTapLikeButton), for: .touchUpInside)
+    }
+
+    // MARK: - Action Methods
+    @objc private func didTapLikeButton() {
+        isLiked.toggle()
+        configureActionButtonForLike(isLiked)
     }
 }
