@@ -122,10 +122,18 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
     
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let event = viewModel.events[indexPath.row]
-        let detailViewModel = EventDetailViewModel(eventId: event.eventId, homeViewModel: viewModel)
-        let detailViewController = EventDetailViewController(viewModel: detailViewModel, homeViewModel: viewModel)
-        navigationController?.pushViewController(detailViewController, animated: true)
+        guard let cell = collectionView.cellForItem(at: indexPath) as? EventCell else {
+            print("Error: Unable to dequeue EventCell") // 디버깅 로그
+            return
+        }
+        guard let eventId = cell.eventId else {
+            print("Error: Event ID is nil") // 디버깅 로그
+            return
+        }
+
+        viewModel.toggleLike(for: eventId)
+        let isLiked = viewModel.isLiked(for: eventId)
+        cell.updateHeartButton(isLiked: isLiked)
     }
     
 }

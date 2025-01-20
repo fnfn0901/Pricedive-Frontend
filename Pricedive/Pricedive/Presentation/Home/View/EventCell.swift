@@ -52,6 +52,9 @@ class EventCell: UICollectionViewCell {
     private func setupViews() {
         contentView.addSubviews(imageView, titleLabel)
         imageView.addSubviews(profileView, dDayView, heartButton)
+        
+        heartButton.isUserInteractionEnabled = true
+        contentView.isUserInteractionEnabled = true
 
         contentView.bringSubviewToFront(heartButton)
 
@@ -115,16 +118,10 @@ class EventCell: UICollectionViewCell {
     }
     
     func updateHeartButton(isLiked: Bool) {
-        DispatchQueue.main.async {
-            let imageName = isLiked ? "heart.fill" : "heart"
-            let tintColor = isLiked ? UIColor.mainRed : UIColor.mainBlack
-            self.heartButton.setImage(UIImage(systemName: imageName), for: .normal)
-            self.heartButton.tintColor = tintColor
-
-            self.heartButton.setNeedsDisplay()
-            self.heartButton.setNeedsLayout()
-            self.heartButton.layoutIfNeeded()
-        }
+        let imageName = isLiked ? "heart.fill" : "heart"
+        let tintColor = isLiked ? UIColor.red : UIColor.black
+        heartButton.setImage(UIImage(systemName: imageName), for: .normal)
+        heartButton.tintColor = tintColor
     }
     
     private func configureDDayView(event: Event) {
@@ -136,17 +133,10 @@ class EventCell: UICollectionViewCell {
     // MARK: - Actions
     @objc private func handleHeartTapped() {
         guard let viewModel = viewModel, let eventId = eventId else {
+            print("Error: viewModel or eventId is nil") // 디버깅 로그
             return
         }
-        
         viewModel.toggleLike(for: eventId)
-        let isLiked = viewModel.isLiked(for: eventId)
-
-        updateHeartButton(isLiked: isLiked)
-        
-        if let collectionView = superview as? UICollectionView,
-           let indexPath = collectionView.indexPath(for: self) {
-            collectionView.reloadItems(at: [indexPath])
-        }
+        updateHeartButton(isLiked: viewModel.isLiked(for: eventId))
     }
 }
