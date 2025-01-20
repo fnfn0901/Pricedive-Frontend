@@ -12,7 +12,11 @@ class EventDetailView: UIView {
 
     // MARK: - Properties
     var eventId: Int?
-    var viewModel: HomeViewModel?
+    var viewModel: EventDetailViewModel? {
+        didSet {
+            updateView()
+        }
+    }
 
     // MARK: - UI Components
     let navigationBar: UIView = {
@@ -361,4 +365,21 @@ class EventDetailView: UIView {
         
         heartButton.configuration = config
     }
+    
+    // MARK: - Update View
+        private func updateView() {
+            guard let viewModel = viewModel else { return }
+
+            titleLabel.text = viewModel.eventTitle
+            imageView.kf.setImage(with: viewModel.eventImageURL)
+            if let profileImageView = profileView.subviews.first as? UIImageView {
+                profileImageView.kf.setImage(with: viewModel.youtuberProfileImageURL)
+            }
+            if let dDayLabel = dDayView.subviews.first(where: { $0 is UILabel }) as? UILabel {
+                dDayLabel.text = viewModel.dDayText
+            }
+            eventDescriptionLabel.text = viewModel.eventDescription ?? ""
+            updateHeartButton(isLiked: viewModel.isLiked)
+        }
+
 }

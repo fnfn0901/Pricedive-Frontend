@@ -122,16 +122,34 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
     
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let cell = collectionView.cellForItem(at: indexPath) as? EventCell else {
-            print("Error: Unable to dequeue EventCell") // 디버깅 로그
-            return
-        }
-        guard let eventId = cell.eventId else {
-            print("Error: Event ID is nil") // 디버깅 로그
+        guard indexPath.row < viewModel.events.count else {
+            print("Error: Index out of bounds") // 디버깅 로그
             return
         }
 
+        // 선택한 이벤트의 ID 가져오기
+        let selectedEventId = viewModel.events[indexPath.row].eventId
+        
+        // EventDetailViewModel 초기화
+        let detailViewModel = EventDetailViewModel(eventId: selectedEventId, homeViewModel: viewModel)
+        
+        // EventDetailViewController 초기화
+        let detailViewController = EventDetailViewController(viewModel: detailViewModel)
+        
+        // 상세 보기로 전환
+        navigationController?.pushViewController(detailViewController, animated: true)
+    }
+
+    @objc private func handleHeartButtonTap(_ sender: UIButton) {
+        guard let cell = sender.superview?.superview as? EventCell, let eventId = cell.eventId else {
+            print("Error: Unable to identify cell or event ID")
+            return
+        }
+
+        // 좋아요 상태 토글
         viewModel.toggleLike(for: eventId)
+
+        // 좋아요 버튼 상태 업데이트
         let isLiked = viewModel.isLiked(for: eventId)
         cell.updateHeartButton(isLiked: isLiked)
     }

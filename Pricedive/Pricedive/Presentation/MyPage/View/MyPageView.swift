@@ -8,7 +8,13 @@
 import UIKit
 import SnapKit
 
+protocol MyPageViewDelegate: AnyObject {
+    func clearAllButtonTapped()
+}
+
 class MyPageView: UIView {
+    weak var delegate: MyPageViewDelegate?
+
     let navigationBarLabel: UILabel = {
         let label = CustomStyles.navigationText()
         label.text = "최근 본 상품"
@@ -37,6 +43,7 @@ class MyPageView: UIView {
         super.init(frame: frame)
         setupView()
         setupConstraints()
+        setupActions()
     }
 
     required init?(coder: NSCoder) {
@@ -68,6 +75,15 @@ class MyPageView: UIView {
             make.edges.equalToSuperview()
             make.width.equalToSuperview()
         }
+    }
+
+    private func setupActions() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(clearAllTapped))
+        clearAllLabel.addGestureRecognizer(tapGesture)
+    }
+
+    @objc private func clearAllTapped() {
+        delegate?.clearAllButtonTapped()
     }
 
     func addSection(title: String, cells: [UIView]) {

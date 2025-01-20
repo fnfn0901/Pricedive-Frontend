@@ -30,8 +30,6 @@ class MyPageViewController: UIViewController {
         super.viewDidLoad()
         setupNavigationBar()
         bindViewModel()
-        populateSections(with: createSampleViewedProducts())
-        setupClearAllAction()
     }
 
     private func setupNavigationBar() {
@@ -39,69 +37,51 @@ class MyPageViewController: UIViewController {
     }
 
     private func bindViewModel() {
-        // 필요 시 ViewModel 바인딩 로직 추가
+        viewModel.$events
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] events in
+                self?.populateSections(with: events)
+            }
+            .store(in: &cancellables)
     }
 
-    private func populateSections(with viewedProducts: [ViewedProduct]) {
-        let groupedProducts = groupProductsByDate(viewedProducts)
-
-        groupedProducts.forEach { (title, products) in
-            let cells = products.map { product -> UIView in
+    private func populateSections(with events: [Event]) {
+        let groupedEvents = groupEventsByDate(events)
+        
+        groupedEvents.forEach { (title, events) in
+            let cells = events.map { event -> UIView in
                 let cell = LikeProductCell()
-                cell.configure(with: product.toEvent(), style: .myPage)
+                cell.configure(with: event, style: .myPage)
                 return cell
             }
             myPageView.addSection(title: title, cells: cells)
         }
     }
 
-    private func groupProductsByDate(_ products: [ViewedProduct]) -> [(String, [ViewedProduct])] {
+    private func groupEventsByDate(_ events: [Event]) -> [(String, [Event])] {
         let calendar = Calendar.current
         let today = Date()
         let yesterday = calendar.date(byAdding: .day, value: -1, to: today)!
         let startOfWeek = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: today))!
 
-        var todayProducts = [ViewedProduct]()
-        var yesterdayProducts = [ViewedProduct]()
-        var thisWeekProducts = [ViewedProduct]()
+        var todayEvents = [Event]()
+        var yesterdayEvents = [Event]()
+        var thisWeekEvents = [Event]()
 
-        products.forEach { product in
-            if calendar.isDate(product.viewedDate, inSameDayAs: today) {
-                todayProducts.append(product)
-            } else if calendar.isDate(product.viewedDate, inSameDayAs: yesterday) {
-                yesterdayProducts.append(product)
-            } else if product.viewedDate >= startOfWeek {
-                thisWeekProducts.append(product)
+        events.forEach { event in
+            if calendar.isDate(event.eventEndDate, inSameDayAs: today) {
+                todayEvents.append(event)
+            } else if calendar.isDate(event.eventEndDate, inSameDayAs: yesterday) {
+                yesterdayEvents.append(event)
+            } else if event.eventEndDate >= startOfWeek {
+                thisWeekEvents.append(event)
             }
         }
 
         return [
-            ("오늘", todayProducts),
-            ("어제", yesterdayProducts),
-            ("이번 주", thisWeekProducts)
+            ("오늘", todayEvents),
+            ("어제", yesterdayEvents),
+            ("이번 주", thisWeekEvents)
         ].filter { !$0.1.isEmpty }
-    }
-
-    private func setupClearAllAction() {
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleClearAllTapped))
-        myPageView.clearAllLabel.addGestureRecognizer(tapGesture)
-    }
-
-    @objc private func handleClearAllTapped() {
-        myPageView.contentView.subviews.forEach { $0.removeFromSuperview() }
-    }
-
-    private func createSampleViewedProducts() -> [ViewedProduct] {
-        let calendar = Calendar.current
-        let today = Date()
-        let yesterday = calendar.date(byAdding: .day, value: -1, to: today)!
-        let earlierThisWeek = calendar.date(byAdding: .day, value: -3, to: today)!
-
-        return [
-            ViewedProduct(id: 1, title: "오늘 본 상품 1", imageUrl: "https://via.placeholder.com/150", viewedDate: today),
-            ViewedProduct(id: 2, title: "오늘 본 상품 2", imageUrl: "https://via.placeholder.com/150", viewedDate: today),
-            ViewedProduct(id: 3, title: "어제 본 상품 1", imageUrl: "https://via.placeholder.com/150", viewedDate: yesterday),
-            ViewedProduct(id: 4, title: "이번 주 본 상품 1", imageUrl: "https://via.placeholder.com/150", viewedDate: earlierThisWeek)
-        ]
     }
 }

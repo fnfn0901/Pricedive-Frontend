@@ -11,11 +11,9 @@ import SafariServices
 class EventDetailViewController: UIViewController, UIGestureRecognizerDelegate {
     private let viewModel: EventDetailViewModel
     private let detailView = EventDetailView()
-    private let homeViewModel: HomeViewModel
 
-    init(viewModel: EventDetailViewModel, homeViewModel: HomeViewModel) {
+    init(viewModel: EventDetailViewModel) {
         self.viewModel = viewModel
-        self.homeViewModel = homeViewModel
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -24,8 +22,7 @@ class EventDetailViewController: UIViewController, UIGestureRecognizerDelegate {
     }
 
     override func loadView() {
-        detailView.eventId = viewModel.eventId
-        detailView.viewModel = homeViewModel
+        detailView.viewModel = viewModel
         view = detailView
     }
 
@@ -103,5 +100,4 @@ class EventDetailViewController: UIViewController, UIGestureRecognizerDelegate {
         let safariVC = SFSafariViewController(url: url)
         present(safariVC, animated: true)
     }
-    
 }

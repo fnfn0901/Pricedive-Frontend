@@ -38,16 +38,15 @@ class HomeViewModel {
     func toggleLike(for eventId: Int) {
         if likedEvents.contains(eventId) {
             likedEvents.remove(eventId)
-            print("Event \(eventId) removed from liked events.") // 디버그 로그
+            print("Event \(eventId) removed from liked events.")
         } else {
             likedEvents.insert(eventId)
-            print("Event \(eventId) added to liked events.") // 디버그 로그
+            print("Event \(eventId) added to liked events.")
         }
     }
 
     func isLiked(for eventId: Int) -> Bool {
         let result = likedEvents.contains(eventId)
-        print("Checking isLiked for event \(eventId): \(result)") // 디버그 로그
         return result
     }
 }
