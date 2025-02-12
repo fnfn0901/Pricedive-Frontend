@@ -7,13 +7,15 @@
 
 import UIKit
 import SafariServices
+import Combine
 
-class EventDetailViewController: UIViewController, UIGestureRecognizerDelegate {
+class EventDetailViewController: UIViewController {
     private let viewModel: EventDetailViewModel
     private let detailView = EventDetailView()
+    private var cancellables = Set<AnyCancellable>()
 
-    init(viewModel: EventDetailViewModel) {
-        self.viewModel = viewModel
+    init(eventId: Int, homeViewModel: HomeViewModel) {
+        self.viewModel = EventDetailViewModel(eventId: eventId, homeViewModel: homeViewModel)
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -22,7 +24,6 @@ class EventDetailViewController: UIViewController, UIGestureRecognizerDelegate {
     }
 
     override func loadView() {
-        detailView.viewModel = viewModel
         view = detailView
     }
 
@@ -40,64 +41,45 @@ class EventDetailViewController: UIViewController, UIGestureRecognizerDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupBindings()
         setupActions()
-        updateView()
-        enableSwipeBackGesture()
+        viewModel.fetchEventDetail()
     }
 
-    private func enableSwipeBackGesture() {
-        navigationController?.interactivePopGestureRecognizer?.delegate = self
+    private func setupBindings() {
+        viewModel.$eventDetail
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] event in
+                guard let self = self, let event = event else { return }
+                self.detailView.updateView(with: event, isLiked: self.viewModel.isLiked)
+            }
+            .store(in: &cancellables)
     }
 
     private func setupActions() {
         detailView.backIconButton.addTarget(self, action: #selector(didTapBack), for: .touchUpInside)
-        detailView.searchIconButton.addTarget(self, action: #selector(didTapSearch), for: .touchUpInside)
         detailView.goToButton.addTarget(self, action: #selector(didTapGoToButton), for: .touchUpInside)
-    }
-
-    private func updateView() {
-        detailView.configureCell(
-            title: viewModel.eventTitle,
-            imageUrl: viewModel.eventImageURL?.absoluteString ?? "",
-            profileImageUrl: viewModel.youtuberProfileImageURL?.absoluteString ?? "",
-            dDayText: viewModel.dDayText,
-            eventDescription: viewModel.eventDescription ?? ""
-        )
+        detailView.heartButton.addTarget(self, action: #selector(didTapHeartButton), for: .touchUpInside)
     }
 
     @objc private func didTapBack() {
         navigationController?.popViewController(animated: true)
     }
 
-    @objc private func didTapSearch() {
-        detailView.navigationBar.isHidden = true
-        
-        if detailView.searchBarView.superview == nil {
-            detailView.addSubview(detailView.searchBarView)
-            detailView.searchBarView.snp.makeConstraints { make in
-                make.top.equalTo(self.view.safeAreaLayoutGuide.snp.top).offset(8)
-                make.leading.trailing.equalToSuperview().inset(20)
-                make.height.equalTo(48)
-            }
-        }
-        detailView.searchBarView.isHidden = false
-        
-        detailView.searchBarView.onCancelTapped = { [weak self] in
-            guard let self = self else { return }
-            self.detailView.searchBarView.isHidden = true
-            self.detailView.navigationBar.isHidden = false
-        }
-    }
-
     @objc private func didTapGoToButton() {
-        guard let eventLink = viewModel.eventLink, let url = URL(string: eventLink) else {
+        guard let eventLink = viewModel.eventDetail?.previewImg, let url = URL(string: eventLink) else {
             let alert = UIAlertController(title: "Error", message: "Invalid link.", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default))
             present(alert, animated: true)
             return
         }
-        
+
         let safariVC = SFSafariViewController(url: url)
         present(safariVC, animated: true)
+    }
+
+    @objc private func didTapHeartButton() {
+        viewModel.toggleLikeStatus()
+        detailView.updateHeartButton(isLiked: viewModel.isLiked)
     }
 }

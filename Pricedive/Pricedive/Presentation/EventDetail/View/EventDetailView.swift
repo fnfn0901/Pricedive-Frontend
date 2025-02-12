@@ -83,7 +83,7 @@ class EventDetailView: UIView {
         return view
     }()
 
-    private lazy var heartButton: UIButton = {
+    lazy var heartButton: UIButton = {
         let button = UIButton(type: .system)
         var config = UIButton.Configuration.plain()
         config.image = UIImage(systemName: "heart")
@@ -354,7 +354,7 @@ class EventDetailView: UIView {
         updateHeartButton(isLiked: isHeartSelected)
     }
 
-    private func updateHeartButton(isLiked: Bool) {
+    func updateHeartButton(isLiked: Bool) {
         let imageName = isLiked ? "heart.fill" : "heart"
         let tintColor = isLiked ? UIColor.mainRed : UIColor.mainBlack
 
@@ -367,19 +367,20 @@ class EventDetailView: UIView {
     }
     
     // MARK: - Update View
-        private func updateView() {
-            guard let viewModel = viewModel else { return }
+    private func updateView() {
+        guard let event = viewModel?.eventDetail else { return }
+        updateView(with: event, isLiked: viewModel?.isLiked ?? false)
+    }
 
-            titleLabel.text = viewModel.eventTitle
-            imageView.kf.setImage(with: viewModel.eventImageURL)
-            if let profileImageView = profileView.subviews.first as? UIImageView {
-                profileImageView.kf.setImage(with: viewModel.youtuberProfileImageURL)
-            }
-            if let dDayLabel = dDayView.subviews.first(where: { $0 is UILabel }) as? UILabel {
-                dDayLabel.text = viewModel.dDayText
-            }
-            eventDescriptionLabel.text = viewModel.eventDescription ?? ""
-            updateHeartButton(isLiked: viewModel.isLiked)
+    func updateView(with event: EventDTO, isLiked: Bool) {
+        titleLabel.text = event.eventItem
+        imageView.kf.setImage(with: URL(string: event.previewImg))
+        eventDescriptionLabel.text = event.category
+
+        if let dDayLabel = dDayView.subviews.first(where: { $0 is UILabel }) as? UILabel {
+            dDayLabel.text = "D-\(event.eventNums)"
         }
 
+        updateHeartButton(isLiked: isLiked)
+    }
 }

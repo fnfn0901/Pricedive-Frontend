@@ -11,7 +11,12 @@ class NetworkManager {
     static let shared = NetworkManager()
     private init() {}
     
-    func request<T: Decodable>(endpoint: Endpoint, baseURL: URL, responseType: T.Type, completion: @escaping (Result<T, Error>) -> Void) {
+    func request<T: Decodable>(
+        endpoint: Endpoint,
+        baseURL: URL,
+        responseType: T.Type,
+        completion: @escaping (Result<T, Error>) -> Void
+    ) {
         guard let request = endpoint.urlRequest(baseURL: baseURL) else {
             completion(.failure(NSError(domain: "Invalid URL Request", code: -1, userInfo: nil)))
             return

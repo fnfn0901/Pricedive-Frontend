@@ -16,7 +16,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
         setupViewControllers()
     }
     
-    // MARK: - TabBar Appearance
+    // MARK: - TabBar Appearance 설정
     private func setupTabBarAppearance() {
         let appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
@@ -42,9 +42,9 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
         }
     }
     
-    // MARK: - View Controllers Setup
+    // MARK: - View Controllers 설정
     private func setupViewControllers() {
-        let homeViewModel = HomeViewModel(events: createSampleEvents())
+        let homeViewModel = HomeViewModel()
 
         let categoryController = createViewController(CategoryViewController(viewModel: CategoryViewModel()), title: "Category", image: "line.3.horizontal", tag: 0)
         let homeViewController = createViewController(UINavigationController(rootViewController: HomeViewController(viewModel: homeViewModel)), title: "Home", image: "house", tag: 1)
@@ -59,29 +59,13 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
 
         viewControllers = [categoryController, homeViewController, likeViewController, myPageViewController]
         selectedIndex = 1
+
+        homeViewModel.loadEvents()
     }
     
     private func createViewController(_ controller: UIViewController, title: String, image: String, tag: Int) -> UIViewController {
         controller.tabBarItem = UITabBarItem(title: title, image: UIImage(systemName: image), tag: tag)
         return controller
-    }
-    
-    private func createSampleEvents() -> [Event] {
-        let calendar = Calendar.current
-        let defaultDate = Date()
-
-        return (1...20).map { index in
-            Event(
-                eventId: index,
-                eventLink: "https://www.youtube.com/watch?v=Kg7_J70MANo",
-                eventImage: "https://via.placeholder.com/150",
-                youtuberProfileImage: "https://yt3.googleusercontent.com/s900-c-k-c0x00ffffff-no-rj",
-                eventEndDate: calendar.date(byAdding: .day, value: index, to: defaultDate) ?? defaultDate,
-                eventTitle: "Sample Event \(index)",
-                eventDescription: "Sample Description for Event \(index)",
-                isLiked: false
-            )
-        }
     }
     
     // MARK: - UITabBarControllerDelegate

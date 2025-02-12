@@ -13,7 +13,7 @@ class EventCell: UICollectionViewCell {
 
     var viewModel: HomeViewModel?
     var eventId: Int?
-    
+
     // MARK: - UI Components
     private let imageView: UIImageView = {
         let imageView = UIImageView()
@@ -21,10 +21,11 @@ class EventCell: UICollectionViewCell {
         imageView.clipsToBounds = true
         return imageView
     }()
-    
+
     private let titleLabel: UILabel = CustomStyles.productTitle()
     private let profileView = UIView.createYoutuberProfileView(imageUrl: "")
     private let dDayView = UIView.createDDayView(text: "0")
+    
     lazy var heartButton: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(systemName: "heart"), for: .normal)
@@ -33,9 +34,6 @@ class EventCell: UICollectionViewCell {
         button.addTarget(self, action: #selector(handleHeartTapped), for: .touchUpInside)
         return button
     }()
-
-    // MARK: - State
-    private var isHeartSelected = false
 
     // MARK: - Initializers
     override init(frame: CGRect) {
@@ -55,12 +53,7 @@ class EventCell: UICollectionViewCell {
         
         heartButton.isUserInteractionEnabled = true
         contentView.isUserInteractionEnabled = true
-
         contentView.bringSubviewToFront(heartButton)
-
-        imageView.isUserInteractionEnabled = false
-        profileView.isUserInteractionEnabled = false
-        dDayView.isUserInteractionEnabled = false
     }
 
     private func setupConstraints() {
@@ -96,44 +89,22 @@ class EventCell: UICollectionViewCell {
         self.viewModel = viewModel
         self.eventId = event.eventId
 
-        configureTitle(event: event)
-        configureImageView(event: event)
-        configureProfileView(event: event)
-        configureDDayView(event: event)
+        titleLabel.text = event.eventTitle
+        imageView.kf.setImage(with: URL(string: event.eventImage))
         updateHeartButton(isLiked: viewModel.isLiked(for: event.eventId))
     }
-    
-    private func configureTitle(event: Event) {
-        titleLabel.text = event.eventTitle
-    }
 
-    private func configureImageView(event: Event) {
-        imageView.kf.setImage(with: URL(string: event.eventImage))
-    }
-
-    private func configureProfileView(event: Event) {
-        if let profileImageView = profileView.subviews.first as? UIImageView {
-            profileImageView.kf.setImage(with: URL(string: event.youtuberProfileImage))
-        }
-    }
-    
     func updateHeartButton(isLiked: Bool) {
         let imageName = isLiked ? "heart.fill" : "heart"
         let tintColor = isLiked ? UIColor.red : UIColor.black
         heartButton.setImage(UIImage(systemName: imageName), for: .normal)
         heartButton.tintColor = tintColor
     }
-    
-    private func configureDDayView(event: Event) {
-        if let dDayLabel = dDayView.subviews.first(where: { $0 is UILabel }) as? UILabel {
-            dDayLabel.text = event.dDayDescription
-        }
-    }
 
     // MARK: - Actions
     @objc private func handleHeartTapped() {
         guard let viewModel = viewModel, let eventId = eventId else {
-            print("Error: viewModel or eventId is nil") // 디버깅 로그
+            print("Error: viewModel or eventId is nil")
             return
         }
         viewModel.toggleLike(for: eventId)
