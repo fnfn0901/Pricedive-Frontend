@@ -57,12 +57,6 @@ class HomeView: BaseView, UITextFieldDelegate {
             make.height.equalTo(150)
         }
         
-        searchBarView.snp.makeConstraints { make in
-            make.top.equalTo(safeAreaLayoutGuide.snp.top).offset(8)
-            make.leading.trailing.equalToSuperview().inset(20)
-            make.height.equalTo(48)
-        }
-        
         scrollView.snp.remakeConstraints { make in
             make.top.equalTo(topFixedFrame.snp.bottom).offset(2)
             make.leading.trailing.bottom.equalToSuperview()
