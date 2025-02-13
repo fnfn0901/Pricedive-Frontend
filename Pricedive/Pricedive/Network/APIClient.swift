@@ -27,7 +27,13 @@ final class APIClient {
         request.allHTTPHeaderFields = endpoint.headers
         request.httpBody = endpoint.body
 
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+        let config = URLSessionConfiguration.default
+        config.timeoutIntervalForRequest = 30
+        config.timeoutIntervalForResource = 60
+        
+        let session = URLSession(configuration: config)
+        
+        let task = session.dataTask(with: request) { data, response, error in
             if let error = error {
                 completion(.failure(.other(error)))
                 return

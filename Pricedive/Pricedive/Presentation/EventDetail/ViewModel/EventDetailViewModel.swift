@@ -10,6 +10,8 @@ import Combine
 
 class EventDetailViewModel: ObservableObject {
     @Published var eventDetail: EventDTO?
+    @Published var videoDetail: VideoDTO?
+
     private let eventId: Int
     private let homeViewModel: HomeViewModel
 
@@ -18,15 +20,15 @@ class EventDetailViewModel: ObservableObject {
         self.homeViewModel = homeViewModel
     }
 
-    /// 이벤트 상세 정보 API 호출
-    func fetchEventDetail() {
-        APIManager.shared.fetchEventDetail(eventId: eventId) { [weak self] result in
+    /// 비디오 상세 정보 API 호출
+    func fetchVideoDetail(videoId: Int) {
+        APIManager.shared.fetchVideoDetail(videoId: videoId) { [weak self] (result: Result<VideoDTO, NetworkError>) in
             DispatchQueue.main.async {
                 switch result {
-                case .success(let event):
-                    self?.eventDetail = event
+                case .success(let video):
+                    self?.videoDetail = video
                 case .failure(let error):
-                    print("❌ 이벤트 상세 정보 불러오기 실패: \(error.localizedDescription)")
+                    print("❌ 비디오 상세 정보 불러오기 실패: \(error.localizedDescription)")
                 }
             }
         }

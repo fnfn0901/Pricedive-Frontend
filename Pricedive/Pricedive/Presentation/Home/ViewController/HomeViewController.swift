@@ -85,7 +85,7 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard indexPath.row < viewModel.events.count else {
-            print("Error: Index out of bounds") // 디버깅 로그
+            print("Error: Index out of bounds")
             return
         }
 

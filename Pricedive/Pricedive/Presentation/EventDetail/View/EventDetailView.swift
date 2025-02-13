@@ -57,6 +57,7 @@ class EventDetailView: UIView {
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         imageView.isUserInteractionEnabled = true
+        imageView.backgroundColor = .mainWhite
         return imageView
     }()
 
@@ -271,7 +272,7 @@ class EventDetailView: UIView {
         }
 
         heartButton.snp.makeConstraints {
-            $0.trailing.bottom.equalToSuperview().offset(-12)
+            $0.trailing.bottom.equalToSuperview().offset(-20)
             $0.size.equalTo(24)
         }
 
@@ -382,5 +383,15 @@ class EventDetailView: UIView {
         }
 
         updateHeartButton(isLiked: isLiked)
+    }
+    
+    func updateVideoView(with video: VideoDTO) {
+        titleLabel.text = video.title
+        imageView.kf.setImage(with: URL(string: video.urlLink))
+        eventDescriptionLabel.text = video.description
+
+        if let profileImageView = profileView.subviews.first as? UIImageView {
+            profileImageView.kf.setImage(with: URL(string: video.channelImg))
+        }
     }
 }

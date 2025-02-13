@@ -13,6 +13,7 @@ enum NetworkError: Error {
     case serverError(statusCode: Int)
     case noData
     case decodingError
+    case timeout
     case other(Error)
     
     var localizedDescription: String {
@@ -22,6 +23,7 @@ enum NetworkError: Error {
         case .serverError(let statusCode): return "Server error with status code: \(statusCode)."
         case .noData: return "No data received."
         case .decodingError: return "Failed to decode data."
+        case .timeout: return "The request timed out."
         case .other(let error): return error.localizedDescription
         }
     }

@@ -13,8 +13,10 @@ class EventDetailViewController: UIViewController {
     private let viewModel: EventDetailViewModel
     private let detailView = EventDetailView()
     private var cancellables = Set<AnyCancellable>()
+    private let eventId: Int
 
     init(eventId: Int, homeViewModel: HomeViewModel) {
+        self.eventId = eventId
         self.viewModel = EventDetailViewModel(eventId: eventId, homeViewModel: homeViewModel)
         super.init(nibName: nil, bundle: nil)
     }
@@ -43,15 +45,15 @@ class EventDetailViewController: UIViewController {
         super.viewDidLoad()
         setupBindings()
         setupActions()
-        viewModel.fetchEventDetail()
+        viewModel.fetchVideoDetail(videoId: eventId)
     }
 
     private func setupBindings() {
-        viewModel.$eventDetail
+        viewModel.$videoDetail
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] event in
-                guard let self = self, let event = event else { return }
-                self.detailView.updateView(with: event, isLiked: self.viewModel.isLiked)
+            .sink { [weak self] video in
+                guard let self = self, let video = video else { return }
+                self.detailView.updateVideoView(with: video)
             }
             .store(in: &cancellables)
     }
@@ -67,9 +69,9 @@ class EventDetailViewController: UIViewController {
     }
 
     @objc private func didTapGoToButton() {
-        guard let eventLink = viewModel.eventDetail?.previewImg, let url = URL(string: eventLink) else {
-            let alert = UIAlertController(title: "Error", message: "Invalid link.", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .default))
+        guard let videoLink = viewModel.videoDetail?.urlLink, let url = URL(string: videoLink) else {
+            let alert = UIAlertController(title: "Error", message: "올바른 URL이 없습니다.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "확인", style: .default))
             present(alert, animated: true)
             return
         }
