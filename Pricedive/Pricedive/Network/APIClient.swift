@@ -35,6 +35,7 @@ final class APIClient {
         
         let task = session.dataTask(with: request) { data, response, error in
             if let error = error {
+                print("❌ 요청 실패: \(error.localizedDescription)")
                 completion(.failure(.other(error)))
                 return
             }
@@ -45,6 +46,7 @@ final class APIClient {
             }
 
             guard (200...299).contains(httpResponse.statusCode) else {
+                print("⚠️ 서버 오류: \(httpResponse.statusCode)")
                 completion(.failure(.serverError(statusCode: httpResponse.statusCode)))
                 return
             }
@@ -56,8 +58,10 @@ final class APIClient {
 
             do {
                 let decodedData = try JSONDecoder().decode(T.self, from: data)
+                print("✅ 성공 응답: \(String(data: data, encoding: .utf8) ?? "No Data")")
                 completion(.success(decodedData))
             } catch {
+                print("⚠️ 디코딩 오류: \(error.localizedDescription)")
                 completion(.failure(.decodingError))
             }
         }

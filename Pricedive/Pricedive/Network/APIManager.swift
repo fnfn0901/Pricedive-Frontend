@@ -10,114 +10,30 @@ import Foundation
 class APIManager {
     static let shared = APIManager()
     private let baseURL = URL(string: "http://172.30.1.71:8080")!
-    
+
     private init() {}
-    
-    /// 전체 이벤트 리스트 가져오기
-    func fetchEvents(completion: @escaping (Result<[EventDTO], NetworkError>) -> Void) {
-        let endpoint = "/events"
-        guard let url = URL(string: baseURL.absoluteString + endpoint) else {
-            completion(.failure(.invalidURL))
-            return
-        }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.setValue("application/json", forHTTPHeaderField: "Accept")
-        
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            if let error = error {
-                completion(.failure(.other(error)))
-                return
-            }
-            
-            guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
-                completion(.failure(.serverError(statusCode: (response as? HTTPURLResponse)?.statusCode ?? 500)))
-                return
-            }
-            
-            guard let data = data else {
-                completion(.failure(.noData))
-                return
-            }
-            
-            do {
-                let apiResponse = try JSONDecoder().decode(APIResponse<[EventDTO]>.self, from: data)
-                completion(.success(apiResponse.data))
-            } catch {
-                completion(.failure(.decodingError))
-            }
-        }
-        
-        task.resume()
-    }
-    
-    /// 특정 이벤트 상세 정보 가져오기
-    func fetchEventDetail(eventId: Int, completion: @escaping (Result<EventDTO, NetworkError>) -> Void) {
-        let endpoint = "/events/\(eventId)"
-        guard let url = URL(string: baseURL.absoluteString + endpoint) else {
-            completion(.failure(.invalidURL))
-            return
-        }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.setValue("application/json", forHTTPHeaderField: "Accept")
-        
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            if let error = error {
-                completion(.failure(.other(error)))
-                return
-            }
-            
-            guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
-                completion(.failure(.serverError(statusCode: (response as? HTTPURLResponse)?.statusCode ?? 500)))
-                return
-            }
-            
-            guard let data = data else {
-                completion(.failure(.noData))
-                return
-            }
-            
-            do {
-                let apiResponse = try JSONDecoder().decode(APIResponse<EventDTO>.self, from: data)
-                completion(.success(apiResponse.data))
-            } catch {
-                completion(.failure(.decodingError))
-            }
-        }
-        
-        task.resume()
-    }
-    
-    /// 특정 비디오 상세 정보 가져오기
-    func fetchVideoDetail(videoId: Int, retryCount: Int = 3, completion: @escaping (Result<VideoDTO, NetworkError>) -> Void) {
-        let endpoint = "/videos/\(videoId)"
+
+    /// **공통 네트워크 요청 함수**
+    func request<T: Decodable>(
+        endpoint: String,
+        method: String = "GET",
+        body: Data? = nil,
+        completion: @escaping (Result<T, NetworkError>) -> Void
+    ) {
         guard let url = URL(string: baseURL.absoluteString + endpoint) else {
             completion(.failure(.invalidURL))
             return
         }
 
         var request = URLRequest(url: url)
-        request.httpMethod = "GET"
+        request.httpMethod = method
         request.setValue("application/json", forHTTPHeaderField: "Accept")
-        request.timeoutInterval = 15.0
+        if let body = body {
+            request.httpBody = body
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        }
 
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            if let error = error as? URLError, error.code == .timedOut {
-                print("⏳ 요청이 타임아웃되었습니다. 남은 재시도 횟수: \(retryCount)")
-                if retryCount > 0 {
-                    DispatchQueue.global().asyncAfter(deadline: .now() + 2) {
-                        self.fetchVideoDetail(videoId: videoId, retryCount: retryCount - 1, completion: completion)
-                    }
-                    return
-                } else {
-                    completion(.failure(.timeout))
-                    return
-                }
-            }
-
             if let error = error {
                 completion(.failure(.other(error)))
                 return
@@ -139,15 +55,38 @@ class APIManager {
             }
 
             do {
-                let decoder = JSONDecoder()
-                decoder.dateDecodingStrategy = .iso8601
-                let apiResponse = try decoder.decode(APIResponse<VideoDTO>.self, from: data)
-                completion(.success(apiResponse.data))
+                let decodedData = try JSONDecoder().decode(T.self, from: data)
+                completion(.success(decodedData))
             } catch {
                 completion(.failure(.decodingError))
             }
         }
-
         task.resume()
+    }
+
+    /// **전체 이벤트 리스트 가져오기**
+    func fetchEvents(completion: @escaping (Result<[EventDTO], NetworkError>) -> Void) {
+        request(endpoint: "/events", completion: completion)
+    }
+
+    /// **특정 이벤트 상세 정보 가져오기**
+    func fetchEventDetail(eventId: Int, completion: @escaping (Result<EventDTO, NetworkError>) -> Void) {
+        request(endpoint: "/events/\(eventId)", completion: completion)
+    }
+
+    /// **특정 유저가 좋아요한 이벤트 리스트 가져오기**
+    func fetchLikedEvents(userId: Int, completion: @escaping (Result<[Int], NetworkError>) -> Void) {
+        request(endpoint: "/like_events/user/\(userId)", completion: completion)
+    }
+
+    /// **좋아요 추가 / 삭제 (`POST` → 추가, `DELETE` → 삭제)**
+    func toggleLike(userId: Int, eventId: Int, isLiked: Bool, completion: @escaping (Result<Bool, NetworkError>) -> Void) {
+        let method = isLiked ? "DELETE" : "POST"
+        request(endpoint: "/like_events/user/\(userId)/event/\(eventId)", method: method, completion: completion)
+    }
+    
+    /// **특정 비디오 상세 정보 가져오기**
+    func fetchVideoDetail(videoId: Int, completion: @escaping (Result<VideoDTO, NetworkError>) -> Void) {
+        request(endpoint: "/videos/\(videoId)", completion: completion)
     }
 }

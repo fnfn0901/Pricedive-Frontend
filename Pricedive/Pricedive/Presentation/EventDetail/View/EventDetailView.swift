@@ -355,8 +355,15 @@ class EventDetailView: UIView {
     }
 
     @objc private func heartButtonTapped() {
-        isHeartSelected.toggle()
-        updateHeartButton(isLiked: isHeartSelected)
+        guard let eventId = eventId, let viewModel = viewModel else { return }
+
+        let userId = viewModel.userId
+
+        viewModel.toggleLikeStatus(userId: userId, eventId: eventId) { [weak self] isLiked in
+            DispatchQueue.main.async {
+                self?.updateHeartButton(isLiked: isLiked)
+            }
+        }
     }
 
     func updateHeartButton(isLiked: Bool) {

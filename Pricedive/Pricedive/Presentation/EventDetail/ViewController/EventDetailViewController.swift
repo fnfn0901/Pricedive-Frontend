@@ -14,9 +14,11 @@ class EventDetailViewController: UIViewController {
     private let detailView = EventDetailView()
     private var cancellables = Set<AnyCancellable>()
     private let eventId: Int
+    private let userId: Int
 
     init(eventId: Int, homeViewModel: HomeViewModel) {
         self.eventId = eventId
+        self.userId = homeViewModel.userId
         self.viewModel = EventDetailViewModel(eventId: eventId, homeViewModel: homeViewModel)
         super.init(nibName: nil, bundle: nil)
     }
@@ -81,7 +83,10 @@ class EventDetailViewController: UIViewController {
     }
 
     @objc private func didTapHeartButton() {
-        viewModel.toggleLikeStatus()
-        detailView.updateHeartButton(isLiked: viewModel.isLiked)
+        viewModel.toggleLikeStatus(userId: userId, eventId: eventId) { [weak self] isLiked in
+            DispatchQueue.main.async {
+                self?.detailView.updateHeartButton(isLiked: isLiked)
+            }
+        }
     }
 }

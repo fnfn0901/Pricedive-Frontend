@@ -103,11 +103,14 @@ class EventCell: UICollectionViewCell {
 
     // MARK: - Actions
     @objc private func handleHeartTapped() {
-        guard let viewModel = viewModel, let eventId = eventId else {
-            print("Error: viewModel or eventId is nil")
-            return
+        guard let viewModel = viewModel, let eventId = eventId else { return }
+        
+        let userId = viewModel.userId
+
+        viewModel.toggleLikeStatus(userId: userId, eventId: eventId) { [weak self] isLiked in
+            DispatchQueue.main.async {
+                self?.updateHeartButton(isLiked: isLiked)
+            }
         }
-        viewModel.toggleLike(for: eventId)
-        updateHeartButton(isLiked: viewModel.isLiked(for: eventId))
     }
 }
