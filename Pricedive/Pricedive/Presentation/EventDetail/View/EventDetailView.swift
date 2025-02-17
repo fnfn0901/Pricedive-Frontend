@@ -355,15 +355,15 @@ class EventDetailView: UIView {
     }
 
     @objc private func heartButtonTapped() {
-        guard let viewModel = viewModel,
-              let videoId = viewModel.videoDetail?.id else {
-            print("❌ Error: 비디오 ID를 찾을 수 없음")
+        guard let viewModel = viewModel else {
+            print("❌ Error: ViewModel이 존재하지 않음")
             return
         }
 
+        let eventId = viewModel.event.eventId
         let userId = viewModel.userId
 
-        viewModel.toggleLikeStatus(userId: userId, videoId: videoId) { [weak self] isLiked in
+        viewModel.toggleLikeStatus(userId: userId, eventId: eventId) { [weak self] isLiked in
             DispatchQueue.main.async {
                 self?.updateHeartButton(isLiked: isLiked)
             }
@@ -384,20 +384,22 @@ class EventDetailView: UIView {
     
     // MARK: - Update View
     private func updateView() {
-        guard let video = viewModel?.videoDetail else { return }
-        updateVideoView(with: video, isLiked: viewModel?.isLiked ?? false)
+        guard let viewModel = viewModel else { return }
+
+        titleLabel.text = viewModel.event.eventTitle
+        eventDescriptionLabel.text = viewModel.event.eventDescription
+        updateHeartButton(isLiked: viewModel.isLiked)
     }
 
     func updateVideoView(with video: VideoDTO, isLiked: Bool) {
         titleLabel.text = video.title
-        imageView.kf.setImage(with: URL(string: video.urlLink))
         eventDescriptionLabel.text = video.description
 
         if let profileImageView = profileView.subviews.first as? UIImageView {
             profileImageView.kf.setImage(with: URL(string: video.channelImg))
         }
-        
-        if let previewImg = video.previewImg, let url = URL(string: previewImg) {
+
+        if let previewImg = viewModel?.event.eventImage, let url = URL(string: previewImg) {
             imageView.kf.setImage(with: url)
         }
 

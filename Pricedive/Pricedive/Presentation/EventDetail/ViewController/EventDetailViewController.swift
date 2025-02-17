@@ -19,6 +19,7 @@ class EventDetailViewController: UIViewController {
 
     init(event: Event, homeViewModel: HomeViewModel) {
         self.videoId = event.videoId ?? -1
+        print("✅ 생성된 videoId: \(self.videoId)")
         self.userId = homeViewModel.userId
         self.event = event
         self.viewModel = EventDetailViewModel(event: event, homeViewModel: homeViewModel)
@@ -70,7 +71,7 @@ class EventDetailViewController: UIViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] previewImg in
                 guard let self = self else { return }
-                
+
                 if let urlString = previewImg, let url = URL(string: urlString) {
                     print("🔄 previewImg 변경 감지: \(urlString)")
                     DispatchQueue.main.async {
@@ -121,7 +122,7 @@ class EventDetailViewController: UIViewController {
     }
 
     @objc private func didTapHeartButton() {
-        viewModel.toggleLikeStatus(userId: userId, videoId: videoId) { [weak self] isLiked in
+        viewModel.toggleLikeStatus(userId: userId, eventId: event.eventId) { [weak self] isLiked in
             DispatchQueue.main.async {
                 self?.detailView.updateHeartButton(isLiked: isLiked)
             }

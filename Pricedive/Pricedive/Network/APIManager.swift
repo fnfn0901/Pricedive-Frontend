@@ -103,18 +103,51 @@ class APIManager {
     }
 
     /// **좋아요 추가 / 삭제 (`POST` → 추가, `DELETE` → 삭제)**
-    func toggleLike(userId: Int, videoId: Int, isLiked: Bool, completion: @escaping (Result<Bool, NetworkError>) -> Void) {
+    func toggleLike(userId: Int, eventId: Int, isLiked: Bool, completion: @escaping (Result<Bool, NetworkError>) -> Void) {
         let method = isLiked ? "DELETE" : "POST"
-        request(endpoint: "/like_events/user/\(userId)/event/\(videoId)", method: method, completion: completion)
+        let endpoint = "/like_events/user/\(userId)/event/\(eventId)"
+        
+        print("🔍 좋아요 요청 - userId: \(userId), eventId: \(eventId), method: \(method)")
+
+        var request = URLRequest(url: URL(string: baseURL.absoluteString + endpoint)!)
+        request.httpMethod = method
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                completion(.failure(.other(error)))
+                return
+            }
+
+            guard let httpResponse = response as? HTTPURLResponse else {
+                completion(.failure(.noResponse))
+                return
+            }
+
+            guard (200...299).contains(httpResponse.statusCode) else {
+                print("❌ 좋아요 상태 변경 실패: \(httpResponse.statusCode)")
+                completion(.failure(.serverError(statusCode: httpResponse.statusCode)))
+                return
+            }
+
+            print("✅ 좋아요 요청 성공 - HTTP Status: \(httpResponse.statusCode)")
+            completion(.success(!isLiked))
+        }
+        task.resume()
     }
     
     /// **특정 비디오 상세 정보 가져오기**
     func fetchVideoDetail(videoId: Int, completion: @escaping (Result<VideoDTO, NetworkError>) -> Void) {
-        request(endpoint: "/videos/\(videoId)") { (result: Result<APIResponse<VideoDTO>, NetworkError>) in
+        let url = "/videos/\(videoId)"
+        print("🔍 요청 URL: \(url)")
+        request(endpoint: url) { (result: Result<APIResponse<VideoDTO>, NetworkError>) in
             switch result {
             case .success(let response):
+                print("✅ 서버 응답 데이터: \(response)")
                 completion(.success(response.data))
             case .failure(let error):
+                print("❌ 서버 요청 실패: \(error)")
                 completion(.failure(error))
             }
         }

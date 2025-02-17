@@ -16,7 +16,7 @@ class EventDetailViewModel: ObservableObject {
     let userId: Int
     private let videoId: Int
     private let homeViewModel: HomeViewModel
-    private let event: Event
+    let event: Event
 
     init(event: Event, homeViewModel: HomeViewModel) {
         self.videoId = event.videoId ?? -1
@@ -26,47 +26,51 @@ class EventDetailViewModel: ObservableObject {
         self.isLiked = homeViewModel.isLiked(for: videoId)
 
         self.previewImg = event.eventImage
-
         print("✅ EventDetailViewModel 초기화 - videoId: \(videoId), previewImg: \(String(describing: previewImg))")
-        fetchVideoDetail(videoId: videoId)
+
+        if videoId != -1 {
+            fetchVideoDetail(videoId: videoId)
+        } else {
+            print("❌ Error: 유효하지 않은 videoId (\(videoId)) - 비디오 상세 요청 안 함")
+        }
     }
 
     /// **🔹 비디오 상세 정보 가져오기**
     func fetchVideoDetail(videoId: Int) {
+        guard videoId != -1 else {
+            print("❌ Error: 유효하지 않은 videoId (\(videoId)) - 요청 중단")
+            return
+        }
+        
+        print("✅ API 요청 전 videoId: \(videoId)")
         APIManager.shared.fetchVideoDetail(videoId: videoId) { [weak self] (result: Result<VideoDTO, NetworkError>) in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let video):
+                    print("✅ 서버 응답 videoId: \(video.id)")
                     if video.id == -1 {
-                        print("❌ 서버에서 유효한 비디오 정보를 제공하지 않음")
+                        print("❌ 서버에서 올바른 비디오 데이터를 제공하지 않음")
                         return
                     }
-
-                    let newPreviewImg = video.previewImg ?? self?.previewImg
-                    if self?.previewImg != newPreviewImg {
-                        print("🔄 previewImg 변경됨: \(String(describing: newPreviewImg))")
-                    }
-
-                    self?.previewImg = newPreviewImg
                     self?.videoDetail = video
-                    print("✅ 비디오 상세 정보 가져오기 성공: \(video), 최종 previewImg: \(String(describing: self?.previewImg))")
                 case .failure(let error):
-                    print("❌ 비디오 상세 정보 불러오기 실패: \(error.localizedDescription)")
+                    print("❌ API 요청 실패: \(error.localizedDescription)")
                 }
             }
         }
     }
 
     /// **🔹 좋아요 상태 변경**
-    func toggleLikeStatus(userId: Int, videoId: Int, completion: @escaping (Bool) -> Void) {
-        let isCurrentlyLiked = isLiked
+    func toggleLikeStatus(userId: Int, eventId: Int, completion: @escaping (Bool) -> Void) {
+        print("✅ 좋아요 요청 - userId: \(userId), eventId: \(eventId), 현재 상태: \(isLiked)")
 
-        APIManager.shared.toggleLike(userId: userId, videoId: videoId, isLiked: isCurrentlyLiked) { result in
+        let method = isLiked ? "DELETE" : "POST"
+        APIManager.shared.toggleLike(userId: userId, eventId: eventId, isLiked: isLiked) { result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let isLiked):
-                    self.isLiked = isLiked
                     print("✅ 좋아요 상태 변경 성공: \(isLiked ? "❤️" : "🤍")")
+                    self.isLiked = isLiked
                     completion(isLiked)
                 case .failure(let error):
                     print("❌ 좋아요 상태 변경 실패: \(error.localizedDescription)")

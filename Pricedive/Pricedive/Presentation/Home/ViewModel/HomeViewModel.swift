@@ -75,9 +75,15 @@ class HomeViewModel: ObservableObject {
 
     // ✅ 좋아요 토글
     func toggleLike(for videoId: Int) {
+        guard let event = events.first(where: { $0.videoId == videoId }) else {
+            print("❌ 오류: videoId(\(videoId))에 해당하는 eventId를 찾을 수 없음")
+            return
+        }
+
+        let eventId = event.eventId
         let isCurrentlyLiked = likedEvents.contains(videoId)
 
-        APIManager.shared.toggleLike(userId: userId, videoId: videoId, isLiked: isCurrentlyLiked) { [weak self] result in
+        APIManager.shared.toggleLike(userId: userId, eventId: eventId, isLiked: isCurrentlyLiked) { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let isLiked):
