@@ -25,14 +25,28 @@ extension UIView {
         profileView.clipsToBounds = true
 
         let imageView = UIImageView()
-        imageView.kf.setImage(with: URL(string: imageUrl), placeholder: placeholderImage)
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
-
         profileView.addSubview(imageView)
+
         imageView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+
+        if let encodedUrl = imageUrl.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+           let validUrl = URL(string: encodedUrl) {
+            imageView.kf.setImage(with: validUrl, placeholder: placeholderImage) { result in
+                switch result {
+                case .success(let value):
+                    print("✅ 프로필 이미지 로드 성공: \(value.source.url?.absoluteString ?? "")")
+                case .failure(let error):
+                    print("❌ 프로필 이미지 로드 실패: \(error.localizedDescription)")
+                }
+            }
+        } else {
+            print("❌ 잘못된 URL: \(imageUrl)")
+        }
+
         return profileView
     }
     

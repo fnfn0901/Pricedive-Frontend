@@ -92,7 +92,9 @@ class BaseView: UIView {
     func updateCollectionViewHeight() {
         collectionView.layoutIfNeeded()
         let contentHeight = collectionView.contentSize.height + 20
+
         guard contentHeight > 0 else { return }
+
         collectionView.snp.updateConstraints { make in
             make.height.equalTo(contentHeight)
         }

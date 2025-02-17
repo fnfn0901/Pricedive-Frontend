@@ -12,7 +12,7 @@ import Kingfisher
 class EventCell: UICollectionViewCell {
 
     var viewModel: HomeViewModel?
-    var eventId: Int?
+    var videoId: Int?
 
     // MARK: - UI Components
     private let imageView: UIImageView = {
@@ -23,9 +23,19 @@ class EventCell: UICollectionViewCell {
     }()
 
     private let titleLabel: UILabel = CustomStyles.productTitle()
-    private let profileView = UIView.createYoutuberProfileView(imageUrl: "")
-    private let dDayView = UIView.createDDayView(text: "0")
     
+    private let profileView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = 18
+        imageView.layer.masksToBounds = true
+        imageView.backgroundColor = .mainWhite
+        return imageView
+    }()
+    
+    private let dDayView = UIView.createDDayView(text: "0")
+
     lazy var heartButton: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(systemName: "heart"), for: .normal)
@@ -50,10 +60,6 @@ class EventCell: UICollectionViewCell {
     private func setupViews() {
         contentView.addSubviews(imageView, titleLabel)
         imageView.addSubviews(profileView, dDayView, heartButton)
-        
-        heartButton.isUserInteractionEnabled = true
-        contentView.isUserInteractionEnabled = true
-        contentView.bringSubviewToFront(heartButton)
     }
 
     private func setupConstraints() {
@@ -74,7 +80,7 @@ class EventCell: UICollectionViewCell {
 
         heartButton.snp.makeConstraints {
             $0.trailing.bottom.equalToSuperview().offset(-5)
-            $0.width.height.equalTo(24)
+            $0.size.equalTo(24)
         }
 
         titleLabel.snp.makeConstraints {
@@ -84,14 +90,20 @@ class EventCell: UICollectionViewCell {
         }
     }
 
-    // MARK: - Configuration
     func configureCell(event: Event, viewModel: HomeViewModel) {
         self.viewModel = viewModel
-        self.eventId = event.eventId
+        self.videoId = event.videoId
 
         titleLabel.text = event.eventTitle
         imageView.kf.setImage(with: URL(string: event.eventImage))
-        updateHeartButton(isLiked: viewModel.isLiked(for: event.eventId))
+        profileView.kf.setImage(with: URL(string: event.youtuberProfileImage))
+
+        updateHeartButton(isLiked: viewModel.isLiked(for: event.videoId ?? -1))
+    }
+
+    @objc private func handleHeartTapped() {
+        guard let viewModel = viewModel, let videoId = videoId else { return }
+        viewModel.toggleLike(for: videoId)
     }
 
     func updateHeartButton(isLiked: Bool) {
@@ -99,18 +111,5 @@ class EventCell: UICollectionViewCell {
         let tintColor = isLiked ? UIColor.red : UIColor.black
         heartButton.setImage(UIImage(systemName: imageName), for: .normal)
         heartButton.tintColor = tintColor
-    }
-
-    // MARK: - Actions
-    @objc private func handleHeartTapped() {
-        guard let viewModel = viewModel, let eventId = eventId else { return }
-        
-        let userId = viewModel.userId
-
-        viewModel.toggleLikeStatus(userId: userId, eventId: eventId) { [weak self] isLiked in
-            DispatchQueue.main.async {
-                self?.updateHeartButton(isLiked: isLiked)
-            }
-        }
     }
 }

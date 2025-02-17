@@ -55,9 +55,25 @@ class APIManager {
             }
 
             do {
-                let decodedData = try JSONDecoder().decode(T.self, from: data)
+                let decoder = JSONDecoder()
+                decoder.keyDecodingStrategy = .convertFromSnakeCase
+                let decodedData = try decoder.decode(T.self, from: data)
+                print("✅ 성공 디코딩 데이터: \(decodedData)")
                 completion(.success(decodedData))
+            } catch let DecodingError.dataCorrupted(context) {
+                print("❌ 디코딩 오류: 데이터가 손상됨 -> \(context)")
+                completion(.failure(.decodingError))
+            } catch let DecodingError.keyNotFound(key, context) {
+                print("❌ 디코딩 오류: 키 \(key.stringValue) 없음 -> \(context.debugDescription)")
+                completion(.failure(.decodingError))
+            } catch let DecodingError.typeMismatch(type, context) {
+                print("❌ 디코딩 오류: 타입 불일치 (\(type)) -> \(context.debugDescription)")
+                completion(.failure(.decodingError))
+            } catch let DecodingError.valueNotFound(value, context) {
+                print("❌ 디코딩 오류: 값 \(value) 없음 -> \(context.debugDescription)")
+                completion(.failure(.decodingError))
             } catch {
+                print("❌ 기타 디코딩 오류: \(error.localizedDescription)")
                 completion(.failure(.decodingError))
             }
         }
@@ -66,7 +82,14 @@ class APIManager {
 
     /// **전체 이벤트 리스트 가져오기**
     func fetchEvents(completion: @escaping (Result<[EventDTO], NetworkError>) -> Void) {
-        request(endpoint: "/events", completion: completion)
+        request(endpoint: "/events") { (result: Result<APIResponse<[EventDTO]>, NetworkError>) in
+            switch result {
+            case .success(let response):
+                completion(.success(response.data))
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
     }
 
     /// **특정 이벤트 상세 정보 가져오기**
@@ -80,13 +103,20 @@ class APIManager {
     }
 
     /// **좋아요 추가 / 삭제 (`POST` → 추가, `DELETE` → 삭제)**
-    func toggleLike(userId: Int, eventId: Int, isLiked: Bool, completion: @escaping (Result<Bool, NetworkError>) -> Void) {
+    func toggleLike(userId: Int, videoId: Int, isLiked: Bool, completion: @escaping (Result<Bool, NetworkError>) -> Void) {
         let method = isLiked ? "DELETE" : "POST"
-        request(endpoint: "/like_events/user/\(userId)/event/\(eventId)", method: method, completion: completion)
+        request(endpoint: "/like_events/user/\(userId)/event/\(videoId)", method: method, completion: completion)
     }
     
     /// **특정 비디오 상세 정보 가져오기**
     func fetchVideoDetail(videoId: Int, completion: @escaping (Result<VideoDTO, NetworkError>) -> Void) {
-        request(endpoint: "/videos/\(videoId)", completion: completion)
+        request(endpoint: "/videos/\(videoId)") { (result: Result<APIResponse<VideoDTO>, NetworkError>) in
+            switch result {
+            case .success(let response):
+                completion(.success(response.data))
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
     }
 }

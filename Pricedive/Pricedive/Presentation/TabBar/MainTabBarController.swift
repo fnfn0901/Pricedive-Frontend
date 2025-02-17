@@ -44,8 +44,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
     
     // MARK: - View Controllers 설정
     private func setupViewControllers() {
-        let userId = 1
-        let homeViewModel = HomeViewModel(userId: userId)
+        let homeViewModel = HomeViewModel()
 
         let categoryController = createViewController(CategoryViewController(viewModel: CategoryViewModel()), title: "Category", image: "line.3.horizontal", tag: 0)
         let homeViewController = createViewController(UINavigationController(rootViewController: HomeViewController(viewModel: homeViewModel)), title: "Home", image: "house", tag: 1)
@@ -66,17 +65,5 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
     private func createViewController(_ controller: UIViewController, title: String, image: String, tag: Int) -> UIViewController {
         controller.tabBarItem = UITabBarItem(title: title, image: UIImage(systemName: image), tag: tag)
         return controller
-    }
-    
-    // MARK: - UITabBarControllerDelegate
-    func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
-        guard let fromView = selectedViewController?.view,
-              let toView = viewController.view,
-              fromView != toView else {
-            return true
-        }
-        
-        UIView.transition(from: fromView, to: toView, duration: 0, options: .transitionCrossDissolve, completion: nil)
-        return true
     }
 }

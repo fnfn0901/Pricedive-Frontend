@@ -10,33 +10,35 @@ import Foundation
 struct VideoDTO: Decodable {
     let id: Int
     let title: String
-    let channelId: String
-    let channelImg: String
     let description: String
     let tags: String
+    let channelId: String
+    let channelImg: String
     let urlLink: String
     let dateStart: String
     let dateEnd: String
     let summarizedDescription: String?
+    let previewImg: String?
 
-    /// dateEnd가 "0000-00-00 00:00:00"인 경우, nil로 처리
     enum CodingKeys: String, CodingKey {
-        case id, title, channelId, channelImg, description, tags, urlLink, dateStart, dateEnd, summarizedDescription
+        case id, title, description, tags, channelId, channelImg, urlLink, dateStart, dateEnd, summarizedDescription, previewImg
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        id = try container.decode(Int.self, forKey: .id)
-        title = try container.decode(String.self, forKey: .title)
-        channelId = try container.decode(String.self, forKey: .channelId)
-        channelImg = try container.decode(String.self, forKey: .channelImg)
-        description = try container.decode(String.self, forKey: .description)
-        tags = try container.decode(String.self, forKey: .tags)
-        urlLink = try container.decode(String.self, forKey: .urlLink)
-        dateStart = try container.decode(String.self, forKey: .dateStart)
-        summarizedDescription = try container.decodeIfPresent(String.self, forKey: .summarizedDescription)
 
-        let rawDateEnd = try container.decode(String.self, forKey: .dateEnd)
-        dateEnd = (rawDateEnd == "0000-00-00 00:00:00") ? "" : rawDateEnd
+        id = try container.decodeIfPresent(Int.self, forKey: .id) ?? -1
+        title = try container.decodeIfPresent(String.self, forKey: .title) ?? "제목 없음"
+        description = try container.decodeIfPresent(String.self, forKey: .description) ?? "설명 없음"
+        tags = try container.decodeIfPresent(String.self, forKey: .tags) ?? ""
+        channelId = try container.decodeIfPresent(String.self, forKey: .channelId) ?? ""
+        channelImg = try container.decodeIfPresent(String.self, forKey: .channelImg) ?? ""
+        urlLink = try container.decodeIfPresent(String.self, forKey: .urlLink) ?? "https://default-url.com"
+        dateStart = try container.decodeIfPresent(String.self, forKey: .dateStart) ?? ""
+        dateEnd = try container.decodeIfPresent(String.self, forKey: .dateEnd) ?? ""
+        summarizedDescription = try container.decodeIfPresent(String.self, forKey: .summarizedDescription)
+        previewImg = try container.decodeIfPresent(String.self, forKey: .previewImg)
+
+        print("✅ 디코딩 완료: \(self)")
     }
 }

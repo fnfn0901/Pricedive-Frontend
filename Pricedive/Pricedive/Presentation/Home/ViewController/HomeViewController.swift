@@ -53,7 +53,9 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
         ]
 
         setupBindings()
-        viewModel.loadEvents()
+        DispatchQueue.main.async {
+            self.viewModel.loadEvents()
+        }
     }
 
     private func setupBindings() {
@@ -61,8 +63,13 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
             .receive(on: DispatchQueue.main)
             .sink { [weak self] events in
                 guard let self = self else { return }
+                
                 self.homeView.collectionView.isHidden = events.isEmpty
-                self.homeView.collectionView.reloadData()
+                
+                DispatchQueue.main.async {
+                    self.homeView.collectionView.reloadData()
+                    self.homeView.updateCollectionViewHeight()
+                }
             }
             .store(in: &cancellables)
     }
@@ -85,23 +92,30 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard indexPath.row < viewModel.events.count else {
-            print("Error: Index out of bounds")
+            print("❌ Error: Index out of bounds")
             return
         }
 
-        let selectedEventId = viewModel.events[indexPath.row].eventId
-        let detailViewController = EventDetailViewController(eventId: selectedEventId, homeViewModel: viewModel)
+        let selectedEvent = viewModel.events[indexPath.row]
 
+        guard let videoId = selectedEvent.videoId else {
+            print("❌ Error: 선택한 이벤트에 비디오 ID가 없습니다.")
+            return
+        }
+
+        print("✅ 선택된 비디오 ID: \(videoId)")
+
+        let detailViewController = EventDetailViewController(event: selectedEvent, homeViewModel: viewModel)
         navigationController?.pushViewController(detailViewController, animated: true)
     }
 
     @objc private func handleHeartButtonTap(_ sender: UIButton) {
-        guard let cell = sender.superview?.superview as? EventCell, let eventId = cell.eventId else {
-            print("Error: Unable to identify cell or event ID")
+        guard let cell = sender.superview?.superview as? EventCell, let videoId = cell.videoId else {
+            print("❌ Error: Unable to identify cell or video ID")
             return
         }
 
-        viewModel.toggleLike(for: eventId)
-        cell.updateHeartButton(isLiked: viewModel.isLiked(for: eventId))
+        viewModel.toggleLike(for: videoId)
+        cell.updateHeartButton(isLiked: viewModel.isLiked(for: videoId))
     }
 }

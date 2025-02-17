@@ -13,13 +13,15 @@ class EventDetailViewController: UIViewController {
     private let viewModel: EventDetailViewModel
     private let detailView = EventDetailView()
     private var cancellables = Set<AnyCancellable>()
-    private let eventId: Int
+    private let videoId: Int
     private let userId: Int
+    private let event: Event
 
-    init(eventId: Int, homeViewModel: HomeViewModel) {
-        self.eventId = eventId
+    init(event: Event, homeViewModel: HomeViewModel) {
+        self.videoId = event.videoId ?? -1
         self.userId = homeViewModel.userId
-        self.viewModel = EventDetailViewModel(eventId: eventId, homeViewModel: homeViewModel)
+        self.event = event
+        self.viewModel = EventDetailViewModel(event: event, homeViewModel: homeViewModel)
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -30,7 +32,7 @@ class EventDetailViewController: UIViewController {
     override func loadView() {
         view = detailView
     }
-
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.isNavigationBarHidden = true
@@ -47,7 +49,12 @@ class EventDetailViewController: UIViewController {
         super.viewDidLoad()
         setupBindings()
         setupActions()
-        viewModel.fetchVideoDetail(videoId: eventId)
+
+        viewModel.fetchVideoDetail(videoId: videoId)
+
+        if let url = URL(string: event.eventImage) {
+            detailView.imageView.kf.setImage(with: url)
+        }
     }
 
     private func setupBindings() {
@@ -56,6 +63,37 @@ class EventDetailViewController: UIViewController {
             .sink { [weak self] video in
                 guard let self = self, let video = video else { return }
                 self.detailView.updateVideoView(with: video)
+            }
+            .store(in: &cancellables)
+
+        viewModel.$previewImg
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] previewImg in
+                guard let self = self else { return }
+                
+                if let urlString = previewImg, let url = URL(string: urlString) {
+                    print("🔄 previewImg 변경 감지: \(urlString)")
+                    DispatchQueue.main.async {
+                        self.detailView.imageView.kf.setImage(
+                            with: url,
+                            placeholder: UIImage(named: "placeholder"),
+                            options: [
+                                .transition(.fade(0.3)),
+                                .cacheOriginalImage
+                            ],
+                            completionHandler: { result in
+                                switch result {
+                                case .success(let value):
+                                    print("✅ 이미지 로드 성공: \(value.source.url?.absoluteString ?? "")")
+                                case .failure(let error):
+                                    print("❌ 이미지 로드 실패: \(error.localizedDescription)")
+                                }
+                            }
+                        )
+                    }
+                } else {
+                    print("⚠️ previewImg가 nil이거나 올바르지 않은 URL: \(String(describing: previewImg))")
+                }
             }
             .store(in: &cancellables)
     }
@@ -83,7 +121,7 @@ class EventDetailViewController: UIViewController {
     }
 
     @objc private func didTapHeartButton() {
-        viewModel.toggleLikeStatus(userId: userId, eventId: eventId) { [weak self] isLiked in
+        viewModel.toggleLikeStatus(userId: userId, videoId: videoId) { [weak self] isLiked in
             DispatchQueue.main.async {
                 self?.detailView.updateHeartButton(isLiked: isLiked)
             }

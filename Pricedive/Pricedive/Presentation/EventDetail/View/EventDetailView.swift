@@ -53,7 +53,7 @@ class EventDetailView: UIView {
     let scrollView = UIScrollView()
     let contentView = UIView()
 
-    private let imageView: UIImageView = {
+    let imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
@@ -355,11 +355,15 @@ class EventDetailView: UIView {
     }
 
     @objc private func heartButtonTapped() {
-        guard let eventId = eventId, let viewModel = viewModel else { return }
+        guard let viewModel = viewModel,
+              let videoId = viewModel.videoDetail?.id else {
+            print("❌ Error: 비디오 ID를 찾을 수 없음")
+            return
+        }
 
         let userId = viewModel.userId
 
-        viewModel.toggleLikeStatus(userId: userId, eventId: eventId) { [weak self] isLiked in
+        viewModel.toggleLikeStatus(userId: userId, videoId: videoId) { [weak self] isLiked in
             DispatchQueue.main.async {
                 self?.updateHeartButton(isLiked: isLiked)
             }
@@ -380,17 +384,21 @@ class EventDetailView: UIView {
     
     // MARK: - Update View
     private func updateView() {
-        guard let event = viewModel?.eventDetail else { return }
-        updateView(with: event, isLiked: viewModel?.isLiked ?? false)
+        guard let video = viewModel?.videoDetail else { return }
+        updateVideoView(with: video, isLiked: viewModel?.isLiked ?? false)
     }
 
-    func updateView(with event: EventDTO, isLiked: Bool) {
-        titleLabel.text = event.eventItem
-        imageView.kf.setImage(with: URL(string: event.previewImg))
-        eventDescriptionLabel.text = event.category
+    func updateVideoView(with video: VideoDTO, isLiked: Bool) {
+        titleLabel.text = video.title
+        imageView.kf.setImage(with: URL(string: video.urlLink))
+        eventDescriptionLabel.text = video.description
 
-        if let dDayLabel = dDayView.subviews.first(where: { $0 is UILabel }) as? UILabel {
-            dDayLabel.text = "D-\(event.eventNums)"
+        if let profileImageView = profileView.subviews.first as? UIImageView {
+            profileImageView.kf.setImage(with: URL(string: video.channelImg))
+        }
+        
+        if let previewImg = video.previewImg, let url = URL(string: previewImg) {
+            imageView.kf.setImage(with: url)
         }
 
         updateHeartButton(isLiked: isLiked)
@@ -398,11 +406,32 @@ class EventDetailView: UIView {
     
     func updateVideoView(with video: VideoDTO) {
         titleLabel.text = video.title
-        imageView.kf.setImage(with: URL(string: video.urlLink))
         eventDescriptionLabel.text = video.description
 
         if let profileImageView = profileView.subviews.first as? UIImageView {
             profileImageView.kf.setImage(with: URL(string: video.channelImg))
+        }
+
+        if let previewImg = viewModel?.previewImg, let url = URL(string: previewImg) {
+            print("🖼 이미지 업데이트: \(previewImg)")
+            DispatchQueue.main.async {
+                self.imageView.kf.setImage(
+                    with: url,
+                    placeholder: UIImage(named: "placeholder"),
+                    options: [
+                        .transition(.fade(0.3)),
+                        .cacheOriginalImage
+                    ],
+                    completionHandler: { result in
+                        switch result {
+                        case .success(let value):
+                            print("✅ 이미지 업데이트 성공: \(value.source.url?.absoluteString ?? "")")
+                        case .failure(let error):
+                            print("❌ 이미지 업데이트 실패: \(error.localizedDescription)")
+                        }
+                    }
+                )
+            }
         }
     }
     

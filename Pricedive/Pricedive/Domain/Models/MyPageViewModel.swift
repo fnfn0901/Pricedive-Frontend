@@ -23,10 +23,10 @@ class MyPageViewModel: ObservableObject {
         let earlierThisWeek = calendar.date(byAdding: .day, value: -3, to: today)!
 
         let sampleData = [
-            ViewedProduct(id: 1, title: "오늘 본 상품 1", imageUrl: "https://via.placeholder.com/150", viewedDate: today),
-            ViewedProduct(id: 2, title: "오늘 본 상품 2", imageUrl: "https://via.placeholder.com/150", viewedDate: today),
-            ViewedProduct(id: 3, title: "어제 본 상품 1", imageUrl: "https://via.placeholder.com/150", viewedDate: yesterday),
-            ViewedProduct(id: 4, title: "이번 주 본 상품 1", imageUrl: "https://via.placeholder.com/150", viewedDate: earlierThisWeek)
+            ViewedProduct(id: 1, title: "오늘 본 상품 1", imageUrl: "https://via.placeholder.com/150", viewedDate: today, videoId: nil),
+            ViewedProduct(id: 2, title: "오늘 본 상품 2", imageUrl: "https://via.placeholder.com/150", viewedDate: today, videoId: nil),
+            ViewedProduct(id: 3, title: "어제 본 상품 1", imageUrl: "https://via.placeholder.com/150", viewedDate: yesterday, videoId: nil),
+            ViewedProduct(id: 4, title: "이번 주 본 상품 1", imageUrl: "https://via.placeholder.com/150", viewedDate: earlierThisWeek, videoId: nil)
         ]
 
         groupedProducts = groupProductsByDate(sampleData)
