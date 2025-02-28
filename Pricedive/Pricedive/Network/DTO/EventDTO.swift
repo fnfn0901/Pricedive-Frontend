@@ -14,7 +14,8 @@ struct EventDTO: Decodable {
     let eventNums: Int
     let eventItem: String
     var previewImg: String
-    let video: VideoDTO?
+    let videoId: Int
+    let dateEnd: String
 
     enum CodingKeys: String, CodingKey {
         case eventId
@@ -22,19 +23,20 @@ struct EventDTO: Decodable {
         case eventNums
         case eventItem
         case previewImg
-        case video
+        case videoId
+        case dateEnd
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        eventId = try container.decodeIfPresent(Int.self, forKey: .eventId) ?? -1
-        category = try container.decodeIfPresent(String.self, forKey: .category) ?? "기타"
-        eventNums = try container.decodeIfPresent(Int.self, forKey: .eventNums) ?? 0
-        eventItem = try container.decodeIfPresent(String.self, forKey: .eventItem) ?? "이벤트 상품 정보 없음"
-        previewImg = try container.decodeIfPresent(String.self, forKey: .previewImg) ?? ""
-
-        video = try container.decodeIfPresent(VideoDTO.self, forKey: .video)
+        eventId = try container.decode(Int.self, forKey: .eventId)
+        category = try container.decode(String.self, forKey: .category)
+        eventNums = try container.decode(Int.self, forKey: .eventNums)
+        eventItem = try container.decode(String.self, forKey: .eventItem)
+        previewImg = try container.decode(String.self, forKey: .previewImg)
+        videoId = try container.decode(Int.self, forKey: .videoId)
+        dateEnd = try container.decode(String.self, forKey: .dateEnd)
 
         if previewImg.starts(with: "/") {
             previewImg = "https://pricedive-event.s3.ap-northeast-2.amazonaws.com" + previewImg

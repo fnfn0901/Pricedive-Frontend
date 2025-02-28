@@ -22,7 +22,15 @@ class EventCell: UICollectionViewCell {
         return imageView
     }()
 
-    private let titleLabel: UILabel = CustomStyles.productTitle()
+    private let titleLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
+        label.textColor = .black
+        label.numberOfLines = 2
+        label.textAlignment = .left
+        label.lineBreakMode = .byTruncatingTail
+        return label
+    }()
     
     private let profileView: UIImageView = {
         let imageView = UIImageView()
@@ -86,7 +94,6 @@ class EventCell: UICollectionViewCell {
         titleLabel.snp.makeConstraints {
             $0.top.equalTo(imageView.snp.bottom).offset(5)
             $0.leading.trailing.equalToSuperview()
-            $0.height.equalTo(44)
         }
     }
 
@@ -99,6 +106,14 @@ class EventCell: UICollectionViewCell {
         profileView.kf.setImage(with: URL(string: event.youtuberProfileImage))
 
         updateHeartButton(isLiked: viewModel.isLiked(for: event.videoId ?? -1))
+        
+        updateDDayView(with: event.dDayDescription)
+    }
+
+    private func updateDDayView(with text: String) {
+        if let label = dDayView.subviews.first as? UILabel {
+            label.text = text
+        }
     }
 
     @objc private func handleHeartTapped() {

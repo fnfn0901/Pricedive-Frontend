@@ -47,18 +47,19 @@ class HomeViewModel: ObservableObject {
                         print("⚠️ 이벤트 리스트가 비어 있습니다.")
                     }
                     let mappedEvents = eventDTOs.map { dto -> Event in
-                        let videoId = dto.video?.id ?? -1
+                        let videoId = dto.videoId
+                        let eventEndDate = self?.parseDate(dto.dateEnd) ?? Date()
                         let isLiked = self?.likedEvents.contains(videoId) ?? false
 
                         return Event(
                             eventId: dto.eventId,
                             videoId: videoId,
-                            eventLink: dto.video?.urlLink ?? "",
+                            eventLink: "",
                             eventImage: dto.previewImg,
-                            youtuberProfileImage: dto.video?.channelImg ?? "",
-                            eventEndDate: self?.parseDate(dto.video?.dateEnd) ?? Date(),
-                            eventTitle: dto.video?.title ?? dto.eventItem,
-                            eventDescription: dto.video?.description,
+                            youtuberProfileImage: "",
+                            eventEndDate: eventEndDate,
+                            eventTitle: dto.eventItem,
+                            eventDescription: nil,
                             isLiked: isLiked
                         )
                     }
@@ -112,23 +113,11 @@ class HomeViewModel: ObservableObject {
         likedEventsList = events.filter { likedEvents.contains($0.videoId ?? -1) }
     }
 
-    private func parseDate(_ dateString: String?) -> Date {
-        guard let dateString = dateString, !dateString.isEmpty else {
-            print("⚠️ 날짜 변환 실패: 입력된 날짜 문자열이 없음 → 기본값(Date()) 적용")
-            return Date()
-        }
+    private func parseDate(_ dateString: String) -> Date {
+        let isoFormatter = ISO8601DateFormatter()
+        isoFormatter.formatOptions = [.withFullDate, .withTime, .withDashSeparatorInDate, .withColonSeparatorInTime]
 
-        if dateString == "0000-00-00 00:00:00" {
-            print("⚠️ 날짜 변환 실패: 서버에서 제공한 기본값 ('0000-00-00 00:00:00') 감지 → Date.distantFuture 설정")
-            return Date.distantFuture
-        }
-
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        formatter.locale = Locale(identifier: "ko_KR")
-        formatter.timeZone = TimeZone(identifier: "Asia/Seoul")
-
-        if let date = formatter.date(from: dateString) {
+        if let date = isoFormatter.date(from: dateString) {
             return date
         } else {
             print("⚠️ 날짜 변환 실패: \(dateString) → 기본값(Date()) 적용")

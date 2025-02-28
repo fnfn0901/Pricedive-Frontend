@@ -48,6 +48,7 @@ class EventDetailViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        detailView.viewModel = viewModel
         setupBindings()
         setupActions()
 
@@ -95,6 +96,15 @@ class EventDetailViewController: UIViewController {
                 } else {
                     print("⚠️ previewImg가 nil이거나 올바르지 않은 URL: \(String(describing: previewImg))")
                 }
+            }
+            .store(in: &cancellables)
+        
+        viewModel.$gptComment
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] comment in
+                guard let self = self else { return }
+                self.detailView.loadingIndicator.stopAnimating()
+                self.detailView.gptLabel.text = comment ?? "생성 버튼을 눌러보세요. GPT가 자동으로 댓글을 작성해드립니다!"
             }
             .store(in: &cancellables)
     }

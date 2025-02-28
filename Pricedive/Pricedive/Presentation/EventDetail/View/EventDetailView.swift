@@ -141,7 +141,7 @@ class EventDetailView: UIView {
         return view
     }()
 
-    private let gptLabel: UILabel = {
+    var gptLabel: UILabel = {
         let label = CustomStyles.customLabel(
             text: "생성 버튼을 눌러보세요. GPT가 자동으로 댓글을 작성해드립니다!",
             color: UIColor(hex: "#AAAAAA")!,
@@ -161,6 +161,7 @@ class EventDetailView: UIView {
             backgroundColor: UIColor(hex: "#4A90E2")!,
             cornerRadius: 4
         )
+        button.addTarget(self, action: #selector(copyButtonTapped), for: .touchUpInside)
         return button
     }()
 
@@ -173,9 +174,16 @@ class EventDetailView: UIView {
             backgroundColor: UIColor(hex: "#7ED321")!,
             cornerRadius: 4
         )
+        button.addTarget(self, action: #selector(makeButtonTapped), for: .touchUpInside)
         return button
     }()
-
+    
+    let loadingIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .medium)
+        indicator.hidesWhenStopped = true
+        return indicator
+    }()
+    
     let bottomView: UIView = {
         let view = UIView()
         view.backgroundColor = .white
@@ -219,7 +227,7 @@ class EventDetailView: UIView {
 
         imageView.addSubviews(profileView, dDayView, heartButton)
 
-        gptContentView.addSubviews(gptLabel, copyButton, makeButton)
+        gptContentView.addSubviews(gptLabel, copyButton, makeButton, loadingIndicator)
 
         bottomView.addSubviews(goToButton)
 
@@ -234,98 +242,103 @@ class EventDetailView: UIView {
             make.leading.trailing.equalToSuperview()
             make.height.equalTo(52)
         }
-
+        
         logoLabel.snp.makeConstraints { make in
             make.center.equalTo(navigationBar)
         }
-
+        
         backIconButton.snp.makeConstraints { make in
             make.leading.equalTo(navigationBar).offset(20)
             make.centerY.equalTo(navigationBar)
         }
-
+        
         searchIconButton.snp.makeConstraints { make in
             make.trailing.equalTo(navigationBar).offset(-20)
             make.centerY.equalTo(navigationBar)
         }
-
+        
         scrollView.snp.makeConstraints { make in
             make.top.equalTo(navigationBar.snp.bottom).offset(2)
             make.leading.trailing.equalToSuperview()
             make.bottom.equalTo(bottomView.snp.top)
         }
-
+        
         contentView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
             make.width.equalToSuperview()
         }
-
+        
         imageView.snp.makeConstraints {
             $0.top.leading.trailing.equalToSuperview()
             $0.height.equalTo(self.snp.width).multipliedBy(0.65)
         }
-
+        
         profileView.snp.makeConstraints {
             $0.top.leading.equalToSuperview().offset(10)
             $0.size.equalTo(90)
         }
-
+        
         dDayView.snp.makeConstraints {
             $0.leading.bottom.equalToSuperview()
             $0.size.equalTo(CGSize(width: 102, height: 59))
         }
-
+        
         heartButton.snp.makeConstraints {
             $0.trailing.bottom.equalToSuperview().offset(-20)
             $0.size.equalTo(24)
         }
-
+        
         titleLabel.snp.makeConstraints {
             $0.top.equalTo(imageView.snp.bottom).offset(20)
             $0.leading.trailing.equalToSuperview().inset(20)
         }
-
+        
         eventContentView.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(40)
             $0.leading.trailing.equalToSuperview().inset(20)
         }
-
+        
         eventContentTitleLabel.snp.makeConstraints {
             $0.top.leading.equalToSuperview().offset(20)
         }
-
+        
         eventDescriptionLabel.snp.makeConstraints {
             $0.top.equalTo(eventContentTitleLabel.snp.bottom).offset(10)
             $0.leading.trailing.equalToSuperview().inset(20)
             $0.bottom.equalToSuperview().offset(-20)
         }
-
+        
         gptContentView.snp.makeConstraints {
             $0.top.equalTo(eventContentView.snp.bottom).offset(20)
             $0.leading.trailing.equalToSuperview().inset(20)
-            $0.height.lessThanOrEqualTo(150)
+            $0.height.greaterThanOrEqualTo(150)
             $0.bottom.equalToSuperview().offset(-20)
         }
-
+        
         gptLabel.snp.makeConstraints {
             $0.top.equalToSuperview().inset(8)
             $0.leading.trailing.equalToSuperview().inset(12)
+            $0.bottom.lessThanOrEqualTo(copyButton.snp.top).offset(-8)
         }
-
+        
         copyButton.snp.makeConstraints {
             $0.bottom.equalToSuperview().inset(5)
             $0.trailing.equalTo(makeButton.snp.leading).offset(-4)
             $0.size.equalTo(CGSize(width: 80, height: 36))
         }
-
+        
         makeButton.snp.makeConstraints {
             $0.bottom.trailing.equalToSuperview().inset(5)
             $0.size.equalTo(CGSize(width: 80, height: 36))
         }
-
+        
         bottomView.snp.makeConstraints {
             $0.bottom.leading.trailing.equalToSuperview()
             $0.height.equalTo(75)
+        }
+        
+        loadingIndicator.snp.makeConstraints {
+            $0.center.equalToSuperview()
         }
 
         goToButton.snp.makeConstraints {
@@ -415,7 +428,6 @@ class EventDetailView: UIView {
         }
 
         if let previewImg = viewModel?.previewImg, let url = URL(string: previewImg) {
-            print("🖼 이미지 업데이트: \(previewImg)")
             DispatchQueue.main.async {
                 self.imageView.kf.setImage(
                     with: url,
@@ -505,5 +517,22 @@ class EventDetailView: UIView {
         }
 
         isSearchBarVisible = false
+    }
+    
+    @objc private func makeButtonTapped() {
+        guard let viewModel = viewModel else { return }
+
+        gptLabel.text = "댓글을 생성 중입니다..."
+        loadingIndicator.startAnimating()
+
+        viewModel.generateGPTComment()
+    }
+
+    @objc private func copyButtonTapped() {
+        guard let comment = gptLabel.text, !comment.isEmpty else {
+            print("⚠️ 복사할 댓글이 없습니다.")
+            return
+        }
+        UIPasteboard.general.string = comment
     }
 }

@@ -78,7 +78,9 @@ class BaseView: UIView {
 
         let totalSpacing = spacing + (inset * 2)
         let cellWidth = (width - totalSpacing) / 2
-        layout.itemSize = CGSize(width: cellWidth, height: cellWidth * 1.25)
+        let cellHeight = min(cellWidth * 1.25, 173)
+
+        layout.itemSize = CGSize(width: cellWidth, height: cellHeight)
         layout.sectionInset = UIEdgeInsets(top: 0, left: inset, bottom: 0, right: inset)
 
         return layout
