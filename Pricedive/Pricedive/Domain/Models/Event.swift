@@ -13,16 +13,31 @@ struct Event: Codable {
     let eventLink: String
     let eventImage: String
     let youtuberProfileImage: String
-    let eventEndDate: Date
+    let eventEndDate: String
     let eventTitle: String
     let eventDescription: String?
     var isLiked: Bool
-    
+
+    /// ✅ eventEndDate(String)를 Date로 변환하는 계산 속성 추가
+    var eventEndDateAsDate: Date? {
+        return Event.dateFormatter.date(from: eventEndDate)
+    }
+
+    /// ✅ D-day 계산을 위한 DateFormatter
+    private static let dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+        formatter.timeZone = TimeZone(identifier: "Asia/Seoul")
+        return formatter
+    }()
+
+    /// ✅ D-day 계산 로직 수정
     var dDay: Int {
-        let daysLeft = Calendar.current.dateComponents([.day], from: Date(), to: eventEndDate).day ?? 0
+        guard let endDate = eventEndDateAsDate else { return 0 }
+        let daysLeft = Calendar.current.dateComponents([.day], from: Date(), to: endDate).day ?? 0
         return daysLeft
     }
-    
+
     var dDayDescription: String {
         if dDay > 0 {
             return "D-\(dDay)"

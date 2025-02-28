@@ -98,43 +98,37 @@ class APIManager {
     }
 
     /// **특정 유저가 좋아요한 이벤트 리스트 가져오기**
-    func fetchLikedEvents(userId: Int, completion: @escaping (Result<[Int], NetworkError>) -> Void) {
-        request(endpoint: "/like_events/user/\(userId)", completion: completion)
+    func fetchLikedEvents(userId: Int, ongoing: Bool, completion: @escaping (Result<[EventDTO], NetworkError>) -> Void) {
+        let endpoint = "/like_events/user/\(userId)?ongoing=\(ongoing)"
+        
+        request(endpoint: endpoint) { (result: Result<[EventDTO], NetworkError>) in
+            switch result {
+            case .success(let events):
+                completion(.success(events))
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
     }
 
     /// **좋아요 추가 / 삭제 (`POST` → 추가, `DELETE` → 삭제)**
-    func toggleLike(userId: Int, eventId: Int, isLiked: Bool, completion: @escaping (Result<Bool, NetworkError>) -> Void) {
+    func toggleLike(eventId: Int, isLiked: Bool, completion: @escaping (Result<Bool, NetworkError>) -> Void) {
+        let userId = 1
         let method = isLiked ? "DELETE" : "POST"
         let endpoint = "/like_events/user/\(userId)/event/\(eventId)"
-        
+
         print("🔍 좋아요 요청 - userId: \(userId), eventId: \(eventId), method: \(method)")
 
-        var request = URLRequest(url: URL(string: baseURL.absoluteString + endpoint)!)
-        request.httpMethod = method
-        request.setValue("application/json", forHTTPHeaderField: "Accept")
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            if let error = error {
-                completion(.failure(.other(error)))
-                return
+        request(endpoint: endpoint, method: method) { (result: Result<Bool, NetworkError>) in
+            switch result {
+            case .success:
+                print("✅ 좋아요 요청 성공 - HTTP Method: \(method)")
+                completion(.success(!isLiked))
+            case .failure(let error):
+                print("❌ 좋아요 상태 변경 실패: \(error.localizedDescription)")
+                completion(.failure(error))
             }
-
-            guard let httpResponse = response as? HTTPURLResponse else {
-                completion(.failure(.noResponse))
-                return
-            }
-
-            guard (200...299).contains(httpResponse.statusCode) else {
-                print("❌ 좋아요 상태 변경 실패: \(httpResponse.statusCode)")
-                completion(.failure(.serverError(statusCode: httpResponse.statusCode)))
-                return
-            }
-
-            print("✅ 좋아요 요청 성공 - HTTP Status: \(httpResponse.statusCode)")
-            completion(.success(!isLiked))
         }
-        task.resume()
     }
     
     /// **특정 비디오 상세 정보 가져오기**

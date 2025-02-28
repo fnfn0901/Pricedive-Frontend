@@ -51,7 +51,7 @@ class MyPageViewController: UIViewController {
         groupedEvents.forEach { (title, events) in
             let cells = events.map { event -> UIView in
                 let cell = LikeProductCell()
-                cell.configure(with: event, style: .myPage)
+                cell.configure(with: event, viewModel: viewModel, style: .myPage)
                 return cell
             }
             myPageView.addSection(title: title, cells: cells)
@@ -69,11 +69,16 @@ class MyPageViewController: UIViewController {
         var thisWeekEvents = [Event]()
 
         events.forEach { event in
-            if calendar.isDate(event.eventEndDate, inSameDayAs: today) {
+            guard let endDate = event.eventEndDateAsDate else {
+                print("⚠️ 날짜 변환 실패: \(event.eventEndDate)")
+                return
+            }
+            
+            if calendar.isDate(endDate, inSameDayAs: today) {
                 todayEvents.append(event)
-            } else if calendar.isDate(event.eventEndDate, inSameDayAs: yesterday) {
+            } else if calendar.isDate(endDate, inSameDayAs: yesterday) {
                 yesterdayEvents.append(event)
-            } else if event.eventEndDate >= startOfWeek {
+            } else if endDate >= startOfWeek {
                 thisWeekEvents.append(event)
             }
         }

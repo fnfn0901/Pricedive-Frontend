@@ -11,7 +11,7 @@ struct ViewedProduct {
     let id: Int
     let title: String
     let imageUrl: String
-    let viewedDate: Date
+    let viewedDate: String
     let videoId: Int?
 
     func toEvent() -> Event {
@@ -21,7 +21,7 @@ struct ViewedProduct {
             eventLink: "",
             eventImage: imageUrl,
             youtuberProfileImage: "",
-            eventEndDate: Date(),
+            eventEndDate: String(),
             eventTitle: title,
             eventDescription: "",
             isLiked: false

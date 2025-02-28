@@ -75,7 +75,7 @@ class EventDetailViewModel: ObservableObject {
         print("✅ 좋아요 요청 - userId: \(userId), eventId: \(eventId), 현재 상태: \(isLiked)")
         
         let method = isLiked ? "DELETE" : "POST"
-        APIManager.shared.toggleLike(userId: userId, eventId: eventId, isLiked: isLiked) { result in
+        APIManager.shared.toggleLike(eventId: eventId, isLiked: isLiked) { result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let isLiked):

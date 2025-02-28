@@ -10,13 +10,15 @@ import SnapKit
 import Kingfisher
 
 final class LikeProductCell: UITableViewCell {
-    // MARK: - Properties
-    private var isLiked: Bool = false
     
     enum EventStyle {
         case like
         case myPage
     }
+    
+    // MARK: - Properties
+    private var event: Event?
+    private var viewModel: HomeViewModel?
 
     // MARK: - UI Components
     private let productImage: UIImageView = {
@@ -53,6 +55,7 @@ final class LikeProductCell: UITableViewCell {
     // MARK: - Setup Methods
     private func setupViews() {
         contentView.addSubviews(productImage, dDayLabel, eventTitleLabel, actionButton, clockIcon, endDateLabel)
+        actionButton.addTarget(self, action: #selector(didTapLikeButton), for: .touchUpInside)
     }
 
     private func setupConstraints() {
@@ -120,10 +123,12 @@ final class LikeProductCell: UITableViewCell {
     }
 
     // MARK: - Configuration Method
-    func configure(with event: Event, style: EventStyle) {
+    func configure(with event: Event, viewModel: HomeViewModel, style: LikeProductCell.EventStyle) {
+        self.event = event
+        self.viewModel = viewModel
         dDayLabel.text = event.dDayDescription
         eventTitleLabel.text = event.eventTitle
-        endDateLabel.text = "이벤트 마감: \(formattedDate(event.eventEndDate))"
+        endDateLabel.text = "이벤트 마감: \(event.eventEndDate)"
 
         if let imageURL = URL(string: event.eventImage) {
             productImage.kf.setImage(with: imageURL)
@@ -134,7 +139,6 @@ final class LikeProductCell: UITableViewCell {
         switch style {
         case .like:
             configureActionButtonForLike(event.isLiked)
-            actionButton.addTarget(self, action: #selector(didTapLikeButton), for: .touchUpInside)
         case .myPage:
             configureActionButtonForMyPage()
         }
@@ -160,12 +164,24 @@ final class LikeProductCell: UITableViewCell {
         let image = UIImage(systemName: "xmark", withConfiguration: configuration)
         actionButton.setImage(image, for: .normal)
         actionButton.tintColor = UIColor.mainBlack
-        actionButton.removeTarget(self, action: #selector(didTapLikeButton), for: .touchUpInside)
     }
 
     // MARK: - Action Methods
     @objc private func didTapLikeButton() {
-        isLiked.toggle()
-        configureActionButtonForLike(isLiked)
+        guard let event = event, let viewModel = viewModel else { return }
+        guard let videoId = event.videoId else { return }
+        
+        viewModel.toggleLike(for: videoId)
+        
+        updateLikeState()
+    }
+    
+    private func updateLikeState() {
+        guard var event = event else { return }
+        
+        event.isLiked.toggle()
+        self.event = event
+        
+        configureActionButtonForLike(event.isLiked)
     }
 }

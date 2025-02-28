@@ -13,6 +13,7 @@ final class LikeViewController: UIViewController {
     private let likeView = LikeView()
     private let viewModel: HomeViewModel
     private var cancellables = Set<AnyCancellable>()
+    private var isOngoing: Bool = false
     
     // MARK: - Initializer
     init(viewModel: HomeViewModel) {
@@ -34,6 +35,7 @@ final class LikeViewController: UIViewController {
         setupTableView()
         setupActions()
         bindViewModel()
+        loadLikedEvents()
     }
     
     override func viewDidLayoutSubviews() {
@@ -68,10 +70,11 @@ final class LikeViewController: UIViewController {
     }
     
     private func bindViewModel() {
-        viewModel.$events
+        viewModel.$likedEventsList
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] events in
-                self?.likeView.tableView.isHidden = events.isEmpty
+            .sink { [weak self] likedEvents in
+                print("✅ TableView 업데이트: \(likedEvents.count)개의 좋아요한 이벤트")
+                self?.likeView.tableView.isHidden = likedEvents.isEmpty
                 self?.likeView.tableView.reloadData()
             }
             .store(in: &cancellables)
@@ -88,11 +91,23 @@ final class LikeViewController: UIViewController {
     
     // MARK: - Actions
     @objc private func didTapSavedItems() {
+        isOngoing = false
         likeView.animateBlueBox(to: 0)
+        loadLikedEvents()
     }
     
     @objc private func didTapInProgress() {
+        isOngoing = true
         likeView.animateBlueBox(to: 1)
+        loadLikedEvents()
+    }
+    
+    private func loadLikedEvents() {
+        viewModel.loadLikedEvents(ongoing: isOngoing)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+            self?.likeView.tableView.reloadData()
+        }
     }
 }
 
@@ -115,19 +130,33 @@ extension LikeViewController: UITableViewDelegate {
 
 extension LikeViewController: UITableViewDataSource {
     func numberOfSections(in tableView: UITableView) -> Int {
-        return viewModel.events.count
+        return viewModel.likedEventsList.count
     }
-    
+
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 1
     }
-    
+
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "LikeProductCell", for: indexPath) as? LikeProductCell else {
             return UITableViewCell()
         }
-        let event = viewModel.events[indexPath.section]
-        cell.configure(with: event, style: .like)
+
+        let eventDTO = viewModel.likedEventsList[indexPath.section]
+        
+        let event = Event(
+            eventId: eventDTO.eventId,
+            videoId: eventDTO.videoId,
+            eventLink: "",
+            eventImage: eventDTO.previewImg,
+            youtuberProfileImage: "",
+            eventEndDate: eventDTO.dateEnd,
+            eventTitle: eventDTO.eventItem,
+            eventDescription: nil,
+            isLiked: true
+        )
+
+        cell.configure(with: event, viewModel: viewModel, style: .like)
         return cell
     }
 }

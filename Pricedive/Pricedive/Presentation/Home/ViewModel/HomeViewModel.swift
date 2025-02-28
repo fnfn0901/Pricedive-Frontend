@@ -10,31 +10,35 @@ import Combine
 
 class HomeViewModel: ObservableObject {
     @Published var events: [Event] = []
-    @Published var likedEventsList: [Event] = []
+    @Published var likedEventsList: [EventDTO] = []
 
     var userId: Int = 1
     private var cancellables = Set<AnyCancellable>()
     private var likedEvents = Set<Int>()
 
     init() {
-        loadLikedEvents()
+        loadLikedEvents(ongoing: false)
         loadEvents()
     }
 
-    // ✅ 서버에서 좋아요한 이벤트 조회
-    func loadLikedEvents() {
-        APIManager.shared.fetchLikedEvents(userId: userId) { [weak self] result in
+    // ✅ 좋아요한 이벤트 조회
+    func loadLikedEvents(ongoing: Bool) {
+        APIManager.shared.fetchLikedEvents(userId: userId, ongoing: ongoing) { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
-                case .success(let likedEventIds):
-                    self?.likedEvents = Set(likedEventIds)
-                    self?.updateLikedEventsList()
-                    print("✅ 좋아요한 이벤트 불러오기 성공: \(likedEventIds)")
+                case .success(let likedEventsDTOs):
+                    self?.likedEventsList = likedEventsDTOs
+                    print("✅ 좋아요한 이벤트 불러오기 성공: \(likedEventsDTOs.count)개, ongoing: \(ongoing)")
                 case .failure(let error):
                     print("❌ 좋아요한 이벤트 불러오기 실패: \(error.localizedDescription)")
                 }
             }
         }
+    }
+
+    // ✅ 좋아요한 이벤트 리스트 업데이트 (진행 여부에 따라 필터링)
+    private func updateLikedEventsList() {
+        likedEventsList = likedEventsList.filter { likedEvents.contains($0.videoId ?? -1) }
     }
 
     // ✅ 전체 이벤트 리스트 조회
@@ -46,18 +50,18 @@ class HomeViewModel: ObservableObject {
                     if eventDTOs.isEmpty {
                         print("⚠️ 이벤트 리스트가 비어 있습니다.")
                     }
+                    
                     let mappedEvents = eventDTOs.map { dto -> Event in
                         let videoId = dto.videoId
-                        let eventEndDate = self?.parseDate(dto.dateEnd) ?? Date()
                         let isLiked = self?.likedEvents.contains(videoId) ?? false
-
+                        
                         return Event(
                             eventId: dto.eventId,
                             videoId: videoId,
                             eventLink: "",
                             eventImage: dto.previewImg,
                             youtuberProfileImage: "",
-                            eventEndDate: eventEndDate,
+                            eventEndDate: dto.dateEnd,
                             eventTitle: dto.eventItem,
                             eventDescription: nil,
                             isLiked: isLiked
@@ -76,15 +80,15 @@ class HomeViewModel: ObservableObject {
 
     // ✅ 좋아요 토글
     func toggleLike(for videoId: Int) {
-        guard let event = events.first(where: { $0.videoId == videoId }) else {
-            print("❌ 오류: videoId(\(videoId))에 해당하는 eventId를 찾을 수 없음")
+        guard let event = likedEventsList.first(where: { $0.videoId == videoId }) else {
+            print("❌ 오류: videoId(\(videoId))에 해당하는 이벤트를 찾을 수 없음")
             return
         }
 
         let eventId = event.eventId
         let isCurrentlyLiked = likedEvents.contains(videoId)
 
-        APIManager.shared.toggleLike(userId: userId, eventId: eventId, isLiked: isCurrentlyLiked) { [weak self] result in
+        APIManager.shared.toggleLike(eventId: eventId, isLiked: isCurrentlyLiked) { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let isLiked):
@@ -108,12 +112,7 @@ class HomeViewModel: ObservableObject {
         return likedEvents.contains(videoId)
     }
 
-    // ✅ 좋아요한 이벤트 리스트 업데이트
-    private func updateLikedEventsList() {
-        likedEventsList = events.filter { likedEvents.contains($0.videoId ?? -1) }
-    }
-
-    private func parseDate(_ dateString: String) -> Date {
+    func parseDate(_ dateString: String) -> Date {
         let isoFormatter = ISO8601DateFormatter()
         isoFormatter.formatOptions = [.withFullDate, .withTime, .withDashSeparatorInDate, .withColonSeparatorInTime]
 
