@@ -14,8 +14,10 @@ class GPTService {
     func generateComment(from eventDescription: String, completion: @escaping (Result<String, Error>) -> Void) {
         let prompt = """
         이벤트 내용: \(eventDescription)
-        위 이벤트에 대한 자연스러운 참여 댓글을 작성해주세요.
-        당신의 답변을 복붙해서 바로 댓글에 달아도 문제가 되지 않도록 반드시 댓글만 작성하고, 추가적인 설명이나 안내 문구는 포함하지 마세요.
+        위는 유튜브 설명란의 내용이야. 이를 참고해서 이벤트에 대한 자연스러운 참여 댓글을 작성해.
+        당신의 응답을 바로 나의 사용자에게 제공할 생각이니 댓글 내용 외 다른 대답 등은 일절 하지마. 절대 내게 말하는 형식으로 해서는 안 돼.
+        오직 댓글만 제공해.
+        네 답변을 사용자가 바로 복붙해서 유튜브에 댓글로 사용할 수 있도록 말이야.
         """
 
         let parameters: [String: Any] = [

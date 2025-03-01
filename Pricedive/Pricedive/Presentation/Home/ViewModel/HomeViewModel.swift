@@ -88,6 +88,15 @@ class HomeViewModel: ObservableObject {
         let eventId = event.eventId
         let isCurrentlyLiked = likedEvents.contains(videoId)
 
+        let previousState = isCurrentlyLiked
+
+        if isCurrentlyLiked {
+            likedEvents.remove(videoId)
+        } else {
+            likedEvents.insert(videoId)
+        }
+        objectWillChange.send()
+
         APIManager.shared.toggleLike(eventId: eventId, isLiked: isCurrentlyLiked) { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
@@ -100,8 +109,16 @@ class HomeViewModel: ObservableObject {
                     self?.updateLikedEventsList()
                     self?.objectWillChange.send()
                     print("✅ 좋아요 상태 변경 성공: \(isLiked ? "❤️" : "🤍")")
+
                 case .failure(let error):
                     print("❌ 좋아요 상태 변경 실패: \(error.localizedDescription)")
+
+                    if previousState {
+                        self?.likedEvents.insert(videoId)
+                    } else {
+                        self?.likedEvents.remove(videoId)
+                    }
+                    self?.objectWillChange.send()
                 }
             }
         }

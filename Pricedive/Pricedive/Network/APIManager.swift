@@ -119,10 +119,10 @@ class APIManager {
 
         print("🔍 좋아요 요청 - userId: \(userId), eventId: \(eventId), method: \(method)")
 
-        request(endpoint: endpoint, method: method) { (result: Result<Bool, NetworkError>) in
+        request(endpoint: endpoint, method: method) { (result: Result<String, NetworkError>) in
             switch result {
-            case .success:
-                print("✅ 좋아요 요청 성공 - HTTP Method: \(method)")
+            case .success(let response):
+                print("✅ 좋아요 요청 성공 - 응답: \(response)")
                 completion(.success(!isLiked))
             case .failure(let error):
                 print("❌ 좋아요 상태 변경 실패: \(error.localizedDescription)")

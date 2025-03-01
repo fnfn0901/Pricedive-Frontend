@@ -115,7 +115,12 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
             return
         }
 
+        print("🔍 좋아요 요청 전송 - videoId: \(videoId)")
+
         viewModel.toggleLike(for: videoId)
-        cell.updateHeartButton(isLiked: viewModel.isLiked(for: videoId))
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            cell.updateHeartButton(isLiked: self.viewModel.isLiked(for: videoId))
+        }
     }
 }
