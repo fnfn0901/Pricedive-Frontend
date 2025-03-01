@@ -13,10 +13,14 @@
 		5E705B4F2CEDFE8C0057F3AB /* RxMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 5E705B4E2CEDFE8C0057F3AB /* RxMoya */; };
 		5E705B522CEDFE9E0057F3AB /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 5E705B512CEDFE9E0057F3AB /* RxCocoa */; };
 		5E705B552CEDFEB20057F3AB /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 5E705B542CEDFEB20057F3AB /* SnapKit */; };
+		A007026055C5C15D7A3E3792 /* Pods_Pricedive.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E765DB6B708281A0F43A029D /* Pods_Pricedive.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		5E705B2F2CEDFE260057F3AB /* Pricedive.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Pricedive.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		7816B31C1B818838F1A38744 /* Pods-Pricedive.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Pricedive.debug.xcconfig"; path = "Target Support Files/Pods-Pricedive/Pods-Pricedive.debug.xcconfig"; sourceTree = "<group>"; };
+		E765DB6B708281A0F43A029D /* Pods_Pricedive.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Pricedive.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		F012300492EA23CA48F7C1F5 /* Pods-Pricedive.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Pricedive.release.xcconfig"; path = "Target Support Files/Pods-Pricedive/Pods-Pricedive.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -51,17 +55,29 @@
 				5E705B492CEDFE620057F3AB /* Alamofire in Frameworks */,
 				5E3EDF8B2CEE04FF0003820A /* Moya in Frameworks */,
 				5E705B552CEDFEB20057F3AB /* SnapKit in Frameworks */,
+				A007026055C5C15D7A3E3792 /* Pods_Pricedive.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		25AA155C42B5DE6DF07BAD4A /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				7816B31C1B818838F1A38744 /* Pods-Pricedive.debug.xcconfig */,
+				F012300492EA23CA48F7C1F5 /* Pods-Pricedive.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		5E705B262CEDFE260057F3AB = {
 			isa = PBXGroup;
 			children = (
 				5E705B312CEDFE260057F3AB /* Pricedive */,
 				5E705B302CEDFE260057F3AB /* Products */,
+				25AA155C42B5DE6DF07BAD4A /* Pods */,
+				74538D62FA4AA29ADB80CA43 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -73,6 +89,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		74538D62FA4AA29ADB80CA43 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				E765DB6B708281A0F43A029D /* Pods_Pricedive.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -80,9 +104,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5E705B422CEDFE280057F3AB /* Build configuration list for PBXNativeTarget "Pricedive" */;
 			buildPhases = (
+				8C06E26F9BEA6FEBE74D37C1 /* [CP] Check Pods Manifest.lock */,
 				5E705B2B2CEDFE260057F3AB /* Sources */,
 				5E705B2C2CEDFE260057F3AB /* Frameworks */,
 				5E705B2D2CEDFE260057F3AB /* Resources */,
+				DCE3A2A4FE6582B1C8697E4F /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -155,6 +181,48 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		8C06E26F9BEA6FEBE74D37C1 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Pricedive-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		DCE3A2A4FE6582B1C8697E4F /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Pricedive/Pods-Pricedive-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Pricedive/Pods-Pricedive-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Pricedive/Pods-Pricedive-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		5E705B2B2CEDFE260057F3AB /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -168,12 +236,14 @@
 /* Begin XCBuildConfiguration section */
 		5E705B432CEDFE280057F3AB /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7816B31C1B818838F1A38744 /* Pods-Pricedive.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = QC8QR8UH59;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Pricedive/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Pricedive;
@@ -201,12 +271,14 @@
 		};
 		5E705B442CEDFE280057F3AB /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = F012300492EA23CA48F7C1F5 /* Pods-Pricedive.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = QC8QR8UH59;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Pricedive/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Pricedive;

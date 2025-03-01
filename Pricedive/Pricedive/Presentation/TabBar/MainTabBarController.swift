@@ -16,7 +16,6 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
         setupViewControllers()
     }
     
-    // MARK: - TabBar Appearance 설정
     private func setupTabBarAppearance() {
         let appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
@@ -30,11 +29,6 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
         
         appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: normalColor]
         appearance.stackedLayoutAppearance.normal.iconColor = normalColor
-        
-        let topBorder = UIView()
-        topBorder.backgroundColor = .mainWhite
-        topBorder.frame = CGRect(x: 0, y: 0, width: tabBar.bounds.width, height: 1)
-        tabBar.addSubview(topBorder)
 
         tabBar.standardAppearance = appearance
         if #available(iOS 15.0, *) {
@@ -42,15 +36,15 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
         }
     }
     
-    // MARK: - View Controllers 설정
     private func setupViewControllers() {
         let homeViewModel = HomeViewModel()
+        let myPageViewModel = MyPageViewModel(homeViewModel: homeViewModel)
 
         let categoryController = createViewController(CategoryViewController(viewModel: CategoryViewModel()), title: "Category", image: "line.3.horizontal", tag: 0)
         let homeViewController = createViewController(UINavigationController(rootViewController: HomeViewController(viewModel: homeViewModel)), title: "Home", image: "house", tag: 1)
         let likeViewController = createViewController(LikeViewController(viewModel: homeViewModel), title: "Like", image: "heart", tag: 2)
         let myPageViewController = createViewController(
-            UINavigationController(rootViewController: MyPageViewController(viewModel: homeViewModel)),
+            UINavigationController(rootViewController: MyPageViewController(viewModel: myPageViewModel)),
             title: "MyPage",
             image: "person.crop.circle",
             tag: 3

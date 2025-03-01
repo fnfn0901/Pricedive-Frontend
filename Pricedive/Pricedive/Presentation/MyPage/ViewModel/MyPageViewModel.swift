@@ -2,36 +2,55 @@
 //  MyPageViewModel.swift
 //  Pricedive
 //
-//  Created by 신호연 on 1/20/25.
+//  Created by 신호연 on 12/26/24.
 //
 
 import Foundation
 import Combine
+import RealmSwift
 
 class MyPageViewModel: ObservableObject {
     @Published var groupedProducts: [(String, [ViewedProduct])] = []
-    
-    init() {
-        fetchViewedProducts()
+
+    let homeViewModel: HomeViewModel
+    private var realm = try! Realm()
+
+    init(homeViewModel: HomeViewModel) {
+        self.homeViewModel = homeViewModel
+        loadViewedProducts()
     }
-    
-    func fetchViewedProducts() {
-        
+
+    func loadViewedProducts() {
+        let products = realm.objects(ViewedProductRealm.self)
+            .sorted(byKeyPath: "viewedDate", ascending: false)
+            .prefix(20)
+            .map { ViewedProduct(from: $0) }
+
+        groupedProducts = groupProductsByDate(Array(products))
     }
-    
+
+    func clearAllViewedProducts() {
+        try? realm.write {
+            realm.delete(realm.objects(ViewedProductRealm.self))
+        }
+        groupedProducts = []
+    }
+
     private func groupProductsByDate(_ products: [ViewedProduct]) -> [(String, [ViewedProduct])] {
         let calendar = Calendar.current
         let today = Date()
         let yesterday = calendar.date(byAdding: .day, value: -1, to: today)!
         let startOfWeek = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: today))!
-        
+
         var todayProducts = [ViewedProduct]()
         var yesterdayProducts = [ViewedProduct]()
         var thisWeekProducts = [ViewedProduct]()
-        
+
+        let dateFormatter = ISO8601DateFormatter()
+
         products.forEach { product in
-            guard let viewedDate = MyPageViewModel.dateFormatter.date(from: product.viewedDate) else { return }
-            
+            guard let viewedDate = dateFormatter.date(from: product.viewedDate) else { return }
+
             if calendar.isDate(viewedDate, inSameDayAs: today) {
                 todayProducts.append(product)
             } else if calendar.isDate(viewedDate, inSameDayAs: yesterday) {
@@ -40,18 +59,11 @@ class MyPageViewModel: ObservableObject {
                 thisWeekProducts.append(product)
             }
         }
-        
+
         return [
             ("오늘", todayProducts),
             ("어제", yesterdayProducts),
             ("이번 주", thisWeekProducts)
         ].filter { !$0.1.isEmpty }
     }
-    
-    private static let dateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
-        formatter.timeZone = TimeZone(identifier: "Asia/Seoul")
-        return formatter
-    }()
 }

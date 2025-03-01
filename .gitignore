@@ -16,3 +16,12 @@ DerivedData/
 
 # Ignore Swift Package Manager resolved file
 **/Package.resolved
+
+# CocoaPods 관련 파일 제외
+Pods/
+*.xcworkspace
+*.lock
+xcuserdata/
+xcshareddata/
+DerivedData/
+.idea/

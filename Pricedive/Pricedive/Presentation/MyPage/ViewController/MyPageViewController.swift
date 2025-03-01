@@ -8,12 +8,12 @@
 import UIKit
 import Combine
 
-class MyPageViewController: UIViewController {
+class MyPageViewController: UIViewController, MyPageViewDelegate {
     private let myPageView = MyPageView()
-    private let viewModel: HomeViewModel
+    private let viewModel: MyPageViewModel
     private var cancellables = Set<AnyCancellable>()
 
-    init(viewModel: HomeViewModel) {
+    init(viewModel: MyPageViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
@@ -28,6 +28,7 @@ class MyPageViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        myPageView.delegate = self
         setupNavigationBar()
         bindViewModel()
     }
@@ -37,56 +38,29 @@ class MyPageViewController: UIViewController {
     }
 
     private func bindViewModel() {
-        viewModel.$events
+        viewModel.$groupedProducts
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] events in
-                self?.populateSections(with: events)
+            .sink { [weak self] groupedProducts in
+                self?.updateUI(with: groupedProducts)
             }
             .store(in: &cancellables)
     }
 
-    private func populateSections(with events: [Event]) {
-        let groupedEvents = groupEventsByDate(events)
+    private func updateUI(with groupedProducts: [(String, [ViewedProduct])]) {
+        myPageView.contentView.subviews.forEach { $0.removeFromSuperview() }
         
-        groupedEvents.forEach { (title, events) in
-            let cells = events.map { event -> UIView in
+        groupedProducts.forEach { (title, products) in
+            let cells = products.map { product -> UIView in
                 let cell = LikeProductCell()
-                cell.configure(with: event, viewModel: viewModel, style: .myPage)
+                cell.configure(with: product.toEvent(), viewModel: viewModel.homeViewModel, style: .myPage)
                 return cell
             }
             myPageView.addSection(title: title, cells: cells)
         }
     }
 
-    private func groupEventsByDate(_ events: [Event]) -> [(String, [Event])] {
-        let calendar = Calendar.current
-        let today = Date()
-        let yesterday = calendar.date(byAdding: .day, value: -1, to: today)!
-        let startOfWeek = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: today))!
-
-        var todayEvents = [Event]()
-        var yesterdayEvents = [Event]()
-        var thisWeekEvents = [Event]()
-
-        events.forEach { event in
-            guard let endDate = event.eventEndDateAsDate else {
-                print("⚠️ 날짜 변환 실패: \(event.eventEndDate)")
-                return
-            }
-            
-            if calendar.isDate(endDate, inSameDayAs: today) {
-                todayEvents.append(event)
-            } else if calendar.isDate(endDate, inSameDayAs: yesterday) {
-                yesterdayEvents.append(event)
-            } else if endDate >= startOfWeek {
-                thisWeekEvents.append(event)
-            }
-        }
-
-        return [
-            ("오늘", todayEvents),
-            ("어제", yesterdayEvents),
-            ("이번 주", thisWeekEvents)
-        ].filter { !$0.1.isEmpty }
+    func clearAllButtonTapped() {
+        viewModel.clearAllViewedProducts()
+        myPageView.contentView.subviews.forEach { $0.removeFromSuperview() }
     }
 }
