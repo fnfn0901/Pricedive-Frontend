@@ -128,7 +128,9 @@ final class LikeProductCell: UITableViewCell {
         self.viewModel = viewModel
         dDayLabel.text = event.dDayDescription
         eventTitleLabel.text = event.eventTitle
-        endDateLabel.text = "이벤트 마감: \(event.eventEndDate)"
+        
+        let formattedDate = formatDate(event.eventEndDate)
+        endDateLabel.text = "이벤트 마감: \(formattedDate)"
 
         if let imageURL = URL(string: event.eventImage) {
             productImage.kf.setImage(with: imageURL)
@@ -144,10 +146,21 @@ final class LikeProductCell: UITableViewCell {
         }
     }
 
-    private func formattedDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy. M. d."
-        return formatter.string(from: date)
+    private func formatDate(_ dateString: String) -> String {
+        let isoFormatter = DateFormatter()
+        isoFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+        isoFormatter.locale = Locale(identifier: "ko_KR")
+
+        let outputFormatter = DateFormatter()
+        outputFormatter.dateFormat = "yyyy.MM.dd"
+        outputFormatter.locale = Locale(identifier: "ko_KR")
+
+        if let date = isoFormatter.date(from: dateString) {
+            return outputFormatter.string(from: date)
+        } else {
+            print("⚠️ 날짜 변환 실패: \(dateString)")
+            return dateString
+        }
     }
     
     // MARK: - Helper Methods
@@ -169,10 +182,8 @@ final class LikeProductCell: UITableViewCell {
     // MARK: - Action Methods
     @objc private func didTapLikeButton() {
         guard let event = event, let viewModel = viewModel else { return }
-        guard let videoId = event.videoId else { return }
-        
-        viewModel.toggleLike(for: videoId)
-        
+
+        viewModel.toggleLike(for: event.eventId)
         updateLikeState()
     }
     

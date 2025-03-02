@@ -16,3 +16,32 @@ struct LikedEventsResponseDTO: Decodable {
         self.likedEventIds = try container.decode([Int].self)
     }
 }
+
+struct LikedEventDTO: Decodable {
+    let eventId: Int
+    let eventItem: String
+    let previewImg: String
+    let dateEnd: String
+
+    enum CodingKeys: String, CodingKey {
+        case eventId
+        case eventItem
+        case previewImg
+        case dateEnd
+    }
+
+    /// `LikedEventDTO` → `Event` 변환 메서드
+    func toEvent() -> Event {
+        return Event(
+            eventId: eventId,
+            videoId: nil,
+            eventLink: "",
+            eventImage: previewImg,
+            youtuberProfileImage: "",
+            eventEndDate: dateEnd,
+            eventTitle: eventItem,
+            eventDescription: nil,
+            isLiked: true
+        )
+    }
+}

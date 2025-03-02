@@ -44,42 +44,30 @@ class APIManager {
                 return
             }
 
-            guard (200...299).contains(httpResponse.statusCode) else {
-                completion(.failure(.serverError(statusCode: httpResponse.statusCode)))
-                return
-            }
-
             guard let data = data else {
                 completion(.failure(.noData))
                 return
             }
 
+            print("📥 서버 응답 원본 데이터: \(String(data: data, encoding: .utf8) ?? "Invalid Data")")
+
+            guard (200...299).contains(httpResponse.statusCode) else {
+                completion(.failure(.serverError(statusCode: httpResponse.statusCode)))
+                return
+            }
+
             do {
                 let decoder = JSONDecoder()
-                decoder.keyDecodingStrategy = .convertFromSnakeCase
                 let decodedData = try decoder.decode(T.self, from: data)
-                print("✅ 성공 디코딩 데이터: \(decodedData)")
                 completion(.success(decodedData))
-            } catch let DecodingError.dataCorrupted(context) {
-                print("❌ 디코딩 오류: 데이터가 손상됨 -> \(context)")
-                completion(.failure(.decodingError))
-            } catch let DecodingError.keyNotFound(key, context) {
-                print("❌ 디코딩 오류: 키 \(key.stringValue) 없음 -> \(context.debugDescription)")
-                completion(.failure(.decodingError))
-            } catch let DecodingError.typeMismatch(type, context) {
-                print("❌ 디코딩 오류: 타입 불일치 (\(type)) -> \(context.debugDescription)")
-                completion(.failure(.decodingError))
-            } catch let DecodingError.valueNotFound(value, context) {
-                print("❌ 디코딩 오류: 값 \(value) 없음 -> \(context.debugDescription)")
-                completion(.failure(.decodingError))
             } catch {
-                print("❌ 기타 디코딩 오류: \(error.localizedDescription)")
+                print("❌ 디코딩 오류: \(error)")
                 completion(.failure(.decodingError))
             }
         }
         task.resume()
     }
-
+    
     /// **전체 이벤트 리스트 가져오기**
     func fetchEvents(completion: @escaping (Result<[EventDTO], NetworkError>) -> Void) {
         request(endpoint: "/events") { (result: Result<APIResponse<[EventDTO]>, NetworkError>) in
@@ -97,15 +85,17 @@ class APIManager {
         request(endpoint: "/events/\(eventId)", completion: completion)
     }
 
-    /// **특정 유저가 좋아요한 이벤트 리스트 가져오기**
-    func fetchLikedEvents(userId: Int, ongoing: Bool, completion: @escaping (Result<[EventDTO], NetworkError>) -> Void) {
+    /// **좋아요한 이벤트 리스트 가져오기**
+    func fetchLikedEvents(userId: Int, ongoing: Bool, completion: @escaping (Result<[LikedEventDTO], NetworkError>) -> Void) {
         let endpoint = "/like_events/user/\(userId)?ongoing=\(ongoing)"
-        
-        request(endpoint: endpoint) { (result: Result<[EventDTO], NetworkError>) in
+
+        request(endpoint: endpoint) { (result: Result<[LikedEventDTO], NetworkError>) in
             switch result {
             case .success(let events):
+                print("✅ 좋아요한 이벤트 데이터 정상 수신: \(events.count)개")
                 completion(.success(events))
             case .failure(let error):
+                print("❌ 좋아요한 이벤트 가져오기 실패: \(error.localizedDescription)")
                 completion(.failure(error))
             }
         }
@@ -117,13 +107,21 @@ class APIManager {
         let method = isLiked ? "DELETE" : "POST"
         let endpoint = "/like_events/user/\(userId)/event/\(eventId)"
 
-        print("🔍 좋아요 요청 - userId: \(userId), eventId: \(eventId), method: \(method)")
+        print("🔍 좋아요 요청 - userId: \(userId), eventId: \(eventId), method: \(method), endpoint: \(endpoint)")
 
-        request(endpoint: endpoint, method: method) { (result: Result<String, NetworkError>) in
+        request(endpoint: endpoint, method: method) { (result: Result<Data, NetworkError>) in
             switch result {
-            case .success(let response):
-                print("✅ 좋아요 요청 성공 - 응답: \(response)")
+            case .success(let data):
+                if let responseString = String(data: data, encoding: .utf8) {
+                    print("✅ 좋아요 요청 성공 - 응답: \(responseString)")
+                    if responseString.contains("이미 좋아요한 이벤트입니다.") {
+                        print("⚠️ 서버 응답: 이미 좋아요한 상태이므로 상태 변경 안 함")
+                        completion(.success(isLiked))
+                        return
+                    }
+                }
                 completion(.success(!isLiked))
+
             case .failure(let error):
                 print("❌ 좋아요 상태 변경 실패: \(error.localizedDescription)")
                 completion(.failure(error))

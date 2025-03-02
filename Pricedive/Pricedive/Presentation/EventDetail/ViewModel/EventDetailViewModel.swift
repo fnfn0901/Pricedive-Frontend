@@ -74,14 +74,13 @@ class EventDetailViewModel: ObservableObject {
     func toggleLikeStatus(userId: Int, eventId: Int, completion: @escaping (Bool) -> Void) {
         print("✅ 좋아요 요청 - userId: \(userId), eventId: \(eventId), 현재 상태: \(isLiked)")
         
-        let method = isLiked ? "DELETE" : "POST"
         APIManager.shared.toggleLike(eventId: eventId, isLiked: isLiked) { result in
             DispatchQueue.main.async {
                 switch result {
-                case .success(let isLiked):
-                    print("✅ 좋아요 상태 변경 성공: \(isLiked ? "❤️" : "🤍")")
-                    self.isLiked = isLiked
-                    completion(isLiked)
+                case .success(let updatedIsLiked):
+                    print("✅ 좋아요 상태 변경 성공: \(updatedIsLiked ? "❤️" : "🤍")")
+                    self.isLiked = updatedIsLiked
+                    completion(updatedIsLiked)
                 case .failure(let error):
                     print("❌ 좋아요 상태 변경 실패: \(error.localizedDescription)")
                     completion(self.isLiked)

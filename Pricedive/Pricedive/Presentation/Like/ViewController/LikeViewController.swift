@@ -15,6 +15,8 @@ final class LikeViewController: UIViewController {
     private var cancellables = Set<AnyCancellable>()
     private var isOngoing: Bool = false
     
+    private var likedEvents: [LikedEventDTO] = []
+    
     // MARK: - Initializer
     init(viewModel: HomeViewModel) {
         self.viewModel = viewModel
@@ -74,6 +76,7 @@ final class LikeViewController: UIViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] likedEvents in
                 print("✅ TableView 업데이트: \(likedEvents.count)개의 좋아요한 이벤트")
+                
                 self?.likeView.tableView.isHidden = likedEvents.isEmpty
                 self?.likeView.tableView.reloadData()
             }
@@ -103,10 +106,33 @@ final class LikeViewController: UIViewController {
     }
     
     private func loadLikedEvents() {
-        viewModel.loadLikedEvents(ongoing: isOngoing)
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
-            self?.likeView.tableView.reloadData()
+        APIManager.shared.fetchLikedEvents(userId: 1, ongoing: isOngoing) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let events):
+                    print("✅ 성공적으로 받아온 이벤트 개수: \(events.count)")
+
+                    self?.likedEvents = events
+                    self?.viewModel.likedEventsList = events.map { dto in
+                        EventDTO(
+                            eventId: dto.eventId,
+                            category: "기본 카테고리",
+                            eventNums: 0,
+                            eventItem: dto.eventItem,
+                            previewImg: dto.previewImg,
+                            videoId: nil,
+                            dateEnd: dto.dateEnd
+                        )
+                    }
+
+                    self?.viewModel.objectWillChange.send()
+
+                    self?.likeView.tableView.reloadData()
+
+                case .failure(let error):
+                    print("❌ 좋아요한 이벤트 가져오기 실패: \(error.localizedDescription)")
+                }
+            }
         }
     }
 }
@@ -128,35 +154,29 @@ extension LikeViewController: UITableViewDelegate {
     }
 }
 
+// MARK: - UITableViewDataSource
 extension LikeViewController: UITableViewDataSource {
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return viewModel.likedEventsList.count
-    }
-
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 1
+    }
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        let count = viewModel.likedEventsList.count
+        return count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "LikeProductCell", for: indexPath) as? LikeProductCell else {
+            print("❌ 셀 등록 오류: LikeProductCell")
             return UITableViewCell()
         }
 
-        let eventDTO = viewModel.likedEventsList[indexPath.section]
-        
-        let event = Event(
-            eventId: eventDTO.eventId,
-            videoId: eventDTO.videoId,
-            eventLink: "",
-            eventImage: eventDTO.previewImg,
-            youtuberProfileImage: "",
-            eventEndDate: eventDTO.dateEnd,
-            eventTitle: eventDTO.eventItem,
-            eventDescription: nil,
-            isLiked: true
-        )
+        let likedEventDTO = viewModel.likedEventsList[indexPath.section]
+        let event = likedEventDTO.toEvent()
 
+        print("✅ 셀 생성: \(event.eventTitle)")
         cell.configure(with: event, viewModel: viewModel, style: .like)
+        
         return cell
     }
 }

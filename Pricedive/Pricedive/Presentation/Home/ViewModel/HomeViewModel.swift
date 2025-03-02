@@ -11,36 +11,93 @@ import Combine
 class HomeViewModel: ObservableObject {
     @Published var events: [Event] = []
     @Published var likedEventsList: [EventDTO] = []
-
+    
     var userId: Int = 1
     private var cancellables = Set<AnyCancellable>()
     private var likedEvents = Set<Int>()
-
+    
     init() {
         loadLikedEvents(ongoing: false)
         loadEvents()
     }
-
+    
+    // ✅ 좋아요한 이벤트 리스트 업데이트
+    private func updateLikedEventsList() {
+        likedEventsList = likedEventsList.filter { likedEvents.contains($0.eventId) }
+    }
+    
     // ✅ 좋아요한 이벤트 조회
     func loadLikedEvents(ongoing: Bool) {
         APIManager.shared.fetchLikedEvents(userId: userId, ongoing: ongoing) { [weak self] result in
+            guard let self = self else { return }
+            
             DispatchQueue.main.async {
                 switch result {
                 case .success(let likedEventsDTOs):
-                    self?.likedEventsList = likedEventsDTOs
-                    print("✅ 좋아요한 이벤트 불러오기 성공: \(likedEventsDTOs.count)개, ongoing: \(ongoing)")
+                    print("✅ 좋아요한 이벤트 정상 수신: \(likedEventsDTOs.count)개")
+                    
+                    self.likedEvents = Set(likedEventsDTOs.map { $0.eventId })
+                    self.likedEventsList = likedEventsDTOs.map { dto in
+                        EventDTO(
+                            eventId: dto.eventId,
+                            category: "기본 카테고리",
+                            eventNums: 0,
+                            eventItem: dto.eventItem,
+                            previewImg: dto.previewImg,
+                            videoId: nil,
+                            dateEnd: dto.dateEnd
+                        )
+                    }
+                    
+                    self.objectWillChange.send()
+                    print("📌 업데이트된 likedEventsList 개수: \(self.likedEventsList.count)")
+                    
                 case .failure(let error):
                     print("❌ 좋아요한 이벤트 불러오기 실패: \(error.localizedDescription)")
                 }
             }
         }
     }
+    
+    // ✅ 좋아요 토글
+    func toggleLike(for eventId: Int) {
+        let isCurrentlyLiked = likedEvents.contains(eventId)
+        let previousState = isCurrentlyLiked
 
-    // ✅ 좋아요한 이벤트 리스트 업데이트 (진행 여부에 따라 필터링)
-    private func updateLikedEventsList() {
-        likedEventsList = likedEventsList.filter { likedEvents.contains($0.videoId ?? -1) }
+        if isCurrentlyLiked {
+            likedEvents.remove(eventId)
+        } else {
+            likedEvents.insert(eventId)
+        }
+        objectWillChange.send()
+
+        APIManager.shared.toggleLike(eventId: eventId, isLiked: isCurrentlyLiked) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success:
+                    if previousState {
+                        self?.likedEvents.remove(eventId)
+                    } else {
+                        self?.likedEvents.insert(eventId)
+                    }
+                    self?.updateLikedEventsList()
+                    self?.objectWillChange.send()
+                    print("✅ 좋아요 상태 변경 성공: \(previousState ? "❤️ → 🤍" : "🤍 → ❤️")")
+
+                case .failure(let error):
+                    print("❌ 좋아요 상태 변경 실패: \(error.localizedDescription)")
+
+                    if previousState {
+                        self?.likedEvents.insert(eventId)
+                    } else {
+                        self?.likedEvents.remove(eventId)
+                    }
+                    self?.objectWillChange.send()
+                }
+            }
+        }
     }
-
+    
     // ✅ 전체 이벤트 리스트 조회
     func loadEvents() {
         APIManager.shared.fetchEvents { [weak self] result in
@@ -52,12 +109,11 @@ class HomeViewModel: ObservableObject {
                     }
                     
                     let mappedEvents = eventDTOs.map { dto -> Event in
-                        let videoId = dto.videoId
-                        let isLiked = self?.likedEvents.contains(videoId) ?? false
+                        let isLiked = self?.likedEvents.contains(dto.eventId) ?? false
                         
                         return Event(
                             eventId: dto.eventId,
-                            videoId: videoId,
+                            videoId: dto.videoId,
                             eventLink: "",
                             eventImage: dto.previewImg,
                             youtuberProfileImage: "",
@@ -67,7 +123,7 @@ class HomeViewModel: ObservableObject {
                             isLiked: isLiked
                         )
                     }
-
+                    
                     self?.events = mappedEvents
                     self?.updateLikedEventsList()
                     self?.objectWillChange.send()
@@ -77,62 +133,16 @@ class HomeViewModel: ObservableObject {
             }
         }
     }
-
-    // ✅ 좋아요 토글
-    func toggleLike(for videoId: Int) {
-        guard let event = likedEventsList.first(where: { $0.videoId == videoId }) else {
-            print("❌ 오류: videoId(\(videoId))에 해당하는 이벤트를 찾을 수 없음")
-            return
-        }
-
-        let eventId = event.eventId
-        let isCurrentlyLiked = likedEvents.contains(videoId)
-
-        let previousState = isCurrentlyLiked
-
-        if isCurrentlyLiked {
-            likedEvents.remove(videoId)
-        } else {
-            likedEvents.insert(videoId)
-        }
-        objectWillChange.send()
-
-        APIManager.shared.toggleLike(eventId: eventId, isLiked: isCurrentlyLiked) { [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let isLiked):
-                    if isLiked {
-                        self?.likedEvents.insert(videoId)
-                    } else {
-                        self?.likedEvents.remove(videoId)
-                    }
-                    self?.updateLikedEventsList()
-                    self?.objectWillChange.send()
-                    print("✅ 좋아요 상태 변경 성공: \(isLiked ? "❤️" : "🤍")")
-
-                case .failure(let error):
-                    print("❌ 좋아요 상태 변경 실패: \(error.localizedDescription)")
-
-                    if previousState {
-                        self?.likedEvents.insert(videoId)
-                    } else {
-                        self?.likedEvents.remove(videoId)
-                    }
-                    self?.objectWillChange.send()
-                }
-            }
-        }
-    }
-
+    
     // ✅ 특정 비디오가 좋아요 되어있는지 확인
     func isLiked(for videoId: Int) -> Bool {
         return likedEvents.contains(videoId)
     }
-
+    
     func parseDate(_ dateString: String) -> Date {
         let isoFormatter = ISO8601DateFormatter()
         isoFormatter.formatOptions = [.withFullDate, .withTime, .withDashSeparatorInDate, .withColonSeparatorInTime]
-
+        
         if let date = isoFormatter.date(from: dateString) {
             return date
         } else {
