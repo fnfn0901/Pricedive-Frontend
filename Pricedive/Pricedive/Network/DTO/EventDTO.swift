@@ -14,13 +14,14 @@ struct EventDTO: Decodable {
     let eventItem: String
     var previewImg: String
     let videoId: Int?
-    let dateEnd: String
-
+    let dateEnd: String?
+    let channelImg: String
+    
     enum CodingKeys: String, CodingKey {
-        case eventId, category, eventNums, eventItem, previewImg, videoId, dateEnd
+        case eventId, category, eventNums, eventItem, previewImg, videoId, dateEnd, channelImg
     }
-
-    init(eventId: Int, category: String, eventNums: Int, eventItem: String, previewImg: String, videoId: Int?, dateEnd: String) {
+    
+    init(eventId: Int, category: String, eventNums: Int, eventItem: String, previewImg: String, videoId: Int?, dateEnd: String, channelImg: String) {
         self.eventId = eventId
         self.category = category
         self.eventNums = eventNums
@@ -28,8 +29,9 @@ struct EventDTO: Decodable {
         self.previewImg = EventDTO.formatImageURL(previewImg)
         self.videoId = videoId
         self.dateEnd = dateEnd
+        self.channelImg = channelImg
     }
-
+    
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         eventId = try container.decode(Int.self, forKey: .eventId)
@@ -38,26 +40,26 @@ struct EventDTO: Decodable {
         eventItem = try container.decode(String.self, forKey: .eventItem)
         previewImg = try container.decode(String.self, forKey: .previewImg)
         videoId = try container.decodeIfPresent(Int.self, forKey: .videoId)
-        dateEnd = try container.decode(String.self, forKey: .dateEnd)
-
-        previewImg = EventDTO.formatImageURL(previewImg)
+        dateEnd = try container.decodeIfPresent(String.self, forKey: .dateEnd)
+        channelImg = try container.decode(String.self, forKey: .channelImg)
+        
+        previewImg = previewImg.isEmpty ? "" : EventDTO.formatImageURL(previewImg)
     }
-
-    /// ✅ `EventDTO`를 `Event`로 변환하는 메서드 추가
+    
+    /// ✅ `EventDTO`를 `Event`로 변환하는 메서드
     func toEvent() -> Event {
         return Event(
             eventId: self.eventId,
-            videoId: self.videoId ?? -1, // ✅ videoId가 없으면 기본값 -1
+            videoId: self.videoId ?? -1,
             eventLink: "",
             eventImage: self.previewImg,
-            youtuberProfileImage: "",
-            eventEndDate: self.dateEnd,
-            eventTitle: self.eventItem,
-            eventDescription: nil,
-            isLiked: true // ✅ 좋아요한 이벤트이므로 기본적으로 true
+            channelImg: self.channelImg,
+            eventEndDate: self.dateEnd ?? "",
+            eventItem: self.eventItem,
+            eventDescription: nil
         )
     }
-
+    
     /// ✅ 이미지 URL을 절대 경로로 변환하는 함수
     private static func formatImageURL(_ url: String) -> String {
         if url.starts(with: "/") {

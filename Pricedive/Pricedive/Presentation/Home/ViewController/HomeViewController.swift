@@ -64,11 +64,17 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
             .sink { [weak self] events in
                 guard let self = self else { return }
                 
-                self.homeView.collectionView.isHidden = events.isEmpty
+                print("📌 [UI] UI 업데이트 - 이벤트 개수: \(events.count)개")
+                if events.isEmpty {
+                    print("⚠️ [UI] UI 업데이트 실패: 이벤트 리스트가 비어 있음")
+                }
                 
+                self.homeView.collectionView.isHidden = events.isEmpty
+
                 DispatchQueue.main.async {
                     self.homeView.collectionView.reloadData()
                     self.homeView.updateCollectionViewHeight()
+                    print("✅ [UI] 최종 업데이트된 이벤트 개수: \(events.count)개")
                 }
             }
             .store(in: &cancellables)
@@ -105,7 +111,10 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
 
         print("✅ 선택된 비디오 ID: \(videoId)")
 
-        let detailViewController = EventDetailViewController(event: selectedEvent, homeViewModel: viewModel)
+        let detailViewController = EventDetailViewController(
+            event: selectedEvent,
+            homeViewModel: viewModel
+        )
         navigationController?.pushViewController(detailViewController, animated: true)
     }
 

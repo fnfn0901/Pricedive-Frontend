@@ -67,7 +67,7 @@ extension UIView {
     
     // 디데이 뷰 생성
     static func createDDayView(
-        text: String,
+        dDayDescription: String,
         backgroundColor: UIColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.60)
     ) -> UIView {
         let dDayView = UIView()
@@ -76,7 +76,7 @@ extension UIView {
         dDayView.clipsToBounds = true
 
         let label = UILabel.createCustomLabel(
-            text: "\(text)",
+            text: dDayDescription,
             color: UIColor.mainRed,
             font: UIFont(name: "Pretendard-Bold", size: 16)!,
             lineHeight: 0,

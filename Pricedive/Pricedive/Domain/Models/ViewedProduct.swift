@@ -26,18 +26,17 @@ struct ViewedProduct {
         return ViewedProductRealm(id: id, title: title, imageUrl: imageUrl, viewedDate: viewedDate, videoId: videoId)
     }
 
-    /// ✅ **`Event`로 변환하는 메서드 추가**
+    /// `ViewedProduct` → `Event` 변환 메서드
     func toEvent() -> Event {
         return Event(
             eventId: id,
             videoId: videoId ?? -1,
             eventLink: "",
             eventImage: imageUrl,
-            youtuberProfileImage: "",
+            channelImg: "",
             eventEndDate: viewedDate,
-            eventTitle: title,
-            eventDescription: "",
-            isLiked: false
+            eventItem: title,
+            eventDescription: ""
         )
     }
 }

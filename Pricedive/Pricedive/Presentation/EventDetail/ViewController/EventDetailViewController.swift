@@ -18,13 +18,12 @@ class EventDetailViewController: UIViewController {
     private let event: Event
 
     init(event: Event, homeViewModel: HomeViewModel) {
-        self.videoId = event.videoId ?? -1
-        print("✅ 생성된 videoId: \(self.videoId)")
-        self.userId = homeViewModel.userId
-        self.event = event
-        self.viewModel = EventDetailViewModel(event: event, homeViewModel: homeViewModel)
-        super.init(nibName: nil, bundle: nil)
-    }
+            self.event = event
+            self.videoId = event.videoId ?? -1
+            self.userId = homeViewModel.userId
+            self.viewModel = EventDetailViewModel(event: event, homeViewModel: homeViewModel)
+            super.init(nibName: nil, bundle: nil)
+        }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")

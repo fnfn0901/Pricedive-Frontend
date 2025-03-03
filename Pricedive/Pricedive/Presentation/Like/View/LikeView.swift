@@ -43,6 +43,8 @@ final class LikeView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
+        
+        topFixedFrameView.isSearchButtonHidden = true
     }
 
     required init?(coder: NSCoder) {

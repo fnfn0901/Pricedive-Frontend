@@ -42,7 +42,7 @@ class EventCell: UICollectionViewCell {
         return imageView
     }()
     
-    private let dDayView = UIView.createDDayView(text: "0")
+    private let dDayView = UIView.createDDayView(dDayDescription: "D-?")
 
     lazy var heartButton: UIButton = {
         let button = UIButton(type: .system)
@@ -101,13 +101,15 @@ class EventCell: UICollectionViewCell {
         self.viewModel = viewModel
         self.videoId = event.videoId
 
-        titleLabel.text = event.eventTitle
+        titleLabel.text = event.eventItem
         imageView.kf.setImage(with: URL(string: event.eventImage))
-        profileView.kf.setImage(with: URL(string: event.youtuberProfileImage))
+        
+        if let profileURL = URL(string: event.channelImg) {
+            profileView.kf.setImage(with: profileURL)
+        }
 
         updateHeartButton(isLiked: viewModel.isLiked(for: event.videoId ?? -1))
-        
-        updateDDayView(with: event.dDayDescription)
+        updateDDayView(with: event.dDayDescription ?? "D-?")
     }
 
     private func updateDDayView(with text: String) {

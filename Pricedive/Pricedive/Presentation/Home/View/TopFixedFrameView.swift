@@ -22,6 +22,12 @@ class TopFixedFrameView: UIView {
     func setSearchButtonTarget(target: Any?, action: Selector) {
         searchIconButton.addTarget(target, action: action, for: .touchUpInside)
     }
+    
+    var isSearchButtonHidden: Bool = false {
+        didSet {
+            searchIconButton.isHidden = isSearchButtonHidden
+        }
+    }
 
     // MARK: - Initializers
 

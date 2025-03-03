@@ -77,14 +77,8 @@ class EventDetailView: UIView {
         return view
     }()
 
-    private let dDayView: UIView = {
-        let view = UIView.createDDayView(text: "0")
-        if let label = view.subviews.first(where: { $0 is UILabel }) as? UILabel {
-            label.font = UIFont(name: "Pretendard-Bold", size: 22)
-        }
-        return view
-    }()
-
+    private var dDayView: UIView = UIView()
+    
     lazy var heartButton: UIButton = {
         let button = UIButton(type: .system)
         var config = UIButton.Configuration.plain()
@@ -211,7 +205,7 @@ class EventDetailView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
     // MARK: - Setup Views
     private func setupViews() {
         backgroundColor = .white
@@ -362,7 +356,7 @@ class EventDetailView: UIView {
             profileImageView.kf.setImage(with: URL(string: profileImageUrl))
         }
         if let dDayLabel = dDayView.subviews.first(where: { $0 is UILabel }) as? UILabel {
-            dDayLabel.text = dDayText
+            dDayLabel.text = viewModel?.event.dDayDescription ?? "D-?"
         }
         eventDescriptionLabel.text = eventDescription ?? ""
     }
@@ -399,9 +393,11 @@ class EventDetailView: UIView {
     private func updateView() {
         guard let viewModel = viewModel else { return }
 
-        titleLabel.text = viewModel.event.eventTitle
+        titleLabel.text = viewModel.event.eventItem
         eventDescriptionLabel.text = viewModel.event.eventDescription
         updateHeartButton(isLiked: viewModel.isLiked)
+
+        setupDDayView()
     }
 
     func updateVideoView(with video: VideoDTO, isLiked: Bool) {
@@ -534,5 +530,23 @@ class EventDetailView: UIView {
             return
         }
         UIPasteboard.general.string = comment
+    }
+    
+    private func setupDDayView() {
+        guard let event = viewModel?.event else { return }
+        
+        let dDayText = event.dDayDescription
+        dDayView = UIView.createDDayView(dDayDescription: dDayText)
+
+        if let label = dDayView.subviews.first(where: { $0 is UILabel }) as? UILabel {
+            label.font = UIFont(name: "Pretendard-Bold", size: 22)
+        }
+
+        self.imageView.addSubview(dDayView)
+
+        dDayView.snp.makeConstraints {
+            $0.leading.bottom.equalToSuperview()
+            $0.size.equalTo(CGSize(width: 102, height: 59))
+        }
     }
 }

@@ -45,7 +45,8 @@ class HomeViewModel: ObservableObject {
                             eventItem: dto.eventItem,
                             previewImg: dto.previewImg,
                             videoId: nil,
-                            dateEnd: dto.dateEnd
+                            dateEnd: dto.dateEnd,
+                            channelImg: ""
                         )
                     }
                     
@@ -104,31 +105,39 @@ class HomeViewModel: ObservableObject {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let eventDTOs):
+                    print("✅ [ViewModel] 받아온 이벤트 개수: \(eventDTOs.count)개")
+
                     if eventDTOs.isEmpty {
-                        print("⚠️ 이벤트 리스트가 비어 있습니다.")
+                        print("⚠️ [ViewModel] API에서 받아온 이벤트 리스트가 비어 있습니다.")
                     }
-                    
-                    let mappedEvents = eventDTOs.map { dto -> Event in
-                        let isLiked = self?.likedEvents.contains(dto.eventId) ?? false
+
+                    let mappedEvents = eventDTOs.compactMap { dto -> Event? in
+                        print("🛠 [ViewModel] 변환 중: \(dto.eventItem) (ID: \(dto.eventId))")
                         
+                        guard !dto.eventItem.isEmpty, !dto.previewImg.isEmpty, !(dto.dateEnd?.isEmpty ?? true) else {
+                            print("⚠️ [ViewModel] 변환 실패 - 필수 값 누락: \(dto)")
+                            return nil
+                        }
+
                         return Event(
                             eventId: dto.eventId,
                             videoId: dto.videoId,
                             eventLink: "",
                             eventImage: dto.previewImg,
-                            youtuberProfileImage: "",
-                            eventEndDate: dto.dateEnd,
-                            eventTitle: dto.eventItem,
-                            eventDescription: nil,
-                            isLiked: isLiked
+                            channelImg: dto.channelImg,
+                            eventEndDate: dto.dateEnd ?? "",
+                            eventItem: dto.eventItem,
+                            eventDescription: nil
                         )
                     }
-                    
+
+                    print("✅ [ViewModel] 변환 후 이벤트 개수: \(mappedEvents.count)개")
+
                     self?.events = mappedEvents
-                    self?.updateLikedEventsList()
                     self?.objectWillChange.send()
+                    
                 case .failure(let error):
-                    print("❌ 이벤트 불러오기 실패: \(error.localizedDescription)")
+                    print("❌ [ViewModel] 이벤트 불러오기 실패: \(error.localizedDescription)")
                 }
             }
         }

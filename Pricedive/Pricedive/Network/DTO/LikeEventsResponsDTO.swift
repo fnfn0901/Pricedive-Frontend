@@ -37,11 +37,10 @@ struct LikedEventDTO: Decodable {
             videoId: nil,
             eventLink: "",
             eventImage: previewImg,
-            youtuberProfileImage: "",
+            channelImg: "",
             eventEndDate: dateEnd,
-            eventTitle: eventItem,
-            eventDescription: nil,
-            isLiked: true
+            eventItem: eventItem,
+            eventDescription: nil
         )
     }
 }

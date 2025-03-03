@@ -9,7 +9,7 @@ import Foundation
 
 class APIManager {
     static let shared = APIManager()
-    private let baseURL = URL(string: "http://172.30.1.71:8080")!
+    private let baseURL = URL(string: "http://localhost:8080")!
 
     private init() {}
 
@@ -73,8 +73,16 @@ class APIManager {
         request(endpoint: "/events") { (result: Result<APIResponse<[EventDTO]>, NetworkError>) in
             switch result {
             case .success(let response):
+                print("✅ [APIManager] 서버에서 받은 전체 데이터: \(response)")
+                
+                if response.data.isEmpty {
+                    print("⚠️ [APIManager] 서버에서 받은 이벤트 리스트가 비어 있습니다.")
+                }
+
                 completion(.success(response.data))
+                
             case .failure(let error):
+                print("❌ [APIManager] 이벤트 가져오기 실패: \(error.localizedDescription)")
                 completion(.failure(error))
             }
         }

@@ -121,12 +121,12 @@ final class LikeViewController: UIViewController {
                             eventItem: dto.eventItem,
                             previewImg: dto.previewImg,
                             videoId: nil,
-                            dateEnd: dto.dateEnd
+                            dateEnd: dto.dateEnd,
+                            channelImg: ""
                         )
                     }
 
                     self?.viewModel.objectWillChange.send()
-
                     self?.likeView.tableView.reloadData()
 
                 case .failure(let error):
@@ -174,7 +174,6 @@ extension LikeViewController: UITableViewDataSource {
         let likedEventDTO = viewModel.likedEventsList[indexPath.section]
         let event = likedEventDTO.toEvent()
 
-        print("✅ 셀 생성: \(event.eventTitle)")
         cell.configure(with: event, viewModel: viewModel, style: .like)
         
         return cell
