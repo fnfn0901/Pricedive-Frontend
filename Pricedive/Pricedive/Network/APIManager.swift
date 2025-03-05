@@ -115,24 +115,30 @@ class APIManager {
         let method = isLiked ? "DELETE" : "POST"
         let endpoint = "/like_events/user/\(userId)/event/\(eventId)"
 
-        print("🔍 좋아요 요청 - userId: \(userId), eventId: \(eventId), method: \(method), endpoint: \(endpoint)")
+        print("🔍 [API] 좋아요 요청 전송 - userId: \(userId), eventId: \(eventId), method: \(method), endpoint: \(endpoint)")
 
         request(endpoint: endpoint, method: method) { (result: Result<Data, NetworkError>) in
             switch result {
             case .success(let data):
                 if let responseString = String(data: data, encoding: .utf8) {
-                    print("✅ 좋아요 요청 성공 - 응답: \(responseString)")
+                    print("📥 서버 응답 원본 데이터: \(responseString)")
+                    
                     if responseString.contains("이미 좋아요한 이벤트입니다.") {
                         print("⚠️ 서버 응답: 이미 좋아요한 상태이므로 상태 변경 안 함")
-                        completion(.success(isLiked))
+                        completion(.success(true))
                         return
                     }
                 }
                 completion(.success(!isLiked))
 
             case .failure(let error):
-                print("❌ 좋아요 상태 변경 실패: \(error.localizedDescription)")
-                completion(.failure(error))
+                if case .serverError(let statusCode) = error, statusCode == 400 {
+                    print("⚠️ 서버에서 400 응답을 보냈지만, 좋아요 상태를 유지합니다.")
+                    completion(.success(isLiked))
+                } else {
+                    print("❌ 좋아요 상태 변경 실패: \(error.localizedDescription)")
+                    completion(.failure(error))
+                }
             }
         }
     }

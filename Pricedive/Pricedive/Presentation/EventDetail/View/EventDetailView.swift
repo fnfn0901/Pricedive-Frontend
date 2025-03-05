@@ -377,16 +377,19 @@ class EventDetailView: UIView {
         }
     }
 
+    /// **하트 버튼 UI 업데이트**
     func updateHeartButton(isLiked: Bool) {
-        let imageName = isLiked ? "heart.fill" : "heart"
-        let tintColor = isLiked ? UIColor.mainRed : UIColor.mainBlack
+        DispatchQueue.main.async {
+            let imageName = isLiked ? "heart.fill" : "heart"
+            let tintColor = isLiked ? UIColor.mainRed : UIColor.mainBlack
 
-        var config = UIButton.Configuration.plain()
-        config.image = UIImage(systemName: imageName)
-        config.baseForegroundColor = tintColor
-        config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(pointSize: 24, weight: .regular)
-        
-        heartButton.configuration = config
+            var config = UIButton.Configuration.plain()
+            config.image = UIImage(systemName: imageName)
+            config.baseForegroundColor = tintColor
+            config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(pointSize: 24, weight: .regular)
+            
+            self.heartButton.configuration = config
+        }
     }
     
     // MARK: - Update View
