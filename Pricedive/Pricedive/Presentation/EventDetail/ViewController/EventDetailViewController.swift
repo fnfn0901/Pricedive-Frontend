@@ -16,6 +16,7 @@ class EventDetailViewController: UIViewController {
     private let videoId: Int
     private let userId: Int
     private let event: Event
+    private let viewedProductRepository = ViewedProductRepository()
 
     init(event: Event, homeViewModel: HomeViewModel) {
             self.event = event
@@ -37,6 +38,7 @@ class EventDetailViewController: UIViewController {
         super.viewWillAppear(animated)
         navigationController?.isNavigationBarHidden = true
         tabBarController?.tabBar.isHidden = true
+        saveViewedProduct()
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -57,6 +59,22 @@ class EventDetailViewController: UIViewController {
             detailView.imageView.kf.setImage(with: url)
         }
     }
+    
+    private func saveViewedProduct() {
+        let dateFormatter = ISO8601DateFormatter()
+        let viewedDate = dateFormatter.string(from: Date())
+
+        let viewedProduct = ViewedProduct(
+            id: event.eventId,
+            title: event.eventItem,
+            imageUrl: event.eventImage,
+            viewedDate: viewedDate,
+            videoId: event.videoId
+        )
+
+        viewedProductRepository.addOrUpdateViewedProduct(viewedProduct)
+    }
+
 
     private func setupBindings() {
         viewModel.$videoDetail

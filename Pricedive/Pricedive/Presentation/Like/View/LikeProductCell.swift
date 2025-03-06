@@ -126,6 +126,9 @@ final class LikeProductCell: UITableViewCell {
     func configure(with event: Event, viewModel: HomeViewModel, style: LikeProductCell.EventStyle) {
         self.event = event
         self.viewModel = viewModel
+
+        print("🛠 LikeProductCell 설정 중: \(event.eventItem)")
+
         dDayLabel.text = event.dDayDescription
         eventTitleLabel.text = event.eventItem
 
@@ -133,8 +136,10 @@ final class LikeProductCell: UITableViewCell {
         endDateLabel.text = "이벤트 마감: \(formattedDate)"
 
         if let imageURL = URL(string: event.eventImage) {
+            print("📸 이미지 로드 시도: \(imageURL)")
             productImage.kf.setImage(with: imageURL)
         } else {
+            print("❌ 이미지 URL 없음")
             productImage.image = nil
         }
 
@@ -155,9 +160,9 @@ final class LikeProductCell: UITableViewCell {
     }
 
     private func formatDate(_ dateString: String) -> String {
-        let isoFormatter = DateFormatter()
-        isoFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
-        isoFormatter.locale = Locale(identifier: "ko_KR")
+        let isoFormatter = ISO8601DateFormatter()
+        isoFormatter.formatOptions = [.withFullDate, .withDashSeparatorInDate]
+        isoFormatter.timeZone = TimeZone.current
 
         let outputFormatter = DateFormatter()
         outputFormatter.dateFormat = "yyyy.MM.dd"
@@ -167,7 +172,7 @@ final class LikeProductCell: UITableViewCell {
             return outputFormatter.string(from: date)
         } else {
             print("⚠️ 날짜 변환 실패: \(dateString)")
-            return dateString
+            return "날짜 오류"
         }
     }
     

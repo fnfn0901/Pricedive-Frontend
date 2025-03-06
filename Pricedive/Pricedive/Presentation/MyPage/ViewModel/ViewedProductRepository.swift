@@ -19,13 +19,23 @@ class ViewedProductRepository {
         }
     }
 
-    /// ✅ 최근 본 상품 저장 (최대 20개 유지)
-    func addViewedProduct(_ product: ViewedProduct) {
-        let realmObject = product.toRealmObject()
+    /// ✅ 최근 본 상품 저장 (중복 제거 후 업데이트)
+    func addOrUpdateViewedProduct(_ product: ViewedProduct) {
+        let existingProduct = realm.object(ofType: ViewedProductRealm.self, forPrimaryKey: product.id)
 
         do {
             try realm.write {
-                realm.add(realmObject, update: .modified)
+                if let existing = existingProduct {
+                    // 이미 존재하면 업데이트
+                    existing.viewedDate = product.viewedDate
+                    existing.videoId = product.videoId
+                    print("🔄 최근 본 상품 업데이트: \(existing.title)")
+                } else {
+                    // 존재하지 않으면 새로 추가
+                    let realmObject = product.toRealmObject()
+                    realm.add(realmObject, update: .modified)
+                    print("✅ 최근 본 상품 추가: \(product.title)")
+                }
             }
             removeOldestIfNeeded()
         } catch {

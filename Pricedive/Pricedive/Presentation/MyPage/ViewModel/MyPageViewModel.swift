@@ -13,26 +13,22 @@ class MyPageViewModel: ObservableObject {
     @Published var groupedProducts: [(String, [ViewedProduct])] = []
 
     let homeViewModel: HomeViewModel
-    private var realm = try! Realm()
+    private let repository = ViewedProductRepository()
 
     init(homeViewModel: HomeViewModel) {
         self.homeViewModel = homeViewModel
         loadViewedProducts()
     }
-
+    
     func loadViewedProducts() {
-        let products = realm.objects(ViewedProductRealm.self)
-            .sorted(byKeyPath: "viewedDate", ascending: false)
-            .prefix(20)
-            .map { ViewedProduct(from: $0) }
-
-        groupedProducts = groupProductsByDate(Array(products))
+        let products = repository.getViewedProducts()
+        groupedProducts = groupProductsByDate(products)
+        
+        print("🔄 groupedProducts 업데이트됨: \(groupedProducts)")
     }
 
     func clearAllViewedProducts() {
-        try? realm.write {
-            realm.delete(realm.objects(ViewedProductRealm.self))
-        }
+        repository.clearAllViewedProducts()
         groupedProducts = []
     }
 
