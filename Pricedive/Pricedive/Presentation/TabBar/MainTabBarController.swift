@@ -40,15 +40,15 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
         let homeViewModel = HomeViewModel()
         let myPageViewModel = MyPageViewModel(homeViewModel: homeViewModel)
 
-        let categoryController = createViewController(CategoryViewController(viewModel: CategoryViewModel()), title: "Category", image: "line.3.horizontal", tag: 0)
-        let homeViewController = createViewController(UINavigationController(rootViewController: HomeViewController(viewModel: homeViewModel)), title: "Home", image: "house", tag: 1)
-        let likeViewController = createViewController(LikeViewController(viewModel: homeViewModel), title: "Like", image: "heart", tag: 2)
-        let myPageViewController = createViewController(
-            UINavigationController(rootViewController: MyPageViewController(viewModel: myPageViewModel)),
-            title: "MyPage",
-            image: "person.crop.circle",
-            tag: 3
-        )
+        let categoryController = UINavigationController(rootViewController: CategoryViewController(viewModel: CategoryViewModel()))
+        let homeViewController = UINavigationController(rootViewController: HomeViewController(viewModel: homeViewModel))
+        let likeViewController = UINavigationController(rootViewController: LikeViewController(viewModel: homeViewModel))
+        let myPageViewController = UINavigationController(rootViewController: MyPageViewController(viewModel: myPageViewModel))
+
+        categoryController.tabBarItem = UITabBarItem(title: "Category", image: UIImage(systemName: "line.3.horizontal"), tag: 0)
+        homeViewController.tabBarItem = UITabBarItem(title: "Home", image: UIImage(systemName: "house"), tag: 1)
+        likeViewController.tabBarItem = UITabBarItem(title: "Like", image: UIImage(systemName: "heart"), tag: 2)
+        myPageViewController.tabBarItem = UITabBarItem(title: "MyPage", image: UIImage(systemName: "person.crop.circle"), tag: 3)
 
         viewControllers = [categoryController, homeViewController, likeViewController, myPageViewController]
         selectedIndex = 1

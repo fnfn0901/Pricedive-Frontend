@@ -29,6 +29,11 @@ class CategoryViewController: UIViewController {
         bindViewModel()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.isNavigationBarHidden = true
+    }
+    
     private func setupView() {
         view.addSubview(categoryView)
         categoryView.snp.makeConstraints { make in

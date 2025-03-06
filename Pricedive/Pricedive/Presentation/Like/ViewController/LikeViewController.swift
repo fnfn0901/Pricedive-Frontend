@@ -27,6 +27,11 @@ final class LikeViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.isNavigationBarHidden = true
+    }
+    
     // MARK: - Lifecycle
     override func loadView() {
         self.view = likeView
@@ -151,6 +156,25 @@ extension LikeViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+
+        let likedEventDTO = viewModel.likedEventsList[indexPath.section]
+        let eventId = likedEventDTO.eventId
+
+        print("✅ 선택된 이벤트 ID: \(eventId), 데이터 요청 중...")
+
+        APIManager.shared.fetchEventDetail(eventId: eventId) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let eventDTO):
+                    let event = eventDTO.toEvent()
+                    let detailVC = EventDetailViewController(event: event, homeViewModel: self?.viewModel ?? HomeViewModel())
+                    self?.navigationController?.pushViewController(detailVC, animated: true)
+                    
+                case .failure(let error):
+                    print("❌ 이벤트 상세 정보 가져오기 실패: \(error.localizedDescription)")
+                }
+            }
+        }
     }
 }
 
