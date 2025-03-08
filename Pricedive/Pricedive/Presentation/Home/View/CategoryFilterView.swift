@@ -117,7 +117,7 @@ class CategoryFilterView: UIView {
                 self?.updateCategoryButtons(with: categories)
             }
             .store(in: &cancellables)
-        
+
         updateCategoryButtons(with: viewModel.categories)
     }
 }

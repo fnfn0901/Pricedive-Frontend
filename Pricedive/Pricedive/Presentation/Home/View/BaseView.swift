@@ -15,11 +15,10 @@ class BaseView: UIView {
     let categoryFilterView = CategoryFilterView()
     let collectionView: UICollectionView
 
-    var viewModel: CategoryViewModel? {
+    var viewModel: HomeViewModel? {
         didSet {
-            if let viewModel = viewModel {
-                categoryFilterView.bind(to: viewModel)
-            }
+            guard let viewModel = viewModel else { return }
+            categoryFilterView.bind(to: viewModel.categoryViewModel)
         }
     }
 

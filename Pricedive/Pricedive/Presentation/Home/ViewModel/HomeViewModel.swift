@@ -11,6 +11,7 @@ import Combine
 class HomeViewModel: ObservableObject {
     @Published var events: [Event] = []
     @Published var likedEventsList: [EventDTO] = []
+    let categoryViewModel = CategoryViewModel()
     
     var userId: Int = 1
     private var cancellables = Set<AnyCancellable>()
