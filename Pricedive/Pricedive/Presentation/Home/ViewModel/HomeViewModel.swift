@@ -105,14 +105,12 @@ class HomeViewModel: ObservableObject {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let eventDTOs):
-                    print("✅ [ViewModel] 받아온 이벤트 개수: \(eventDTOs.count)개")
 
                     if eventDTOs.isEmpty {
                         print("⚠️ [ViewModel] API에서 받아온 이벤트 리스트가 비어 있습니다.")
                     }
 
                     let mappedEvents = eventDTOs.compactMap { dto -> Event? in
-                        print("🛠 [ViewModel] 변환 중: \(dto.eventItem) (ID: \(dto.eventId))")
                         
                         guard !dto.eventItem.isEmpty, !dto.previewImg.isEmpty, !(dto.dateEnd?.isEmpty ?? true) else {
                             print("⚠️ [ViewModel] 변환 실패 - 필수 값 누락: \(dto)")
@@ -131,7 +129,6 @@ class HomeViewModel: ObservableObject {
                         )
                     }
 
-                    print("✅ [ViewModel] 변환 후 이벤트 개수: \(mappedEvents.count)개")
 
                     self?.events = mappedEvents
                     self?.objectWillChange.send()

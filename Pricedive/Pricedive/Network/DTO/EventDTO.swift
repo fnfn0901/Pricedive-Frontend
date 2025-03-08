@@ -38,13 +38,16 @@ struct EventDTO: Decodable {
         category = try container.decode(String.self, forKey: .category)
         eventNums = try container.decode(Int.self, forKey: .eventNums)
         eventItem = try container.decode(String.self, forKey: .eventItem)
-        previewImg = try container.decode(String.self, forKey: .previewImg)
+        previewImg = try container.decodeIfPresent(String.self, forKey: .previewImg) ?? EventDTO.defaultImageURL
         videoId = try container.decodeIfPresent(Int.self, forKey: .videoId)
         dateEnd = try container.decodeIfPresent(String.self, forKey: .dateEnd)
         channelImg = try container.decode(String.self, forKey: .channelImg)
-        
-        previewImg = previewImg.isEmpty ? "" : EventDTO.formatImageURL(previewImg)
+
+        previewImg = EventDTO.formatImageURL(previewImg)
     }
+
+    /// ✅ 기본 이미지 URL 설정
+    private static let defaultImageURL = "/defaultimage.jpg"
     
     /// ✅ `EventDTO`를 `Event`로 변환하는 메서드
     func toEvent() -> Event {

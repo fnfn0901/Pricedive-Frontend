@@ -72,7 +72,6 @@ class EventDetailViewModel: ObservableObject {
     
     /// **🔹 좋아요 상태 변경**
     func toggleLikeStatus(userId: Int, eventId: Int, completion: @escaping (Bool) -> Void) {
-        print("✅ 좋아요 요청 - userId: \(userId), eventId: \(eventId), 현재 상태: \(isLiked)")
         
         let currentLikeStatus = isLiked
         let newLikeStatus = !currentLikeStatus

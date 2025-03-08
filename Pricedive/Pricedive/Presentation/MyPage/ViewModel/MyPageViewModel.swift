@@ -23,8 +23,6 @@ class MyPageViewModel: ObservableObject {
     func loadViewedProducts() {
         let products = repository.getViewedProducts()
         groupedProducts = groupProductsByDate(products)
-        
-        print("🔄 groupedProducts 업데이트됨: \(groupedProducts)")
     }
 
     func clearAllViewedProducts() {

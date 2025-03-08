@@ -9,7 +9,7 @@ import Foundation
 
 class APIManager {
     static let shared = APIManager()
-    private let baseURL = URL(string: "http://localhost:8080")!
+    private let baseURL = URL(string: "http://3.37.130.95:8080")!
 
     private init() {}
 
@@ -48,9 +48,7 @@ class APIManager {
                 completion(.failure(.noData))
                 return
             }
-
-            print("📥 서버 응답 원본 데이터: \(String(data: data, encoding: .utf8) ?? "Invalid Data")")
-
+            
             guard (200...299).contains(httpResponse.statusCode) else {
                 completion(.failure(.serverError(statusCode: httpResponse.statusCode)))
                 return
@@ -73,7 +71,6 @@ class APIManager {
         request(endpoint: "/events") { (result: Result<APIResponse<[EventDTO]>, NetworkError>) in
             switch result {
             case .success(let response):
-                print("✅ [APIManager] 서버에서 받은 전체 데이터: \(response)")
                 
                 if response.data.isEmpty {
                     print("⚠️ [APIManager] 서버에서 받은 이벤트 리스트가 비어 있습니다.")
@@ -111,7 +108,6 @@ class APIManager {
         request(endpoint: endpoint) { (result: Result<[LikedEventDTO], NetworkError>) in
             switch result {
             case .success(let events):
-                print("✅ 좋아요한 이벤트 데이터 정상 수신: \(events.count)개")
                 completion(.success(events))
             case .failure(let error):
                 print("❌ 좋아요한 이벤트 가져오기 실패: \(error.localizedDescription)")
@@ -126,13 +122,10 @@ class APIManager {
         let method = isLiked ? "DELETE" : "POST"
         let endpoint = "/like_events/user/\(userId)/event/\(eventId)"
 
-        print("🔍 [API] 좋아요 요청 전송 - userId: \(userId), eventId: \(eventId), method: \(method), endpoint: \(endpoint)")
-
         request(endpoint: endpoint, method: method) { (result: Result<Data, NetworkError>) in
             switch result {
             case .success(let data):
                 if let responseString = String(data: data, encoding: .utf8) {
-                    print("📥 서버 응답 원본 데이터: \(responseString)")
                     
                     if responseString.contains("이미 좋아요한 이벤트입니다.") {
                         print("⚠️ 서버 응답: 이미 좋아요한 상태이므로 상태 변경 안 함")
@@ -161,7 +154,6 @@ class APIManager {
         request(endpoint: url) { (result: Result<APIResponse<VideoDTO>, NetworkError>) in
             switch result {
             case .success(let response):
-                print("✅ 서버 응답 데이터: \(response)")
                 completion(.success(response.data))
             case .failure(let error):
                 print("❌ 서버 요청 실패: \(error)")

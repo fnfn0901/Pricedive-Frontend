@@ -68,9 +68,14 @@ class CategoryFilterView: UIView {
             button.addTarget(self, action: #selector(categoryButtonTapped(_:)), for: .touchUpInside)
             stackView.addArrangedSubview(button)
         }
+        
+        layoutIfNeeded()
+        adjustFirstAndLastButtonConstraints()
     }
 
     private func adjustFirstAndLastButtonConstraints() {
+        guard !stackView.arrangedSubviews.isEmpty else { return }
+        
         if let firstButton = stackView.arrangedSubviews.first {
             firstButton.snp.makeConstraints { make in
                 make.leading.equalToSuperview().offset(20)
@@ -104,7 +109,6 @@ class CategoryFilterView: UIView {
     }
 
     // MARK: - Public Methods
-
     func bind(to viewModel: CategoryViewModel) {
         self.viewModel = viewModel
         viewModel.$categories
@@ -113,5 +117,7 @@ class CategoryFilterView: UIView {
                 self?.updateCategoryButtons(with: categories)
             }
             .store(in: &cancellables)
+        
+        updateCategoryButtons(with: viewModel.categories)
     }
 }

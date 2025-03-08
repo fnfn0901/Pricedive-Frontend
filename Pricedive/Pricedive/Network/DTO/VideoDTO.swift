@@ -38,7 +38,5 @@ struct VideoDTO: Decodable {
         dateEnd = try container.decodeIfPresent(String.self, forKey: .dateEnd) ?? ""
         summarizedDescription = try container.decodeIfPresent(String.self, forKey: .summarizedDescription)
         previewImg = try container.decodeIfPresent(String.self, forKey: .previewImg)
-
-        print("✅ 디코딩 완료: \(self)")
     }
 }

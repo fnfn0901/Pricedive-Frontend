@@ -64,7 +64,6 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
             .sink { [weak self] events in
                 guard let self = self else { return }
                 
-                print("📌 [UI] UI 업데이트 - 이벤트 개수: \(events.count)개")
                 if events.isEmpty {
                     print("⚠️ [UI] UI 업데이트 실패: 이벤트 리스트가 비어 있음")
                 }
@@ -74,7 +73,6 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
                 DispatchQueue.main.async {
                     self.homeView.collectionView.reloadData()
                     self.homeView.updateCollectionViewHeight()
-                    print("✅ [UI] 최종 업데이트된 이벤트 개수: \(events.count)개")
                 }
             }
             .store(in: &cancellables)

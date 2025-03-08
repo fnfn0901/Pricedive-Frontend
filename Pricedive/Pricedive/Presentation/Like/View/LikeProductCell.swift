@@ -127,7 +127,6 @@ final class LikeProductCell: UITableViewCell {
         self.event = event
         self.viewModel = viewModel
 
-        print("🛠 LikeProductCell 설정 중: \(event.eventItem)")
 
         dDayLabel.text = event.dDayDescription
         eventTitleLabel.text = event.eventItem
@@ -136,7 +135,6 @@ final class LikeProductCell: UITableViewCell {
         endDateLabel.text = "이벤트 마감: \(formattedDate)"
 
         if let imageURL = URL(string: event.eventImage) {
-            print("📸 이미지 로드 시도: \(imageURL)")
             productImage.kf.setImage(with: imageURL)
         } else {
             print("❌ 이미지 URL 없음")

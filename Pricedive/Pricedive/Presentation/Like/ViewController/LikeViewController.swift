@@ -80,7 +80,6 @@ final class LikeViewController: UIViewController {
         viewModel.$likedEventsList
             .receive(on: DispatchQueue.main)
             .sink { [weak self] likedEvents in
-                print("✅ TableView 업데이트: \(likedEvents.count)개의 좋아요한 이벤트")
                 
                 self?.likeView.tableView.isHidden = likedEvents.isEmpty
                 self?.likeView.tableView.reloadData()
@@ -115,8 +114,6 @@ final class LikeViewController: UIViewController {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let events):
-                    print("✅ 성공적으로 받아온 이벤트 개수: \(events.count)")
-
                     self?.likedEvents = events
                     self?.viewModel.likedEventsList = events.map { dto in
                         EventDTO(

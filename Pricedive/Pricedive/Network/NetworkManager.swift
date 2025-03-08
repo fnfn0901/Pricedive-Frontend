@@ -48,7 +48,6 @@ class NetworkManager {
 
             do {
                 let decodedData = try JSONDecoder().decode(T.self, from: data)
-                print("✅ 성공 응답: \(String(data: data, encoding: .utf8) ?? "No Data")")
                 completion(.success(decodedData))
             } catch {
                 print("⚠️ 디코딩 오류: \(error.localizedDescription)")
