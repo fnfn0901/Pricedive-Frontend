@@ -26,12 +26,11 @@ class ViewedProductRepository {
         do {
             try realm.write {
                 if let existing = existingProduct {
-                    // 이미 존재하면 업데이트
                     existing.viewedDate = product.viewedDate
+                    existing.eventEndDate = product.eventEndDate
                     existing.videoId = product.videoId
                     print("🔄 최근 본 상품 업데이트: \(existing.title)")
                 } else {
-                    // 존재하지 않으면 새로 추가
                     let realmObject = product.toRealmObject()
                     realm.add(realmObject, update: .modified)
                     print("✅ 최근 본 상품 추가: \(product.title)")
@@ -73,6 +72,22 @@ class ViewedProductRepository {
                 realm.delete(realm.objects(ViewedProductRealm.self))
             }
             print("✅ 모든 최근 본 상품 삭제 완료")
+        } catch {
+            print("❌ 최근 본 상품 삭제 실패: \(error.localizedDescription)")
+        }
+    }
+    
+    func deleteViewedProduct(_ product: ViewedProduct) {
+        guard let productToDelete = realm.object(ofType: ViewedProductRealm.self, forPrimaryKey: product.id) else {
+            print("❌ 삭제할 상품을 찾을 수 없음: \(product.title)")
+            return
+        }
+
+        do {
+            try realm.write {
+                realm.delete(productToDelete)
+            }
+            print("✅ 최근 본 상품 삭제 완료: \(product.title)")
         } catch {
             print("❌ 최근 본 상품 삭제 실패: \(error.localizedDescription)")
         }

@@ -16,6 +16,8 @@ final class LikeProductCell: UITableViewCell {
         case myPage
     }
     
+    var onDelete: (() -> Void)?
+    
     // MARK: - Properties
     private var event: Event?
     private var viewModel: HomeViewModel?
@@ -60,10 +62,9 @@ final class LikeProductCell: UITableViewCell {
 
     private func setupConstraints() {
         productImage.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(8)
+            make.top.bottom.equalToSuperview().inset(8)
             make.leading.equalToSuperview().offset(12)
             make.height.width.equalTo(80)
-            make.bottom.lessThanOrEqualToSuperview().offset(-8).priority(.low)
         }
 
         eventTitleLabel.snp.makeConstraints { make in
@@ -96,7 +97,8 @@ final class LikeProductCell: UITableViewCell {
     }
 
     private func configureAppearance() {
-        backgroundColor = .white
+        backgroundColor = .clear
+        contentView.backgroundColor = .white
         contentView.layer.cornerRadius = 12
         contentView.layer.masksToBounds = true
         contentView.layer.borderWidth = 1
@@ -155,6 +157,12 @@ final class LikeProductCell: UITableViewCell {
         let image = UIImage(systemName: imageName, withConfiguration: configuration)
         actionButton.setImage(image, for: .normal)
         actionButton.tintColor = UIColor.mainBlack
+
+        actionButton.snp.remakeConstraints { make in
+            make.centerY.equalToSuperview()
+            make.trailing.equalToSuperview().offset(-16)
+            make.size.equalTo(28)
+        }
     }
 
     private func formatDate(_ dateString: String) -> String {
@@ -174,20 +182,20 @@ final class LikeProductCell: UITableViewCell {
         }
     }
     
-    // MARK: - Helper Methods
-    private func configureActionButtonForLike(_ isLiked: Bool) {
-        let imageName = isLiked ? "heart.fill" : "heart"
-        let configuration = UIImage.SymbolConfiguration(pointSize: 28, weight: .regular)
-        let image = UIImage(systemName: imageName, withConfiguration: configuration)
-        actionButton.setImage(image, for: .normal)
-        actionButton.tintColor = isLiked ? UIColor.mainRed : UIColor.mainBlack
-    }
-    
     private func configureActionButtonForMyPage() {
-        let configuration = UIImage.SymbolConfiguration(pointSize: 28, weight: .regular)
+        let configuration = UIImage.SymbolConfiguration(pointSize: 20, weight: .regular)
         let image = UIImage(systemName: "xmark", withConfiguration: configuration)
         actionButton.setImage(image, for: .normal)
         actionButton.tintColor = UIColor.mainBlack
+
+        actionButton.snp.remakeConstraints { make in
+            make.centerY.equalToSuperview()
+            make.trailing.equalToSuperview().offset(-16)
+            make.size.equalTo(20)
+        }
+
+        actionButton.removeTarget(self, action: nil, for: .allEvents)
+        actionButton.addTarget(self, action: #selector(didTapDeleteButton), for: .touchUpInside)
     }
 
     // MARK: - Action Methods
@@ -195,5 +203,9 @@ final class LikeProductCell: UITableViewCell {
         guard let event = event, let viewModel = viewModel else { return }
 
         viewModel.toggleLike(for: event.eventId)
+    }
+    
+    @objc private func didTapDeleteButton() {
+        onDelete?()
     }
 }

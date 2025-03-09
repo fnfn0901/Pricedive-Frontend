@@ -29,6 +29,11 @@ class MyPageViewModel: ObservableObject {
         repository.clearAllViewedProducts()
         groupedProducts = []
     }
+    
+    func deleteViewedProduct(_ product: ViewedProduct) {
+        repository.deleteViewedProduct(product)
+        loadViewedProducts()
+    }
 
     private func groupProductsByDate(_ products: [ViewedProduct]) -> [(String, [ViewedProduct])] {
         let calendar = Calendar.current
@@ -43,13 +48,13 @@ class MyPageViewModel: ObservableObject {
         let dateFormatter = ISO8601DateFormatter()
 
         products.forEach { product in
-            guard let viewedDate = dateFormatter.date(from: product.viewedDate) else { return }
+            guard let eventDate = dateFormatter.date(from: product.viewedDate) else { return }
 
-            if calendar.isDate(viewedDate, inSameDayAs: today) {
+            if calendar.isDate(eventDate, inSameDayAs: today) {
                 todayProducts.append(product)
-            } else if calendar.isDate(viewedDate, inSameDayAs: yesterday) {
+            } else if calendar.isDate(eventDate, inSameDayAs: yesterday) {
                 yesterdayProducts.append(product)
-            } else if viewedDate >= startOfWeek {
+            } else if eventDate >= startOfWeek {
                 thisWeekProducts.append(product)
             }
         }

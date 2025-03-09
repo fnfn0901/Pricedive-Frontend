@@ -12,7 +12,6 @@ final class LikeView: UIView {
     // MARK: - UI Elements
     let topFixedFrameView = TopFixedFrameView()
     let searchBarView = SearchBarView()
-    private var isSearchBarVisible = false
     
     let savedItemsLabel = UILabel.createCustomLabel(
         text: "찜한 상품",
@@ -108,40 +107,6 @@ final class LikeView: UIView {
             make.top.equalTo(baseView.snp.bottom).offset(2)
             make.leading.trailing.bottom.equalToSuperview().inset(30)
         }
-    }
-
-    // MARK: - 검색 토글 기능 추가
-    func toggleToSearchBar() {
-        guard !isSearchBarVisible else { return }
-        
-        searchBarView.isHidden = false
-        searchBarView.alpha = 0
-        topFixedFrameView.isHidden = false
-        
-        UIView.animate(withDuration: 0.3, animations: {
-            self.topFixedFrameView.alpha = 0
-            self.searchBarView.alpha = 1
-        }) { _ in
-            self.topFixedFrameView.isHidden = true
-            self.searchBarView.searchTextField.becomeFirstResponder()
-        }
-        
-        isSearchBarVisible = true
-    }
-
-    func toggleToTopFrame() {
-        guard isSearchBarVisible else { return }
-        
-        UIView.animate(withDuration: 0.3, animations: {
-            self.searchBarView.alpha = 0
-            self.topFixedFrameView.alpha = 1
-        }) { _ in
-            self.searchBarView.isHidden = true
-            self.topFixedFrameView.isHidden = false
-            self.searchBarView.searchTextField.resignFirstResponder()
-        }
-        
-        isSearchBarVisible = false
     }
     
     private func createRoundedView(cornerRadius: CGFloat, backgroundColor: UIColor) -> UIView {

@@ -38,7 +38,6 @@ class HomeViewModel: ObservableObject {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let likedEventsDTOs):
-                    print("✅ 좋아요한 이벤트 정상 수신: \(likedEventsDTOs.count)개")
                     
                     self.likedEvents = Set(likedEventsDTOs.map { $0.eventId })
                     self.likedEventsList = likedEventsDTOs.map { dto in
@@ -55,7 +54,6 @@ class HomeViewModel: ObservableObject {
                     }
                     
                     self.objectWillChange.send()
-                    print("📌 업데이트된 likedEventsList 개수: \(self.likedEventsList.count)")
                     
                 case .failure(let error):
                     print("❌ 좋아요한 이벤트 불러오기 실패: \(error.localizedDescription)")

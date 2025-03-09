@@ -31,9 +31,8 @@ class MyPageView: UIView {
     }()
 
     let tableView: UITableView = {
-        let tableView = UITableView()
+        let tableView = UITableView(frame: .zero, style: .plain)
         tableView.separatorStyle = .none
-        tableView.backgroundColor = UIColor(hex: "F9FAFB")
         tableView.register(LikeProductCell.self, forCellReuseIdentifier: "LikeProductCell")
         return tableView
     }()

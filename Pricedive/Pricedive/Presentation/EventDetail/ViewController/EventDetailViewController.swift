@@ -69,6 +69,7 @@ class EventDetailViewController: UIViewController {
             title: event.eventItem,
             imageUrl: event.eventImage,
             viewedDate: viewedDate,
+            eventEndDate: event.eventEndDate,
             videoId: event.videoId
         )
 

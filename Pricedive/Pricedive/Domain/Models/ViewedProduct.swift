@@ -12,14 +12,16 @@ struct ViewedProduct {
     let title: String
     let imageUrl: String
     let viewedDate: String
+    let eventEndDate: String
     let videoId: Int?
 
     /// ✅ 기본 생성자 추가
-    init(id: Int, title: String, imageUrl: String, viewedDate: String, videoId: Int?) {
+    init(id: Int, title: String, imageUrl: String, viewedDate: String, eventEndDate: String, videoId: Int?) {
         self.id = id
         self.title = title
         self.imageUrl = imageUrl
         self.viewedDate = viewedDate
+        self.eventEndDate = eventEndDate
         self.videoId = videoId
     }
 
@@ -29,6 +31,7 @@ struct ViewedProduct {
         self.title = realmObject.title
         self.imageUrl = realmObject.imageUrl
         self.viewedDate = realmObject.viewedDate
+        self.eventEndDate = realmObject.eventEndDate
         self.videoId = realmObject.videoId
     }
 
@@ -39,6 +42,7 @@ struct ViewedProduct {
         realmObject.title = title
         realmObject.imageUrl = imageUrl
         realmObject.viewedDate = viewedDate
+        realmObject.eventEndDate = eventEndDate
         realmObject.videoId = videoId
         return realmObject
     }
@@ -51,7 +55,7 @@ struct ViewedProduct {
             eventLink: "",
             eventImage: imageUrl,
             channelImg: "",
-            eventEndDate: viewedDate,
+            eventEndDate: eventEndDate,
             eventItem: title,
             eventDescription: ""
         )

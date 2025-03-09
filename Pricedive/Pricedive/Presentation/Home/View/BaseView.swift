@@ -77,7 +77,11 @@ class BaseView: UIView {
 
         let totalSpacing = spacing + (inset * 2)
         let cellWidth = (width - totalSpacing) / 2
-        let cellHeight = min(cellWidth * 1.25, 173)
+        let imageHeight = cellWidth * 0.65
+        let titleHeight: CGFloat = 40
+        let verticalPadding: CGFloat = 5
+
+        let cellHeight = imageHeight + verticalPadding + titleHeight
 
         layout.itemSize = CGSize(width: cellWidth, height: cellHeight)
         layout.sectionInset = UIEdgeInsets(top: 0, left: inset, bottom: 0, right: inset)

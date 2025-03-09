@@ -31,25 +31,25 @@ class MyPageViewController: UIViewController, MyPageViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         myPageView.delegate = self
-        setupNavigationBar()
         setupTableView()
         bindViewModel()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        viewModel.loadViewedProducts()
-    }
-
-    private func setupNavigationBar() {
         navigationController?.navigationBar.isHidden = true
+        viewModel.loadViewedProducts()
     }
 
     private func setupTableView() {
         myPageView.tableView.delegate = self
         myPageView.tableView.dataSource = self
         myPageView.tableView.separatorStyle = .none
-        myPageView.tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 0, right: 0)
+        myPageView.tableView.backgroundColor = .clear
+
+        // ✅ HeaderCell 등록 추가
+        myPageView.tableView.register(HeaderCell.self, forCellReuseIdentifier: "HeaderCell")
+        myPageView.tableView.register(LikeProductCell.self, forCellReuseIdentifier: "LikeProductCell")
     }
 
     private func bindViewModel() {
@@ -75,47 +75,103 @@ extension MyPageViewController: UITableViewDataSource, UITableViewDelegate {
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return groupedProducts[section].1.count
+        return groupedProducts[section].1.count + 1 // ✅ 첫 번째 헤더 셀을 추가했으므로 +1
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return indexPath.row == 0 ? 40 + 12 : 100 + 12 // ✅ 패딩 포함 (6+6)
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "LikeProductCell", for: indexPath) as! LikeProductCell
-        let product = groupedProducts[indexPath.section].1[indexPath.row]
-        cell.configure(with: product.toEvent(), viewModel: viewModel.homeViewModel, style: .myPage)
-        return cell
-    }
+        if indexPath.row == 0 {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "HeaderCell", for: indexPath) as! HeaderCell
+            let dateText = groupedProducts[indexPath.section].0
+            cell.configure(with: dateText)
+            cell.selectionStyle = .none
+            return cell
+        } else {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "LikeProductCell", for: indexPath) as! LikeProductCell
+            let product = groupedProducts[indexPath.section].1[indexPath.row - 1]
+            cell.configure(with: product.toEvent(), viewModel: viewModel.homeViewModel, style: .myPage)
 
-    /// ✅ 섹션 헤더 (날짜 구분 유지)
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let headerView = UIView()
-        headerView.backgroundColor = UIColor(hex: "F9FAFB")
+            cell.backgroundColor = .clear
+            cell.contentView.backgroundColor = .white
+            cell.contentView.layer.cornerRadius = 12
+            cell.contentView.layer.masksToBounds = true
 
-        let label = UILabel()
-        label.text = groupedProducts[section].0
-        label.font = UIFont(name: "Pretendard-SemiBold", size: 14)
-        label.textColor = UIColor.darkGray
+            cell.selectionStyle = .none
 
-        headerView.addSubview(label)
-        label.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(16)
-            make.top.bottom.equalToSuperview().inset(8)
+            // ✅ 삭제 버튼이 눌렸을 때 해당 상품 삭제
+            cell.onDelete = { [weak self] in
+                self?.viewModel.deleteViewedProduct(product)
+            }
+
+            return cell
         }
-
-        return headerView
     }
 
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 40
-    }
-
-    /// ✅ 셀 간격 추가 (LikeViewController와 동일)
+    /// ✅ 셀 간 간격을 12로 설정하기 위한 푸터 설정
     func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        return 16
+        return 12
+    }
+    
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        cell.contentView.snp.remakeConstraints { make in
+            make.leading.equalToSuperview().offset(20)
+            make.trailing.equalToSuperview().offset(-20)
+            make.top.equalToSuperview()
+            make.bottom.equalToSuperview().offset(-12) // ✅ 셀 간 간격 유지
+        }
     }
 
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         let footerView = UIView()
-        footerView.backgroundColor = .clear
+        footerView.backgroundColor = .clear // ✅ 푸터 배경을 clear로 설정하여 간격만 적용되도록 함
         return footerView
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true) // ✅ 선택 해제 애니메이션
+
+        // ✅ 첫 번째 셀(헤더)은 클릭해도 아무 동작 없음
+        if indexPath.row == 0 { return }
+
+        let product = groupedProducts[indexPath.section].1[indexPath.row - 1] // ✅ row - 1 적용
+        let event = product.toEvent() // ✅ ViewedProduct -> Event 변환
+
+        // ✅ 상세 페이지로 이동
+        let detailVC = EventDetailViewController(event: event, homeViewModel: viewModel.homeViewModel)
+        navigationController?.pushViewController(detailVC, animated: true)
+    }
+}
+
+class HeaderCell: UITableViewCell {
+    private let dateLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont(name: "Pretendard-SemiBold", size: 14)
+        label.textColor = UIColor.darkGray
+        return label
+    }()
+
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        setupLayout()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    func configure(with date: String) {
+        dateLabel.text = date
+    }
+
+    private func setupLayout() {
+        contentView.addSubview(dateLabel)
+        dateLabel.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(20) // ✅ 좌우 패딩 적용
+            make.trailing.equalToSuperview().offset(-20)
+            make.centerY.equalToSuperview()
+        }
     }
 }

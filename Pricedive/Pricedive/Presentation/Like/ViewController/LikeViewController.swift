@@ -71,9 +71,6 @@ final class LikeViewController: UIViewController {
         
         let inProgressTapGesture = UITapGestureRecognizer(target: self, action: #selector(didTapInProgress))
         likeView.inProgressLabel.addGestureRecognizer(inProgressTapGesture)
-        
-        likeView.topFixedFrameView.searchIconButton.addTarget(self, action: #selector(toggleSearchBar), for: .touchUpInside)
-        likeView.searchBarView.xMarkButton.addTarget(self, action: #selector(toggleToTopFrame), for: .touchUpInside)
     }
     
     private func bindViewModel() {
@@ -86,15 +83,7 @@ final class LikeViewController: UIViewController {
             }
             .store(in: &cancellables)
     }
-    
-    // MARK: - 검색 기능 토글
-    @objc private func toggleSearchBar() {
-        likeView.toggleToSearchBar()
-    }
-    
-    @objc private func toggleToTopFrame() {
-        likeView.toggleToTopFrame()
-    }
+
     
     // MARK: - Actions
     @objc private func didTapSavedItems() {

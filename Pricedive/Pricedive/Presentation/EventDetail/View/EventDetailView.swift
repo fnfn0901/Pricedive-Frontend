@@ -25,11 +25,6 @@ class EventDetailView: UIView {
         return view
     }()
     
-    let searchBarView: SearchBarView = {
-        let view = SearchBarView()
-        view.isHidden = true
-        return view
-    }()
     private var isSearchBarVisible = false
 
     let logoLabel: UILabel = CustomStyles.logoText()
@@ -37,14 +32,6 @@ class EventDetailView: UIView {
     let backIconButton: UIButton = {
         let button = UIButton(type: .system)
         let image = UIImage(systemName: "chevron.backward")
-        button.setImage(image, for: .normal)
-        button.tintColor = .black
-        return button
-    }()
-
-    let searchIconButton: UIButton = {
-        let button = UIButton(type: .system)
-        let image = UIImage(systemName: "magnifyingglass")
         button.setImage(image, for: .normal)
         button.tintColor = .black
         return button
@@ -211,8 +198,7 @@ class EventDetailView: UIView {
         backgroundColor = .white
         addSubviews(navigationBar, scrollView, bottomView)
 
-        navigationBar.addSubviews(logoLabel, backIconButton, searchIconButton)
-        searchIconButton.addTarget(self, action: #selector(toggleSearchBar), for: .touchUpInside)
+        navigationBar.addSubviews(logoLabel, backIconButton)
 
         scrollView.addSubview(contentView)
 
@@ -224,8 +210,6 @@ class EventDetailView: UIView {
         gptContentView.addSubviews(gptLabel, copyButton, makeButton, loadingIndicator)
 
         bottomView.addSubviews(goToButton)
-
-        searchBarView.xMarkButton.addTarget(self, action: #selector(toggleToNavigationBar), for: .touchUpInside)
 
         setupConstraints()
     }
@@ -243,11 +227,6 @@ class EventDetailView: UIView {
         
         backIconButton.snp.makeConstraints { make in
             make.leading.equalTo(navigationBar).offset(20)
-            make.centerY.equalTo(navigationBar)
-        }
-        
-        searchIconButton.snp.makeConstraints { make in
-            make.trailing.equalTo(navigationBar).offset(-20)
             make.centerY.equalTo(navigationBar)
         }
         
@@ -446,76 +425,6 @@ class EventDetailView: UIView {
                 )
             }
         }
-    }
-    
-    @objc private func toggleSearchBar() {
-        if isSearchBarVisible {
-            toggleToNavigationBar()
-        } else {
-            toggleToSearchBar()
-        }
-    }
-    
-    @objc func resetToNavigationBar() {
-        searchBarView.searchTextField.text = ""
-        searchBarView.searchTextField.resignFirstResponder()
-        toggleVisibility(viewToShow: navigationBar, viewToHide: searchBarView)
-    }
-    
-    private func toggleVisibility(viewToShow: UIView, viewToHide: UIView) {
-        UIView.animate(withDuration: 0.3) {
-            viewToHide.alpha = 0
-            viewToShow.alpha = 1
-        } completion: { _ in
-            viewToHide.isHidden = true
-            viewToShow.isHidden = false
-            self.bringSubviewToFront(viewToShow)
-        }
-    }
-    
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        textField.resignFirstResponder()
-        return true
-    }
-    
-    func toggleToSearchBar() {
-        guard !isSearchBarVisible else { return }
-
-        addSubview(searchBarView)
-        searchBarView.snp.makeConstraints { make in
-            make.top.equalTo(safeAreaLayoutGuide.snp.top).offset(8)
-            make.leading.trailing.equalToSuperview().inset(20)
-            make.height.equalTo(48)
-        }
-
-        searchBarView.isHidden = false
-        searchBarView.alpha = 0
-        navigationBar.isHidden = false
-
-        UIView.animate(withDuration: 0.3, animations: {
-            self.navigationBar.alpha = 0
-            self.searchBarView.alpha = 1
-        }) { _ in
-            self.navigationBar.isHidden = true
-            self.searchBarView.searchTextField.becomeFirstResponder()
-        }
-
-        isSearchBarVisible = true
-    }
-    
-    @objc func toggleToNavigationBar() {
-        guard isSearchBarVisible else { return }
-
-        UIView.animate(withDuration: 0.3, animations: {
-            self.searchBarView.alpha = 0
-            self.navigationBar.alpha = 1
-        }) { _ in
-            self.searchBarView.isHidden = true
-            self.navigationBar.isHidden = false
-            self.searchBarView.searchTextField.resignFirstResponder()
-        }
-
-        isSearchBarVisible = false
     }
     
     @objc private func makeButtonTapped() {

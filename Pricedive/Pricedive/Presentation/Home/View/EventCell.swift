@@ -29,6 +29,9 @@ class EventCell: UICollectionViewCell {
         label.numberOfLines = 2
         label.textAlignment = .left
         label.lineBreakMode = .byTruncatingTail
+        label.baselineAdjustment = .alignBaselines
+        label.setContentHuggingPriority(.required, for: .vertical)
+        label.setContentCompressionResistancePriority(.required, for: .vertical)
         return label
     }()
     
@@ -109,7 +112,7 @@ class EventCell: UICollectionViewCell {
         }
 
         updateHeartButton(isLiked: viewModel.isLiked(for: event.videoId ?? -1))
-        updateDDayView(with: event.dDayDescription ?? "D-?")
+        updateDDayView(with: event.dDayDescription)
     }
 
     private func updateDDayView(with text: String) {
