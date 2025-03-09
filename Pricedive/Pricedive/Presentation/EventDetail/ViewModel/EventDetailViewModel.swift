@@ -29,7 +29,6 @@ class EventDetailViewModel: ObservableObject {
         self.isLiked = homeViewModel.isLiked(for: videoId)
         
         self.previewImg = event.eventImage
-        print("✅ EventDetailViewModel 초기화 - videoId: \(videoId), previewImg: \(String(describing: previewImg))")
         
         self.eventDescription = event.eventDescription ?? "이벤트 정보 없음"
         
@@ -47,12 +46,10 @@ class EventDetailViewModel: ObservableObject {
             return
         }
         
-        print("✅ API 요청 전 videoId: \(videoId)")
         APIManager.shared.fetchVideoDetail(videoId: videoId) { [weak self] (result: Result<VideoDTO, NetworkError>) in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let video):
-                    print("✅ 서버 응답 videoId: \(video.id)")
                     if video.id == -1 {
                         print("❌ 서버에서 올바른 비디오 데이터를 제공하지 않음")
                         return
@@ -61,7 +58,6 @@ class EventDetailViewModel: ObservableObject {
                     
                     if !video.description.isEmpty {
                         self?.eventDescription = video.description
-                        print("🔹 eventDescription 업데이트됨: \(video.description)")
                     }
                 case .failure(let error):
                     print("❌ API 요청 실패: \(error.localizedDescription)")
@@ -105,8 +101,16 @@ class EventDetailViewModel: ObservableObject {
     /// **🔹 GPT를 사용해 이벤트 댓글 자동 생성**
     func generateGPTComment() {
         print("📝 GPT 댓글 생성 요청: \(eventDescription)")
-        
-        gptService.generateComment(from: eventDescription) { [weak self] result in
+
+        guard let videoDetail = videoDetail else {
+            print("❌ videoDetail이 없습니다.")
+            return
+        }
+
+        let tags = videoDetail.tags
+        let channelId = videoDetail.channelId
+
+        gptService.generateComment(from: eventDescription, tags: tags, channelId: channelId) { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let comment):

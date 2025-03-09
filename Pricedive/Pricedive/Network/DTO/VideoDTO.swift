@@ -11,7 +11,7 @@ struct VideoDTO: Decodable {
     let id: Int
     let title: String
     let description: String
-    let tags: String
+    let tags: [String]
     let channelId: String
     let channelImg: String
     let urlLink: String
@@ -30,7 +30,7 @@ struct VideoDTO: Decodable {
         id = try container.decodeIfPresent(Int.self, forKey: .id) ?? -1
         title = try container.decodeIfPresent(String.self, forKey: .title) ?? "제목 없음"
         description = try container.decodeIfPresent(String.self, forKey: .description) ?? "설명 없음"
-        tags = try container.decodeIfPresent(String.self, forKey: .tags) ?? ""
+        tags = try container.decodeIfPresent([String].self, forKey: .tags) ?? []
         channelId = try container.decodeIfPresent(String.self, forKey: .channelId) ?? ""
         channelImg = try container.decodeIfPresent(String.self, forKey: .channelImg) ?? ""
         urlLink = try container.decodeIfPresent(String.self, forKey: .urlLink) ?? "https://default-url.com"

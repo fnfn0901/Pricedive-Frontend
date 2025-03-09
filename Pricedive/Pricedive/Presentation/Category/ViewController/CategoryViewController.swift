@@ -61,6 +61,9 @@ class CategoryViewController: UIViewController {
 
         if let homeNavController = tabBarController.viewControllers?[1] as? UINavigationController,
            let homeViewController = homeNavController.viewControllers.first as? HomeViewController {
+            
+            homeViewController.homeView.scrollView.setContentOffset(.zero, animated: false)
+            
             homeViewController.viewModel.searchEvents(category: category.name, query: "")
             homeViewController.homeView.categoryFilterView.selectCategory(category.name)
         }
