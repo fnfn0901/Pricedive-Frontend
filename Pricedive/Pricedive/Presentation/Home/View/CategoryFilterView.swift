@@ -101,15 +101,15 @@ class CategoryFilterView: UIView {
         }
 
         sender.animateNaturalTouch { [weak self] in
-            self?.updateButtonStyles(selectedButton: self?.selectedCategory == nil ? nil : sender)
+            self?.updateButtonStyles()
             self?.onCategorySelected?(self?.selectedCategory)
         }
     }
 
-    private func updateButtonStyles(selectedButton: UIButton?) {
+    private func updateButtonStyles() {
         stackView.arrangedSubviews.forEach {
             guard let button = $0 as? UIButton else { return }
-            let isSelected = (button == selectedButton)
+            let isSelected = (button.title(for: .normal) == selectedCategory)
             button.layer.backgroundColor = isSelected ? UIColor.mainBlue.cgColor : UIColor.mainWhite.cgColor
             button.setTitleColor(isSelected ? .mainWhite : .mainBlack, for: .normal)
         }
@@ -126,5 +126,15 @@ class CategoryFilterView: UIView {
             .store(in: &cancellables)
 
         updateCategoryButtons(with: viewModel.categories)
+    }
+    
+    func selectCategory(_ categoryName: String) {
+        selectedCategory = categoryName
+        updateButtonStyles()
+    }
+    
+    func deselectAllCategories() {
+        selectedCategory = nil
+        updateButtonStyles()
     }
 }

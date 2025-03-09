@@ -9,7 +9,7 @@ import UIKit
 import Combine
 
 class HomeViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
-    private let homeView = HomeView()
+    let homeView = HomeView()
     let viewModel: HomeViewModel
     private var cancellables = Set<AnyCancellable>()
 
@@ -47,6 +47,7 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
 
         homeView.searchBarView.onResetSearch = { [weak self] in
             self?.viewModel.resetFilters()
+            self?.homeView.categoryFilterView.deselectAllCategories()
         }
 
         homeView.categoryFilterView.onCategorySelected = { [weak self] category in
