@@ -10,7 +10,7 @@ import Combine
 
 class HomeViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
     private let homeView = HomeView()
-    private let viewModel: HomeViewModel
+    let viewModel: HomeViewModel
     private var cancellables = Set<AnyCancellable>()
 
     init(viewModel: HomeViewModel) {

@@ -46,7 +46,22 @@ class CategoryViewController: UIViewController {
             .receive(on: RunLoop.main)
             .sink { [weak self] categories in
                 self?.categoryView.updateCategories(categories)
+                
+                self?.categoryView.setCategorySelectionHandler { category in
+                    self?.categorySelected(category)
+                }
             }
             .store(in: &cancellables)
+    }
+    
+    private func categorySelected(_ category: Category) {
+        guard let tabBarController = self.tabBarController as? MainTabBarController else { return }
+
+        tabBarController.selectedIndex = 1
+
+        if let homeNavController = tabBarController.viewControllers?[1] as? UINavigationController,
+           let homeViewController = homeNavController.viewControllers.first as? HomeViewController {
+            homeViewController.viewModel.searchEvents(category: category.name, query: "")
+        }
     }
 }

@@ -64,6 +64,10 @@ class CategoryItemView: UIView {
             make.height.equalTo(1)
         }
     }
+    
+    func getCategoryName() -> String? {
+        return categoryLabel.text
+    }
 }
 
 private extension UIView {
