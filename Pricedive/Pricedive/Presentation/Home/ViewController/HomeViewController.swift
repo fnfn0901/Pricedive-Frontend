@@ -50,6 +50,10 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
             self?.homeView.categoryFilterView.deselectAllCategories()
         }
 
+        homeView.searchBarView.onCancelTapped = { [weak self] in
+            self?.homeView.resetToTopFixedFrame()
+        }
+
         homeView.categoryFilterView.onCategorySelected = { [weak self] category in
             if category == nil {
                 self?.viewModel.resetFilters()
