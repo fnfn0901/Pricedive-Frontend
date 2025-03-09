@@ -10,8 +10,9 @@ import SnapKit
 import Combine
 
 class CategoryFilterView: UIView {
-
     // MARK: - Properties
+    var onCategorySelected: ((String?) -> Void)?
+    private var selectedCategory: String? = nil
 
     private let scrollView: UIScrollView = {
         let scrollView = UIScrollView()
@@ -90,16 +91,22 @@ class CategoryFilterView: UIView {
     }
 
     // MARK: - Button Actions
-
     @objc private func categoryButtonTapped(_ sender: UIButton) {
-        guard sender.title(for: .normal) != nil else { return }
+        guard let category = sender.title(for: .normal) else { return }
+
+        if selectedCategory == category {
+            selectedCategory = nil
+        } else {
+            selectedCategory = category
+        }
 
         sender.animateNaturalTouch { [weak self] in
-            self?.updateButtonStyles(selectedButton: sender)
+            self?.updateButtonStyles(selectedButton: self?.selectedCategory == nil ? nil : sender)
+            self?.onCategorySelected?(self?.selectedCategory)
         }
     }
 
-    private func updateButtonStyles(selectedButton: UIButton) {
+    private func updateButtonStyles(selectedButton: UIButton?) {
         stackView.arrangedSubviews.forEach {
             guard let button = $0 as? UIButton else { return }
             let isSelected = (button == selectedButton)

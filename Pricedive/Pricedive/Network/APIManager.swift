@@ -67,17 +67,14 @@ class APIManager {
     }
     
     /// **전체 이벤트 리스트 가져오기**
-    func fetchEvents(completion: @escaping (Result<[EventDTO], NetworkError>) -> Void) {
-        request(endpoint: "/events") { (result: Result<APIResponse<[EventDTO]>, NetworkError>) in
+    func fetchEvents(endpoint: String, completion: @escaping (Result<[EventDTO], NetworkError>) -> Void) {
+        request(endpoint: endpoint) { (result: Result<APIResponse<[EventDTO]>, NetworkError>) in
             switch result {
             case .success(let response):
-                
                 if response.data.isEmpty {
-                    print("⚠️ [APIManager] 서버에서 받은 이벤트 리스트가 비어 있습니다.")
+                    print("⚠️ [APIManager] 검색 결과가 비어 있습니다.")
                 }
-
                 completion(.success(response.data))
-                
             case .failure(let error):
                 print("❌ [APIManager] 이벤트 가져오기 실패: \(error.localizedDescription)")
                 completion(.failure(error))

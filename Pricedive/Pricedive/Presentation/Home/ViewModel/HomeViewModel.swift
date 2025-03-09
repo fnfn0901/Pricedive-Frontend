@@ -13,6 +13,9 @@ class HomeViewModel: ObservableObject {
     @Published var likedEventsList: [EventDTO] = []
     let categoryViewModel = CategoryViewModel()
     
+    @Published var selectedCategory: String? = nil
+    @Published var searchQuery: String = ""
+    
     var userId: Int = 1
     private var cancellables = Set<AnyCancellable>()
     private var likedEvents = Set<Int>()
@@ -102,22 +105,32 @@ class HomeViewModel: ObservableObject {
     
     // ✅ 전체 이벤트 리스트 조회
     func loadEvents() {
-        APIManager.shared.fetchEvents { [weak self] result in
+        var endpoint = "/events"
+
+        var queryParams: [String] = []
+        if let category = selectedCategory {
+            queryParams.append("category=\(category)")
+        }
+        if !searchQuery.isEmpty {
+            queryParams.append("search=\(searchQuery)")
+        }
+
+        if !queryParams.isEmpty {
+            endpoint += "?" + queryParams.joined(separator: "&")
+        }
+
+        APIManager.shared.fetchEvents(endpoint: endpoint) { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let eventDTOs):
-
                     if eventDTOs.isEmpty {
-                        print("⚠️ [ViewModel] API에서 받아온 이벤트 리스트가 비어 있습니다.")
+                        print("⚠️ [ViewModel] 검색 결과가 없습니다.")
                     }
-
                     let mappedEvents = eventDTOs.compactMap { dto -> Event? in
-                        
                         guard !dto.eventItem.isEmpty, !dto.previewImg.isEmpty, !(dto.dateEnd?.isEmpty ?? true) else {
-                            print("⚠️ [ViewModel] 변환 실패 - 필수 값 누락: \(dto)")
+                            print("⚠️ 필수 값 누락으로 변환 실패: \(dto)")
                             return nil
                         }
-
                         return Event(
                             eventId: dto.eventId,
                             videoId: dto.videoId,
@@ -129,13 +142,11 @@ class HomeViewModel: ObservableObject {
                             eventDescription: nil
                         )
                     }
-
-
                     self?.events = mappedEvents
                     self?.objectWillChange.send()
                     
                 case .failure(let error):
-                    print("❌ [ViewModel] 이벤트 불러오기 실패: \(error.localizedDescription)")
+                    print("❌ 이벤트 불러오기 실패: \(error.localizedDescription)")
                 }
             }
         }
@@ -156,5 +167,18 @@ class HomeViewModel: ObservableObject {
             print("⚠️ 날짜 변환 실패: \(dateString) → 기본값(Date()) 적용")
             return Date()
         }
+    }
+
+    /// ✅ 검색 기능
+    func searchEvents(category: String?, query: String) {
+        self.selectedCategory = category
+        self.searchQuery = query
+        loadEvents()
+    }
+    /// ✅ 검색 & 필터 초기화
+    func resetFilters() {
+        self.selectedCategory = nil
+        self.searchQuery = ""
+        loadEvents()
     }
 }

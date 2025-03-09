@@ -9,6 +9,8 @@ import UIKit
 import SnapKit
 
 class SearchBarView: UIView, UITextFieldDelegate {
+    var onSearch: ((String) -> Void)?
+    var onResetSearch: (() -> Void)?
     
     let searchTextField: UITextField = {
         let textField = UITextField()
@@ -109,18 +111,20 @@ class SearchBarView: UIView, UITextFieldDelegate {
     }
 
     @objc private func handleMagnifyingGlassClick() {
+        guard let query = searchTextField.text, !query.isEmpty else { return }
+        onSearch?(query)
         searchTextField.resignFirstResponder()
     }
 
     @objc private func handleXMarkClick() {
         searchTextField.text = ""
+        onResetSearch?()
         searchTextField.resignFirstResponder()
-        if let homeView = self.superview as? HomeView {
-            homeView.resetToTopFixedFrame()
-        }
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        guard let query = textField.text, !query.isEmpty else { return false }
+        onSearch?(query)
         textField.resignFirstResponder()
         return true
     }

@@ -38,8 +38,24 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         homeView.viewModel = viewModel
+
+        homeView.searchBarView.onSearch = { [weak self] query in
+            self?.viewModel.searchEvents(category: self?.viewModel.selectedCategory, query: query)
+        }
+
+        homeView.searchBarView.onResetSearch = { [weak self] in
+            self?.viewModel.resetFilters()
+        }
+
+        homeView.categoryFilterView.onCategorySelected = { [weak self] category in
+            if category == nil {
+                self?.viewModel.resetFilters()
+            } else {
+                self?.viewModel.searchEvents(category: category, query: self?.viewModel.searchQuery ?? "")
+            }
+        }
 
         homeView.collectionView.dataSource = self
         homeView.collectionView.delegate = self
