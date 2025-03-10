@@ -366,7 +366,7 @@ class EventDetailView: UIView {
             config.image = UIImage(systemName: imageName)
             config.baseForegroundColor = tintColor
             config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(pointSize: 24, weight: .regular)
-            
+
             self.heartButton.configuration = config
         }
     }

@@ -73,19 +73,14 @@ class HomeViewModel: ObservableObject {
             likedEvents.insert(eventId)
         }
         objectWillChange.send()
-
+        
         APIManager.shared.toggleLike(eventId: eventId, isLiked: isCurrentlyLiked) { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
                 case .success:
-                    if previousState {
-                        self?.likedEvents.remove(eventId)
-                    } else {
-                        self?.likedEvents.insert(eventId)
-                    }
+                    print("✅ 좋아요 상태 변경 성공: \(previousState ? "❤️ → 🤍" : "🤍 → ❤️")")
                     self?.updateLikedEventsList()
                     self?.objectWillChange.send()
-                    print("✅ 좋아요 상태 변경 성공: \(previousState ? "❤️ → 🤍" : "🤍 → ❤️")")
 
                 case .failure(let error):
                     print("❌ 좋아요 상태 변경 실패: \(error.localizedDescription)")

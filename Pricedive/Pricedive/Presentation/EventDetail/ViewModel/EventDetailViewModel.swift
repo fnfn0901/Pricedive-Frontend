@@ -10,8 +10,21 @@ import Combine
 
 class EventDetailViewModel: ObservableObject {
     @Published var videoDetail: VideoDTO?
-    @Published var isLiked: Bool = false
-    @Published var previewImg: String?
+    @Published var isLiked: Bool = false {
+        didSet {
+            DispatchQueue.main.async {
+                self.objectWillChange.send()
+            }
+        }
+    }
+
+    @Published var previewImg: String? {
+        didSet {
+            DispatchQueue.main.async {
+                self.objectWillChange.send()
+            }
+        }
+    }
     @Published var gptComment: String?
     @Published var eventDescription: String = "이벤트 정보 없음"
     
@@ -26,16 +39,15 @@ class EventDetailViewModel: ObservableObject {
         self.userId = homeViewModel.userId
         self.homeViewModel = homeViewModel
         self.event = event
-        self.isLiked = homeViewModel.isLiked(for: videoId)
-        
+        self.isLiked = homeViewModel.isLiked(for: event.eventId)
         self.previewImg = event.eventImage
-        
-        self.eventDescription = event.eventDescription ?? "이벤트 정보 없음"
-        
+
+        DispatchQueue.main.async {
+            self.objectWillChange.send()
+        }
+
         if videoId != -1 {
             fetchVideoDetail(videoId: videoId)
-        } else {
-            print("❌ Error: 유효하지 않은 videoId (\(videoId)) - 비디오 상세 요청 안 함")
         }
     }
     
@@ -68,32 +80,23 @@ class EventDetailViewModel: ObservableObject {
     
     /// **🔹 좋아요 상태 변경**
     func toggleLikeStatus(userId: Int, eventId: Int, completion: @escaping (Bool) -> Void) {
-        
-        let currentLikeStatus = isLiked
-        let newLikeStatus = !currentLikeStatus
-        self.isLiked = newLikeStatus
-        
-        DispatchQueue.main.async {
-            self.objectWillChange.send()
-        }
-        
-        APIManager.shared.toggleLike(eventId: eventId, isLiked: currentLikeStatus) { [weak self] result in
+        let previousState = isLiked
+        let newLikeState = !previousState
+
+        isLiked = newLikeState
+        objectWillChange.send()
+
+        APIManager.shared.toggleLike(eventId: eventId, isLiked: previousState) { [weak self] result in
             DispatchQueue.main.async {
-                guard let self = self else { return }
-                
                 switch result {
                 case .success(let updatedIsLiked):
-                    print("✅ 좋아요 상태 변경 성공: \(updatedIsLiked ? "❤️" : "🤍")")
-                    self.isLiked = updatedIsLiked
+                    self?.isLiked = updatedIsLiked
                     completion(updatedIsLiked)
-
-                case .failure(let error):
-                    print("❌ 좋아요 상태 변경 실패: \(error.localizedDescription)")
-                    self.isLiked = currentLikeStatus
-                    completion(currentLikeStatus)
+                case .failure:
+                    self?.isLiked = previousState
+                    completion(previousState)
+                    self?.objectWillChange.send()
                 }
-                
-                self.objectWillChange.send()
             }
         }
     }

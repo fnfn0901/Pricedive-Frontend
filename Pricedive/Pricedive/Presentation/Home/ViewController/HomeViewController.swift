@@ -143,9 +143,7 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
             print("❌ Error: Unable to identify cell or video ID")
             return
         }
-
-        print("🔍 좋아요 요청 전송 - videoId: \(videoId)")
-
+        
         viewModel.toggleLike(for: videoId)
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {

@@ -129,7 +129,6 @@ final class LikeProductCell: UITableViewCell {
         self.event = event
         self.viewModel = viewModel
 
-
         dDayLabel.text = event.dDayDescription
         eventTitleLabel.text = event.eventItem
 
@@ -145,24 +144,18 @@ final class LikeProductCell: UITableViewCell {
 
         switch style {
         case .like:
-            configureActionButtonForLike()
+            configureActionButtonForLike(isLiked: viewModel.isLiked(for: event.eventId))
         case .myPage:
             configureActionButtonForMyPage()
         }
     }
     
-    private func configureActionButtonForLike() {
-        let imageName = "heart"
+    private func configureActionButtonForLike(isLiked: Bool) {
+        let imageName = isLiked ? "heart.fill" : "heart"
         let configuration = UIImage.SymbolConfiguration(pointSize: 28, weight: .regular)
         let image = UIImage(systemName: imageName, withConfiguration: configuration)
         actionButton.setImage(image, for: .normal)
-        actionButton.tintColor = UIColor.mainBlack
-
-        actionButton.snp.remakeConstraints { make in
-            make.centerY.equalToSuperview()
-            make.trailing.equalToSuperview().offset(-16)
-            make.size.equalTo(28)
-        }
+        actionButton.tintColor = isLiked ? UIColor.mainRed : UIColor.mainBlack
     }
 
     private func formatDate(_ dateString: String) -> String {

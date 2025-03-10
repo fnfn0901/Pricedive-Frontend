@@ -104,32 +104,62 @@ class EventCell: UICollectionViewCell {
         self.viewModel = viewModel
         self.videoId = event.videoId
 
-        titleLabel.text = event.eventItem
-        imageView.kf.setImage(with: URL(string: event.eventImage))
-        
-        if let profileURL = URL(string: event.channelImg) {
-            profileView.kf.setImage(with: profileURL)
-        }
-
-        updateHeartButton(isLiked: viewModel.isLiked(for: event.videoId ?? -1))
+        setTitle(event.eventItem)
+        setImage(event.eventImage)
+        setProfileImage(event.channelImg)
+        updateHeartButton(isLiked: viewModel.isLiked(for: event.eventId))
         updateDDayView(with: event.dDayDescription)
-    }
+        setupHeartButtonInteraction()
 
+        heartButton.addTarget(self, action: #selector(handleHeartTapped), for: .touchUpInside)
+    }
+    
+    private func setTitle(_ title: String) {
+        titleLabel.text = title
+    }
+    
+    private func setImage(_ imageUrl: String) {
+        imageView.kf.setImage(with: URL(string: imageUrl))
+    }
+    
+    private func setProfileImage(_ profileUrl: String) {
+        if let url = URL(string: profileUrl) {
+            profileView.kf.setImage(with: url)
+        }
+    }
+    
     private func updateDDayView(with text: String) {
         if let label = dDayView.subviews.first as? UILabel {
             label.text = text
         }
     }
+    
+    private func setupHeartButtonInteraction() {
+        contentView.isUserInteractionEnabled = true
+    }
+    
+    func updateHeartButton(isLiked: Bool) {
+        let imageName = isLiked ? "heart.fill" : "heart"
+        let tintColor = isLiked ? UIColor.mainRed : UIColor.black
+        heartButton.setImage(UIImage(systemName: imageName), for: .normal)
+        heartButton.tintColor = tintColor
+    }
 
     @objc private func handleHeartTapped() {
         guard let viewModel = viewModel, let videoId = videoId else { return }
-        viewModel.toggleLike(for: videoId)
-    }
 
-    func updateHeartButton(isLiked: Bool) {
-        let imageName = isLiked ? "heart.fill" : "heart"
-        let tintColor = isLiked ? UIColor.red : UIColor.black
-        heartButton.setImage(UIImage(systemName: imageName), for: .normal)
-        heartButton.tintColor = tintColor
+        UIView.animate(withDuration: 0.1, animations: {
+            self.heartButton.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
+        }) { _ in
+            UIView.animate(withDuration: 0.1) {
+                self.heartButton.transform = CGAffineTransform.identity
+            }
+        }
+
+        viewModel.toggleLike(for: videoId)
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            self.updateHeartButton(isLiked: viewModel.isLiked(for: videoId))
+        }
     }
 }

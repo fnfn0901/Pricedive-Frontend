@@ -30,6 +30,7 @@ final class LikeViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.isNavigationBarHidden = true
+        loadLikedEvents()
     }
     
     // MARK: - Lifecycle
@@ -42,7 +43,6 @@ final class LikeViewController: UIViewController {
         setupTableView()
         setupActions()
         bindViewModel()
-        loadLikedEvents()
     }
     
     override func viewDidLayoutSubviews() {
@@ -77,7 +77,6 @@ final class LikeViewController: UIViewController {
         viewModel.$likedEventsList
             .receive(on: DispatchQueue.main)
             .sink { [weak self] likedEvents in
-                
                 self?.likeView.tableView.isHidden = likedEvents.isEmpty
                 self?.likeView.tableView.reloadData()
             }

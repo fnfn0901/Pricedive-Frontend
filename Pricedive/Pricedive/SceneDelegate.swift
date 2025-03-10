@@ -42,7 +42,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         do {
             _ = try Realm()
-            print("✅ Realm 마이그레이션 완료")
         } catch {
             fatalError("❌ Realm 초기화 실패: \(error.localizedDescription)")
         }

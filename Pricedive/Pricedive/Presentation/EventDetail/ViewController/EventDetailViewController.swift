@@ -55,8 +55,12 @@ class EventDetailViewController: UIViewController {
 
         viewModel.fetchVideoDetail(videoId: videoId)
 
-        if let url = URL(string: event.eventImage) {
-            detailView.imageView.kf.setImage(with: url)
+        DispatchQueue.main.async {
+            self.detailView.updateHeartButton(isLiked: self.viewModel.isLiked)
+
+            if let initialPreviewImg = self.viewModel.previewImg, let url = URL(string: initialPreviewImg) {
+                self.detailView.imageView.kf.setImage(with: url)
+            }
         }
     }
     
@@ -86,43 +90,18 @@ class EventDetailViewController: UIViewController {
             }
             .store(in: &cancellables)
 
+        viewModel.$isLiked
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isLiked in
+                self?.detailView.updateHeartButton(isLiked: isLiked)
+            }
+            .store(in: &cancellables)
+
         viewModel.$previewImg
             .receive(on: DispatchQueue.main)
             .sink { [weak self] previewImg in
-                guard let self = self else { return }
-
-                if let urlString = previewImg, let url = URL(string: urlString) {
-                    print("🔄 previewImg 변경 감지: \(urlString)")
-                    DispatchQueue.main.async {
-                        self.detailView.imageView.kf.setImage(
-                            with: url,
-                            placeholder: UIImage(named: "placeholder"),
-                            options: [
-                                .transition(.fade(0.3)),
-                                .cacheOriginalImage
-                            ],
-                            completionHandler: { result in
-                                switch result {
-                                case .success(let value):
-                                    print("✅ 이미지 로드 성공: \(value.source.url?.absoluteString ?? "")")
-                                case .failure(let error):
-                                    print("❌ 이미지 로드 실패: \(error.localizedDescription)")
-                                }
-                            }
-                        )
-                    }
-                } else {
-                    print("⚠️ previewImg가 nil이거나 올바르지 않은 URL: \(String(describing: previewImg))")
-                }
-            }
-            .store(in: &cancellables)
-        
-        viewModel.$gptComment
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] comment in
-                guard let self = self else { return }
-                self.detailView.loadingIndicator.stopAnimating()
-                self.detailView.gptLabel.text = comment ?? "생성 버튼을 눌러보세요. GPT가 자동으로 댓글을 작성해드립니다!"
+                guard let self = self, let urlString = previewImg, let url = URL(string: urlString) else { return }
+                self.detailView.imageView.kf.setImage(with: url)
             }
             .store(in: &cancellables)
     }
