@@ -31,6 +31,7 @@ final class LikeViewController: UIViewController {
         super.viewWillAppear(animated)
         navigationController?.isNavigationBarHidden = true
         loadLikedEvents()
+        viewModel.loadLikedEvents(ongoing: isOngoing)
     }
     
     // MARK: - Lifecycle
@@ -83,6 +84,9 @@ final class LikeViewController: UIViewController {
             .store(in: &cancellables)
     }
 
+    private func loadLikedEvents() {
+        viewModel.loadLikedEvents(ongoing: isOngoing)
+    }
     
     // MARK: - Actions
     @objc private func didTapSavedItems() {
@@ -95,35 +99,6 @@ final class LikeViewController: UIViewController {
         isOngoing = true
         likeView.animateBlueBox(to: 1)
         loadLikedEvents()
-    }
-    
-    private func loadLikedEvents() {
-        APIManager.shared.fetchLikedEvents(userId: 1, ongoing: isOngoing) { [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let events):
-                    self?.likedEvents = events
-                    self?.viewModel.likedEventsList = events.map { dto in
-                        EventDTO(
-                            eventId: dto.eventId,
-                            category: "기본 카테고리",
-                            eventNums: 0,
-                            eventItem: dto.eventItem,
-                            previewImg: dto.previewImg,
-                            videoId: nil,
-                            dateEnd: dto.dateEnd,
-                            channelImg: ""
-                        )
-                    }
-
-                    self?.viewModel.objectWillChange.send()
-                    self?.likeView.tableView.reloadData()
-
-                case .failure(let error):
-                    print("❌ 좋아요한 이벤트 가져오기 실패: \(error.localizedDescription)")
-                }
-            }
-        }
     }
 }
 

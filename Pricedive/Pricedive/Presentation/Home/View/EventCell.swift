@@ -13,6 +13,8 @@ class EventCell: UICollectionViewCell {
 
     var viewModel: HomeViewModel?
     var videoId: Int?
+    
+    private var isRequestingLike = false
 
     // MARK: - UI Components
     private let imageView: UIImageView = {
@@ -52,10 +54,11 @@ class EventCell: UICollectionViewCell {
         button.setImage(UIImage(systemName: "heart"), for: .normal)
         button.tintColor = .mainBlack
         button.imageView?.contentMode = .scaleAspectFit
+        button.isUserInteractionEnabled = true
         button.addTarget(self, action: #selector(handleHeartTapped), for: .touchUpInside)
         return button
     }()
-
+    
     // MARK: - Initializers
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -69,8 +72,10 @@ class EventCell: UICollectionViewCell {
 
     // MARK: - Setup Methods
     private func setupViews() {
-        contentView.addSubviews(imageView, titleLabel)
-        imageView.addSubviews(profileView, dDayView, heartButton)
+        contentView.addSubviews(imageView, titleLabel, heartButton)
+        imageView.addSubviews(profileView, dDayView)
+        
+        contentView.isUserInteractionEnabled = true
     }
 
     private func setupConstraints() {
@@ -90,7 +95,7 @@ class EventCell: UICollectionViewCell {
         }
 
         heartButton.snp.makeConstraints {
-            $0.trailing.bottom.equalToSuperview().offset(-5)
+            $0.trailing.bottom.equalTo(imageView).offset(-5)
             $0.size.equalTo(24)
         }
 
@@ -146,7 +151,13 @@ class EventCell: UICollectionViewCell {
     }
 
     @objc private func handleHeartTapped() {
-        guard let viewModel = viewModel, let videoId = videoId else { return }
+        guard let viewModel = viewModel, let videoId = videoId, !isRequestingLike else { return }
+        
+        isRequestingLike = true
+        heartButton.isUserInteractionEnabled = false
+
+        let isCurrentlyLiked = viewModel.isLiked(for: videoId)
+        let newLikeState = !isCurrentlyLiked
 
         UIView.animate(withDuration: 0.1, animations: {
             self.heartButton.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
@@ -156,10 +167,14 @@ class EventCell: UICollectionViewCell {
             }
         }
 
-        viewModel.toggleLike(for: videoId)
+        viewModel.toggleLike(for: videoId) { [weak self] isLiked in
+            DispatchQueue.main.async {
+                guard let self = self else { return }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            self.updateHeartButton(isLiked: viewModel.isLiked(for: videoId))
+                self.isRequestingLike = false
+                self.updateHeartButton(isLiked: isLiked)
+                self.heartButton.isUserInteractionEnabled = true
+            }
         }
     }
 }

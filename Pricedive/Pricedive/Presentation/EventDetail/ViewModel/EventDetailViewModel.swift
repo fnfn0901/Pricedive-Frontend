@@ -28,6 +28,8 @@ class EventDetailViewModel: ObservableObject {
     @Published var gptComment: String?
     @Published var eventDescription: String = "이벤트 정보 없음"
     
+    private var isRequestingLike = false
+    
     let userId: Int
     private let videoId: Int
     private let homeViewModel: HomeViewModel
@@ -80,22 +82,29 @@ class EventDetailViewModel: ObservableObject {
     
     /// **🔹 좋아요 상태 변경**
     func toggleLikeStatus(userId: Int, eventId: Int, completion: @escaping (Bool) -> Void) {
+        guard !isRequestingLike else { return }
+        isRequestingLike = true
+
         let previousState = isLiked
         let newLikeState = !previousState
 
-        isLiked = newLikeState
-        objectWillChange.send()
+        DispatchQueue.main.async {
+            self.isLiked = newLikeState
+        }
 
         APIManager.shared.toggleLike(eventId: eventId, isLiked: previousState) { [weak self] result in
             DispatchQueue.main.async {
+                guard let self = self else { return }
+                self.isRequestingLike = false
+
                 switch result {
                 case .success(let updatedIsLiked):
-                    self?.isLiked = updatedIsLiked
+                    self.isLiked = updatedIsLiked
                     completion(updatedIsLiked)
+
                 case .failure:
-                    self?.isLiked = previousState
+                    self.isLiked = previousState
                     completion(previousState)
-                    self?.objectWillChange.send()
                 }
             }
         }
@@ -125,5 +134,11 @@ class EventDetailViewModel: ObservableObject {
                 }
             }
         }
+    }
+    
+    func loadLikedEvents() {
+        homeViewModel.loadLikedEvents(ongoing: false)
+        self.isLiked = homeViewModel.isLiked(for: event.eventId)
+        self.objectWillChange.send()
     }
 }

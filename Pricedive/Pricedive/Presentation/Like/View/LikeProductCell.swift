@@ -195,7 +195,17 @@ final class LikeProductCell: UITableViewCell {
     @objc private func didTapLikeButton() {
         guard let event = event, let viewModel = viewModel else { return }
 
-        viewModel.toggleLike(for: event.eventId)
+        actionButton.isUserInteractionEnabled = false
+
+        viewModel.toggleLike(for: event.eventId) { [weak self] isLiked in
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+
+                self.configureActionButtonForLike(isLiked: isLiked)
+
+                self.actionButton.isUserInteractionEnabled = true
+            }
+        }
     }
     
     @objc private func didTapDeleteButton() {

@@ -38,7 +38,14 @@ class EventDetailViewController: UIViewController {
         super.viewWillAppear(animated)
         navigationController?.isNavigationBarHidden = true
         tabBarController?.tabBar.isHidden = true
+
         saveViewedProduct()
+        
+        viewModel.loadLikedEvents()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.detailView.updateHeartButton(isLiked: self.viewModel.isLiked)
+        }
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -91,6 +98,7 @@ class EventDetailViewController: UIViewController {
             .store(in: &cancellables)
 
         viewModel.$isLiked
+            .removeDuplicates()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] isLiked in
                 self?.detailView.updateHeartButton(isLiked: isLiked)

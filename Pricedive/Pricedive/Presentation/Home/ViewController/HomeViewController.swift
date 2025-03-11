@@ -29,6 +29,12 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
+
+        viewModel.loadLikedEvents(ongoing: false)
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.homeView.collectionView.reloadData()
+        }
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -143,11 +149,11 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
             print("❌ Error: Unable to identify cell or video ID")
             return
         }
-        
-        viewModel.toggleLike(for: videoId)
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            cell.updateHeartButton(isLiked: self.viewModel.isLiked(for: videoId))
+        viewModel.toggleLike(for: videoId) { isLiked in
+            DispatchQueue.main.async {
+                cell.updateHeartButton(isLiked: isLiked)
+            }
         }
     }
 }

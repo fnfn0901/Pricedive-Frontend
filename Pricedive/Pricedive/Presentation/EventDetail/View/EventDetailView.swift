@@ -349,9 +349,18 @@ class EventDetailView: UIView {
         let eventId = viewModel.event.eventId
         let userId = viewModel.userId
 
+        let isCurrentlyLiked = viewModel.isLiked
+        let newLikeState = !isCurrentlyLiked
+
+        updateHeartButton(isLiked: newLikeState)
+        heartButton.isUserInteractionEnabled = false
+
         viewModel.toggleLikeStatus(userId: userId, eventId: eventId) { [weak self] isLiked in
             DispatchQueue.main.async {
-                self?.updateHeartButton(isLiked: isLiked)
+                guard let self = self else { return }
+                
+                self.updateHeartButton(isLiked: isLiked)
+                self.heartButton.isUserInteractionEnabled = true
             }
         }
     }
