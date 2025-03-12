@@ -74,7 +74,7 @@ class HomeViewModel: ObservableObject {
         }
         objectWillChange.send()
 
-        APIManager.shared.toggleLike(eventId: eventId, isLiked: isCurrentlyLiked) { [weak self] result in
+        APIManager.shared.toggleLike(eventId: eventId, isLiked: !isCurrentlyLiked) { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
                 case .success:

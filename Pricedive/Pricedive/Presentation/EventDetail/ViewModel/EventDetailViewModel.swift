@@ -92,7 +92,7 @@ class EventDetailViewModel: ObservableObject {
             self.isLiked = newLikeState
         }
 
-        APIManager.shared.toggleLike(eventId: eventId, isLiked: previousState) { [weak self] result in
+        APIManager.shared.toggleLike(eventId: eventId, isLiked: !previousState) { [weak self] result in
             DispatchQueue.main.async {
                 guard let self = self else { return }
                 self.isRequestingLike = false
@@ -100,6 +100,7 @@ class EventDetailViewModel: ObservableObject {
                 switch result {
                 case .success(let updatedIsLiked):
                     self.isLiked = updatedIsLiked
+                    self.homeViewModel.loadLikedEvents(ongoing: false)
                     completion(updatedIsLiked)
 
                 case .failure:

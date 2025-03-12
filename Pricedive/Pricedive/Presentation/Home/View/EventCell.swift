@@ -156,6 +156,14 @@ class EventCell: UICollectionViewCell {
         isRequestingLike = true
         heartButton.isUserInteractionEnabled = false
 
+        viewModel.toggleLike(for: videoId) { [weak self] isLiked in
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                self.updateHeartButton(isLiked: isLiked)
+                self.heartButton.isUserInteractionEnabled = true
+            }
+        }
+
         let isCurrentlyLiked = viewModel.isLiked(for: videoId)
         let newLikeState = !isCurrentlyLiked
 

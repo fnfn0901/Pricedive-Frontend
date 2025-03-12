@@ -69,6 +69,8 @@ class EventDetailViewController: UIViewController {
                 self.detailView.imageView.kf.setImage(with: url)
             }
         }
+        
+        navigationController?.interactivePopGestureRecognizer?.delegate = self
     }
     
     private func saveViewedProduct() {
@@ -142,5 +144,11 @@ class EventDetailViewController: UIViewController {
                 self?.detailView.updateHeartButton(isLiked: isLiked)
             }
         }
+    }
+}
+
+extension EventDetailViewController: UIGestureRecognizerDelegate {
+    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        return navigationController?.viewControllers.count ?? 0 > 1
     }
 }

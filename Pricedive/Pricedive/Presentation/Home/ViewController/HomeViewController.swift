@@ -32,9 +32,12 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
 
         viewModel.loadLikedEvents(ongoing: false)
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            self.homeView.collectionView.reloadData()
-        }
+        viewModel.$likedEventsList
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.homeView.collectionView.reloadData()
+            }
+            .store(in: &cancellables)
     }
 
     override func viewWillDisappear(_ animated: Bool) {
