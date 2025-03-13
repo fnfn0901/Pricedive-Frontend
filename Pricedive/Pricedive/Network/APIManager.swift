@@ -114,35 +114,35 @@ class APIManager {
     }
 
     /// **좋아요 추가 / 삭제 (`POST` → 추가, `DELETE` → 삭제)**
-    func toggleLike(eventId: Int, isLiked: Bool, completion: @escaping (Result<Bool, NetworkError>) -> Void) {
-        let userId = 1
-        let method = isLiked ? "DELETE" : "POST"
-        let endpoint = "/like_events/user/\(userId)/event/\(eventId)"
+    func toggleLike(eventId: Int, isLiked: Bool, completion: @escaping (Result<Void, Error>) -> Void) {
+            let userId = 1
+            let urlString = "http://3.37.130.95:8080/like_events/user/\(userId)/event/\(eventId)"
+            guard let url = URL(string: urlString) else { return }
 
-        request(endpoint: endpoint, method: method) { (result: Result<Data, NetworkError>) in
-            switch result {
-            case .success(let data):
-                if let responseString = String(data: data, encoding: .utf8) {
-                    
-                    if responseString.contains("이미 좋아요한 이벤트입니다.") {
-                        print("⚠️ 서버 응답: 이미 좋아요한 상태이므로 상태 변경 안 함")
-                        completion(.success(true))
-                        return
-                    }
-                }
-                completion(.success(!isLiked))
+            var request = URLRequest(url: url)
+            request.httpMethod = isLiked ? "POST" : "DELETE"
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
 
-            case .failure(let error):
-                if case .serverError(let statusCode) = error, statusCode == 400 {
-                    print("⚠️ 서버에서 400 응답을 보냈지만, 좋아요 상태를 유지합니다.")
-                    completion(.success(isLiked))
-                } else {
-                    print("❌ 좋아요 상태 변경 실패: \(error.localizedDescription)")
+            let task = URLSession.shared.dataTask(with: request) { data, response, error in
+                if let error = error {
                     completion(.failure(error))
+                    return
+                }
+
+                guard let httpResponse = response as? HTTPURLResponse else {
+                    completion(.failure(NSError(domain: "Invalid Response", code: -1, userInfo: nil)))
+                    return
+                }
+
+                if (200...299).contains(httpResponse.statusCode) {
+                    completion(.success(()))
+                } else {
+                    let errorMessage = "HTTP 상태 코드: \(httpResponse.statusCode)"
+                    completion(.failure(NSError(domain: "Server Error", code: httpResponse.statusCode, userInfo: [NSLocalizedDescriptionKey: errorMessage])))
                 }
             }
+            task.resume()
         }
-    }
     
     /// **특정 비디오 상세 정보 가져오기**
     func fetchVideoDetail(videoId: Int, completion: @escaping (Result<VideoDTO, NetworkError>) -> Void) {

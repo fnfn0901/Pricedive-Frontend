@@ -30,8 +30,10 @@ final class LikeViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.isNavigationBarHidden = true
-        loadLikedEvents()
-        viewModel.loadLikedEvents(ongoing: isOngoing)
+
+        if viewModel.likedEventsList.isEmpty {
+            viewModel.loadLikedEvents(ongoing: isOngoing)
+        }
     }
     
     // MARK: - Lifecycle

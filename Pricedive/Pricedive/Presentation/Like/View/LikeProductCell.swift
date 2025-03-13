@@ -202,7 +202,6 @@ final class LikeProductCell: UITableViewCell {
                 guard let self = self else { return }
 
                 self.configureActionButtonForLike(isLiked: isLiked)
-
                 self.actionButton.isUserInteractionEnabled = true
             }
         }

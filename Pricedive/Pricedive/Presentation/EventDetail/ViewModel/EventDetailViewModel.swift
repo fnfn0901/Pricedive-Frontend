@@ -98,10 +98,10 @@ class EventDetailViewModel: ObservableObject {
                 self.isRequestingLike = false
 
                 switch result {
-                case .success(let updatedIsLiked):
-                    self.isLiked = updatedIsLiked
+                case .success:
+                    self.isLiked = newLikeState
                     self.homeViewModel.loadLikedEvents(ongoing: false)
-                    completion(updatedIsLiked)
+                    completion(newLikeState)
 
                 case .failure:
                     self.isLiked = previousState

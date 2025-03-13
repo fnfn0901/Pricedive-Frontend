@@ -38,7 +38,6 @@ class HomeViewModel: ObservableObject {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let likedEventsDTOs):
-                    
                     self.likedEvents = Set(likedEventsDTOs.map { $0.eventId })
                     self.likedEventsList = likedEventsDTOs.map { dto in
                         EventDTO(
@@ -69,6 +68,7 @@ class HomeViewModel: ObservableObject {
 
         if isCurrentlyLiked {
             likedEvents.remove(eventId)
+            likedEventsList.removeAll { $0.eventId == eventId }
         } else {
             likedEvents.insert(eventId)
         }
@@ -76,22 +76,34 @@ class HomeViewModel: ObservableObject {
 
         APIManager.shared.toggleLike(eventId: eventId, isLiked: !isCurrentlyLiked) { [weak self] result in
             DispatchQueue.main.async {
+                guard let self = self else { return }
+
                 switch result {
                 case .success:
                     print("✅ 좋아요 상태 변경 성공: \(previousState ? "❤️ → 🤍" : "🤍 → ❤️")")
-                    self?.updateLikedEventsList()
-                    self?.objectWillChange.send()
+                    self.objectWillChange.send()
                     completion(!previousState)
 
                 case .failure(let error):
                     print("❌ 좋아요 상태 변경 실패: \(error.localizedDescription)")
 
                     if previousState {
-                        self?.likedEvents.insert(eventId)
+                        self.likedEvents.insert(eventId)
+                        self.likedEventsList.append(EventDTO(
+                            eventId: eventId,
+                            category: "기본 카테고리",
+                            eventNums: 0,
+                            eventItem: "복구된 이벤트",
+                            previewImg: "",
+                            videoId: nil,
+                            dateEnd: "",
+                            channelImg: ""
+                        ))
                     } else {
-                        self?.likedEvents.remove(eventId)
+                        self.likedEvents.remove(eventId)
                     }
-                    self?.objectWillChange.send()
+
+                    self.objectWillChange.send()
                     completion(previousState)
                 }
             }
