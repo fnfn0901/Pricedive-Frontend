@@ -144,16 +144,13 @@ class EventDetailViewController: UIViewController {
         }
     }
 
-    // 유튜브 Video ID 추출 함수 추가
     private func extractYouTubeVideoID(from url: String) -> String? {
         if let url = URL(string: url),
            let host = url.host, host.contains("youtube.com") || host.contains("youtu.be") {
 
             if host.contains("youtu.be") {
-                // 짧은 URL: youtu.be/VIDEO_ID
                 return url.lastPathComponent
             } else if host.contains("youtube.com") {
-                // 긴 URL: youtube.com/watch?v=VIDEO_ID
                 let queryItems = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems
                 return queryItems?.first(where: { $0.name == "v" })?.value
             }

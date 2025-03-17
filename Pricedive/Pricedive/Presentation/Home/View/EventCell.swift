@@ -13,6 +13,7 @@ class EventCell: UICollectionViewCell {
 
     var viewModel: HomeViewModel?
     var videoId: Int?
+    var eventId: Int?
     
     private var isRequestingLike = false
 
@@ -108,6 +109,7 @@ class EventCell: UICollectionViewCell {
     func configureCell(event: Event, viewModel: HomeViewModel) {
         self.viewModel = viewModel
         self.videoId = event.videoId
+        self.eventId = event.eventId
 
         setTitle(event.eventItem)
         setImage(event.eventImage)
@@ -151,22 +153,11 @@ class EventCell: UICollectionViewCell {
     }
 
     @objc private func handleHeartTapped() {
-        guard let viewModel = viewModel, let videoId = videoId, !isRequestingLike else { return }
+        guard let viewModel = viewModel, let eventId = eventId, !isRequestingLike else { return }
         
         isRequestingLike = true
         heartButton.isUserInteractionEnabled = false
-
-        viewModel.toggleLike(for: videoId) { [weak self] isLiked in
-            DispatchQueue.main.async {
-                guard let self = self else { return }
-                self.updateHeartButton(isLiked: isLiked)
-                self.heartButton.isUserInteractionEnabled = true
-            }
-        }
-
-        let isCurrentlyLiked = viewModel.isLiked(for: videoId)
-        let newLikeState = !isCurrentlyLiked
-
+        
         UIView.animate(withDuration: 0.1, animations: {
             self.heartButton.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
         }) { _ in
@@ -175,13 +166,12 @@ class EventCell: UICollectionViewCell {
             }
         }
 
-        viewModel.toggleLike(for: videoId) { [weak self] isLiked in
+        viewModel.toggleLike(for: eventId) { [weak self] isLiked in
             DispatchQueue.main.async {
                 guard let self = self else { return }
-
-                self.isRequestingLike = false
                 self.updateHeartButton(isLiked: isLiked)
                 self.heartButton.isUserInteractionEnabled = true
+                self.isRequestingLike = false
             }
         }
     }

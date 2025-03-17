@@ -31,11 +31,16 @@ class HomeViewModel: ObservableObject {
     }
     
     // ✅ 좋아요한 이벤트 조회
+    private var isLoadingLikedEvents = false
+
     func loadLikedEvents(ongoing: Bool) {
+        guard !isLoadingLikedEvents else { return }
+        isLoadingLikedEvents = true
+        
         APIManager.shared.fetchLikedEvents(userId: userId, ongoing: ongoing) { [weak self] result in
-            guard let self = self else { return }
-            
             DispatchQueue.main.async {
+                guard let self = self else { return }
+                self.isLoadingLikedEvents = false
                 switch result {
                 case .success(let likedEventsDTOs):
                     self.likedEvents = Set(likedEventsDTOs.map { $0.eventId })
@@ -52,8 +57,6 @@ class HomeViewModel: ObservableObject {
                         )
                     }
                     
-                    self.objectWillChange.send()
-                    
                 case .failure(let error):
                     print("❌ 좋아요한 이벤트 불러오기 실패: \(error.localizedDescription)")
                 }
@@ -64,47 +67,30 @@ class HomeViewModel: ObservableObject {
     // ✅ 좋아요 토글
     func toggleLike(for eventId: Int, completion: @escaping (Bool) -> Void) {
         let isCurrentlyLiked = likedEvents.contains(eventId)
-        let previousState = isCurrentlyLiked
-
-        if isCurrentlyLiked {
-            likedEvents.remove(eventId)
-            likedEventsList.removeAll { $0.eventId == eventId }
-        } else {
-            likedEvents.insert(eventId)
-        }
-        objectWillChange.send()
 
         APIManager.shared.toggleLike(eventId: eventId, isLiked: !isCurrentlyLiked) { [weak self] result in
             DispatchQueue.main.async {
                 guard let self = self else { return }
-
+                
                 switch result {
                 case .success:
-                    print("✅ 좋아요 상태 변경 성공: \(previousState ? "❤️ → 🤍" : "🤍 → ❤️")")
+                    print("✅ 좋아요 상태 변경 성공: \(isCurrentlyLiked ? "❤️ → 🤍" : "🤍 → ❤️")")
+                    
+                    if isCurrentlyLiked {
+                        self.likedEvents.remove(eventId)
+                        self.likedEventsList.removeAll { $0.eventId == eventId }
+                    } else {
+                        self.likedEvents.insert(eventId)
+                    }
+                    
                     self.objectWillChange.send()
-                    completion(!previousState)
-
+                    completion(!isCurrentlyLiked)
+                    
                 case .failure(let error):
                     print("❌ 좋아요 상태 변경 실패: \(error.localizedDescription)")
-
-                    if previousState {
-                        self.likedEvents.insert(eventId)
-                        self.likedEventsList.append(EventDTO(
-                            eventId: eventId,
-                            category: "기본 카테고리",
-                            eventNums: 0,
-                            eventItem: "복구된 이벤트",
-                            previewImg: "",
-                            videoId: nil,
-                            dateEnd: "",
-                            channelImg: ""
-                        ))
-                    } else {
-                        self.likedEvents.remove(eventId)
-                    }
-
+                    
                     self.objectWillChange.send()
-                    completion(previousState)
+                    completion(isCurrentlyLiked)
                 }
             }
         }
@@ -160,8 +146,8 @@ class HomeViewModel: ObservableObject {
     }
     
     // ✅ 특정 비디오가 좋아요 되어있는지 확인
-    func isLiked(for videoId: Int) -> Bool {
-        return likedEvents.contains(videoId)
+    func isLiked(for eventId: Int) -> Bool {
+        return likedEvents.contains(eventId)
     }
     
     func parseDate(_ dateString: String) -> Date {
