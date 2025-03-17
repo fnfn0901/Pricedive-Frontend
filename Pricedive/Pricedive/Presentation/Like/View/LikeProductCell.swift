@@ -17,6 +17,7 @@ final class LikeProductCell: UITableViewCell {
     }
     
     var onDelete: (() -> Void)?
+    var onLikeToggle: (() -> Void)?
     
     // MARK: - Properties
     private var event: Event?
@@ -192,6 +193,7 @@ final class LikeProductCell: UITableViewCell {
     }
 
     // MARK: - Action Methods
+
     @objc private func didTapLikeButton() {
         guard let event = event, let viewModel = viewModel else { return }
 
@@ -203,6 +205,8 @@ final class LikeProductCell: UITableViewCell {
 
                 self.configureActionButtonForLike(isLiked: isLiked)
                 self.actionButton.isUserInteractionEnabled = true
+                
+                self.onLikeToggle?()
             }
         }
     }

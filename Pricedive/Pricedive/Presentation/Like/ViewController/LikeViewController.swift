@@ -161,7 +161,12 @@ extension LikeViewController: UITableViewDataSource {
         let event = likedEventDTO.toEvent()
 
         cell.configure(with: event, viewModel: viewModel, style: .like)
-        
+
+        cell.onLikeToggle = { [weak self] in
+            guard let self = self else { return }
+            tableView.reloadSections(IndexSet(integer: indexPath.section), with: .none)
+        }
+
         return cell
     }
 }
