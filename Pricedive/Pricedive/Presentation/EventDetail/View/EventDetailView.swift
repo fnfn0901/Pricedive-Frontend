@@ -170,11 +170,23 @@ class EventDetailView: UIView {
         view.backgroundColor = .white
         return view
     }()
-
+    
+    let formButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setCustomStyle(
+            title: "폼 신청하기",
+            font: UIFont(name: "Pretendard-Medium", size: 14)!,
+            textColor: .white,
+            backgroundColor: UIColor.mainBlue,
+            cornerRadius: 10
+        )
+        return button
+    }()
+    
     let goToButton: UIButton = {
         let button = UIButton(type: .system)
         button.setCustomStyle(
-            title: "바로가기",
+            title: "영상 바로가기",
             font: UIFont(name: "Pretendard-Medium", size: 14)!,
             textColor: .white,
             backgroundColor: UIColor.mainBlue,
@@ -209,7 +221,7 @@ class EventDetailView: UIView {
 
         gptContentView.addSubviews(gptLabel, copyButton, makeButton, loadingIndicator)
 
-        bottomView.addSubviews(goToButton)
+        bottomView.addSubviews(formButton, goToButton)
 
         setupConstraints()
     }
@@ -313,11 +325,20 @@ class EventDetailView: UIView {
         loadingIndicator.snp.makeConstraints {
             $0.center.equalToSuperview()
         }
-
-        goToButton.snp.makeConstraints {
+        
+        formButton.snp.remakeConstraints {
             $0.top.equalToSuperview().offset(5)
-            $0.leading.trailing.equalToSuperview().inset(20)
+            $0.leading.equalToSuperview().inset(20)
+            $0.trailing.equalTo(goToButton.snp.leading).offset(-10)
             $0.height.equalTo(48)
+            $0.width.equalTo(goToButton.snp.width)
+        }
+
+        goToButton.snp.remakeConstraints {
+            $0.top.equalTo(formButton)
+            $0.trailing.equalToSuperview().inset(20)
+            $0.height.equalTo(48)
+            $0.width.equalTo(formButton.snp.width)
         }
     }
 
