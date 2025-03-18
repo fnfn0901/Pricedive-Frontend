@@ -491,4 +491,28 @@ class EventDetailView: UIView {
             $0.size.equalTo(CGSize(width: 102, height: 59))
         }
     }
+    
+    func configureFormButton(with link: String?) {
+        if let link = link, !link.isEmpty {
+            // 링크 있는 경우
+            formButton.isEnabled = true
+            formButton.setCustomStyle(
+                title: "폼 신청하기",
+                font: UIFont(name: "Pretendard-Medium", size: 14)!,
+                textColor: .white,
+                backgroundColor: UIColor.mainBlue,
+                cornerRadius: 10
+            )
+        } else {
+            // 링크 없는 경우 (비활성화 스타일)
+            formButton.isEnabled = false
+            formButton.setCustomStyle(
+                title: "폼 신청 불가",
+                font: UIFont(name: "Pretendard-Medium", size: 14)!,
+                textColor: UIColor.mainBlue,
+                backgroundColor: .mainWhite,
+                cornerRadius: 10
+            )
+        }
+    }
 }

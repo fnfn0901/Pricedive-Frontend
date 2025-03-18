@@ -96,6 +96,7 @@ class EventDetailViewController: UIViewController {
             .sink { [weak self] video in
                 guard let self = self, let video = video else { return }
                 self.detailView.updateVideoView(with: video)
+                self.detailView.configureFormButton(with: video.googleFormLink)
             }
             .store(in: &cancellables)
 
@@ -120,6 +121,7 @@ class EventDetailViewController: UIViewController {
         detailView.backIconButton.addTarget(self, action: #selector(didTapBack), for: .touchUpInside)
         detailView.goToButton.addTarget(self, action: #selector(didTapGoToButton), for: .touchUpInside)
         detailView.heartButton.addTarget(self, action: #selector(didTapHeartButton), for: .touchUpInside)
+        detailView.formButton.addTarget(self, action: #selector(didTapFormButton), for: .touchUpInside)
     }
 
     @objc private func didTapBack() {
@@ -163,6 +165,20 @@ class EventDetailViewController: UIViewController {
             DispatchQueue.main.async {
                 self?.detailView.updateHeartButton(isLiked: isLiked)
             }
+        }
+    }
+    
+    @objc private func didTapFormButton() {
+        guard let link = viewModel.videoDetail?.googleFormLink, !link.isEmpty else {
+            let alert = UIAlertController(title: "링크 없음", message: "현재 폼 신청 링크가 없습니다.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "확인", style: .default))
+            present(alert, animated: true)
+            return
+        }
+        
+        if let url = URL(string: link) {
+            let safariVC = SFSafariViewController(url: url)
+            present(safariVC, animated: true)
         }
     }
 }

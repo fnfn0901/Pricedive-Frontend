@@ -19,9 +19,10 @@ struct VideoDTO: Decodable {
     let dateEnd: String
     let summarizedDescription: String?
     let previewImg: String?
+    let googleFormLink: String?
 
     enum CodingKeys: String, CodingKey {
-        case id, title, description, tags, channelId, channelImg, urlLink, dateStart, dateEnd, summarizedDescription, previewImg
+        case id, title, description, tags, channelId, channelImg, urlLink, dateStart, dateEnd, summarizedDescription, previewImg, googleFormLink
     }
 
     init(from decoder: Decoder) throws {
@@ -38,5 +39,6 @@ struct VideoDTO: Decodable {
         dateEnd = try container.decodeIfPresent(String.self, forKey: .dateEnd) ?? ""
         summarizedDescription = try container.decodeIfPresent(String.self, forKey: .summarizedDescription)
         previewImg = try container.decodeIfPresent(String.self, forKey: .previewImg)
+        googleFormLink = try container.decodeIfPresent(String.self, forKey: .googleFormLink)
     }
 }
