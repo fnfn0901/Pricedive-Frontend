@@ -56,21 +56,24 @@ class EventDetailViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         detailView.viewModel = viewModel
         setupBindings()
         setupActions()
 
         viewModel.fetchVideoDetail(videoId: videoId)
 
+        // 기존 코드
         DispatchQueue.main.async {
             self.detailView.updateHeartButton(isLiked: self.viewModel.isLiked)
-
             if let initialPreviewImg = self.viewModel.previewImg, let url = URL(string: initialPreviewImg) {
                 self.detailView.imageView.kf.setImage(with: url)
             }
         }
-        
+
+        // 👇 이 부분 추가 (스와이프 살리기)
         navigationController?.interactivePopGestureRecognizer?.delegate = self
+        navigationController?.interactivePopGestureRecognizer?.isEnabled = true
     }
     
     private func saveViewedProduct() {
