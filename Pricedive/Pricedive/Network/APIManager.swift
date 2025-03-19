@@ -20,7 +20,14 @@ class APIManager {
         body: Data? = nil,
         completion: @escaping (Result<T, NetworkError>) -> Void
     ) {
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(name: .showLoading, object: nil)
+        }
+
         guard let url = URL(string: baseURL.absoluteString + endpoint) else {
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: .hideLoading, object: nil)
+            }
             completion(.failure(.invalidURL))
             return
         }
@@ -34,6 +41,10 @@ class APIManager {
         }
 
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: .hideLoading, object: nil)
+            }
+
             if let error = error {
                 completion(.failure(.other(error)))
                 return
@@ -48,7 +59,7 @@ class APIManager {
                 completion(.failure(.noData))
                 return
             }
-            
+
             guard (200...299).contains(httpResponse.statusCode) else {
                 completion(.failure(.serverError(statusCode: httpResponse.statusCode)))
                 return
@@ -59,7 +70,6 @@ class APIManager {
                 let decodedData = try decoder.decode(T.self, from: data)
                 completion(.success(decodedData))
             } catch {
-                print("❌ 디코딩 오류: \(error)")
                 completion(.failure(.decodingError))
             }
         }

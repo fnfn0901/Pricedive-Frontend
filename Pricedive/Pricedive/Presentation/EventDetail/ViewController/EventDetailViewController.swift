@@ -56,6 +56,7 @@ class EventDetailViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        _ = LoadingIndicatorManager.shared 
         detailView.viewModel = viewModel
         setupBindings()
         setupActions()

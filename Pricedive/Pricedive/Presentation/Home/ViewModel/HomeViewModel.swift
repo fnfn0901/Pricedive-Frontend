@@ -44,7 +44,9 @@ class HomeViewModel: ObservableObject {
                 switch result {
                 case .success(let likedEventsDTOs):
                     self.likedEvents = Set(likedEventsDTOs.map { $0.videoId })
-                    self.likedEventsList = likedEventsDTOs.map { dto in
+                    
+                    // ✅ 먼저 리스트 생성
+                    let eventDTOs = likedEventsDTOs.map { dto in
                         EventDTO(
                             eventId: -1,
                             category: "기본 카테고리",
@@ -55,6 +57,17 @@ class HomeViewModel: ObservableObject {
                             dateEnd: dto.dateEnd ?? "",
                             channelImg: ""
                         )
+                    }
+                    
+                    // ✅ 이벤트 마감일 기준으로 정렬 (많이 남은 순 → 내림차순)
+                    self.likedEventsList = eventDTOs.sorted { dto1, dto2 in
+                        guard
+                            let date1 = self.parseDate(dto1.dateEnd ?? ""),
+                            let date2 = self.parseDate(dto2.dateEnd ?? "")
+                        else {
+                            return false
+                        }
+                        return date1 > date2 // 내림차순
                     }
                     
                 case .failure(let error):
@@ -150,15 +163,15 @@ class HomeViewModel: ObservableObject {
         return likedEvents.contains(eventId)
     }
     
-    func parseDate(_ dateString: String) -> Date {
+    func parseDate(_ dateString: String) -> Date? {
         let isoFormatter = ISO8601DateFormatter()
         isoFormatter.formatOptions = [.withFullDate, .withTime, .withDashSeparatorInDate, .withColonSeparatorInTime]
         
         if let date = isoFormatter.date(from: dateString) {
             return date
         } else {
-            print("⚠️ 날짜 변환 실패: \(dateString) → 기본값(Date()) 적용")
-            return Date()
+            print("⚠️ 날짜 변환 실패: \(dateString)")
+            return nil
         }
     }
 

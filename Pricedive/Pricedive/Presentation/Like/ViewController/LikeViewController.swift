@@ -41,6 +41,7 @@ final class LikeViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        _ = LoadingIndicatorManager.shared 
         setupTableView()
         setupActions()
         bindViewModel()

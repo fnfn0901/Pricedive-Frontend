@@ -47,6 +47,7 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        _ = LoadingIndicatorManager.shared 
         
         homeView.viewModel = viewModel
 
