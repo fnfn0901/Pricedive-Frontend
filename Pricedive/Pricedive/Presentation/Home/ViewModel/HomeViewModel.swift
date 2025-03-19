@@ -43,16 +43,16 @@ class HomeViewModel: ObservableObject {
                 self.isLoadingLikedEvents = false
                 switch result {
                 case .success(let likedEventsDTOs):
-                    self.likedEvents = Set(likedEventsDTOs.map { $0.eventId })
+                    self.likedEvents = Set(likedEventsDTOs.map { $0.videoId })
                     self.likedEventsList = likedEventsDTOs.map { dto in
                         EventDTO(
-                            eventId: dto.eventId,
+                            eventId: -1,
                             category: "기본 카테고리",
                             eventNums: 0,
                             eventItem: dto.eventItem,
                             previewImg: dto.previewImg,
-                            videoId: nil,
-                            dateEnd: dto.dateEnd,
+                            videoId: dto.videoId,
+                            dateEnd: dto.dateEnd ?? "",
                             channelImg: ""
                         )
                     }
@@ -68,7 +68,7 @@ class HomeViewModel: ObservableObject {
     func toggleLike(for eventId: Int, completion: @escaping (Bool) -> Void) {
         let isCurrentlyLiked = likedEvents.contains(eventId)
 
-        APIManager.shared.toggleLike(eventId: eventId, isLiked: !isCurrentlyLiked) { [weak self] result in
+        APIManager.shared.toggleLike(videoId: eventId, isLiked: !isCurrentlyLiked) { [weak self] result in
             DispatchQueue.main.async {
                 guard let self = self else { return }
                 

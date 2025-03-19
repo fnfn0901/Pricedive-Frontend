@@ -56,22 +56,20 @@ class EventDetailViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         detailView.viewModel = viewModel
         setupBindings()
         setupActions()
 
         viewModel.fetchVideoDetail(videoId: videoId)
 
-        // 기존 코드
         DispatchQueue.main.async {
             self.detailView.updateHeartButton(isLiked: self.viewModel.isLiked)
+
             if let initialPreviewImg = self.viewModel.previewImg, let url = URL(string: initialPreviewImg) {
                 self.detailView.imageView.kf.setImage(with: url)
             }
         }
-
-        // 👇 이 부분 추가 (스와이프 살리기)
+        
         navigationController?.interactivePopGestureRecognizer?.delegate = self
         navigationController?.interactivePopGestureRecognizer?.isEnabled = true
     }
@@ -81,7 +79,7 @@ class EventDetailViewController: UIViewController {
         let viewedDate = dateFormatter.string(from: Date())
 
         let viewedProduct = ViewedProduct(
-            id: event.eventId,
+            id: event.eventId ?? -1,
             title: event.eventItem,
             imageUrl: event.eventImage,
             viewedDate: viewedDate,
@@ -164,7 +162,12 @@ class EventDetailViewController: UIViewController {
     }
 
     @objc private func didTapHeartButton() {
-        viewModel.toggleLikeStatus(userId: userId, eventId: event.eventId) { [weak self] isLiked in
+        guard let videoId = event.videoId else {
+            print("⚠️ videoId가 nil입니다.")
+            return
+        }
+
+        viewModel.toggleLikeStatus(userId: userId, videoId: videoId) { [weak self] isLiked in
             DispatchQueue.main.async {
                 self?.detailView.updateHeartButton(isLiked: isLiked)
             }

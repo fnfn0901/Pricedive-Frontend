@@ -18,24 +18,23 @@ struct LikedEventsResponseDTO: Decodable {
 }
 
 struct LikedEventDTO: Decodable {
-    let eventId: Int
+    let videoId: Int
     let eventItem: String
     var previewImg: String
     let dateEnd: String
 
     enum CodingKeys: String, CodingKey {
-        case eventId
+        case videoId
         case eventItem
         case previewImg
         case dateEnd
     }
 
-    /// 기본 이미지 URL 설정
     private static let defaultImageURL = "https://pricedive-event.s3.ap-northeast-2.amazonaws.com/defaultimage.jpg"
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        eventId = try container.decode(Int.self, forKey: .eventId)
+        videoId = try container.decode(Int.self, forKey: .videoId)
         eventItem = try container.decode(String.self, forKey: .eventItem)
         previewImg = try container.decodeIfPresent(String.self, forKey: .previewImg) ?? LikedEventDTO.defaultImageURL
         dateEnd = try container.decode(String.self, forKey: .dateEnd)
@@ -43,11 +42,10 @@ struct LikedEventDTO: Decodable {
         previewImg = LikedEventDTO.formatImageURL(previewImg)
     }
 
-    /// `LikedEventDTO` → `Event` 변환 메서드
     func toEvent() -> Event {
         return Event(
-            eventId: eventId,
-            videoId: nil,
+            eventId: nil,
+            videoId: videoId,
             eventLink: "",
             eventImage: previewImg,
             channelImg: "",
@@ -56,8 +54,7 @@ struct LikedEventDTO: Decodable {
             eventDescription: nil
         )
     }
-    
-    /// 이미지 URL을 절대 경로로 변환하는 함수
+
     private static func formatImageURL(_ url: String) -> String {
         if url.starts(with: "/") {
             return "https://pricedive-event.s3.ap-northeast-2.amazonaws.com" + url

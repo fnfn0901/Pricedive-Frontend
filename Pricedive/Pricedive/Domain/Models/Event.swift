@@ -8,7 +8,7 @@
 import Foundation
 
 struct Event: Codable {
-    let eventId: Int
+    let eventId: Int?
     let videoId: Int?
     let eventLink: String
     let eventImage: String

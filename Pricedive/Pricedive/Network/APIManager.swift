@@ -114,9 +114,9 @@ class APIManager {
     }
 
     /// **좋아요 추가 / 삭제 (`POST` → 추가, `DELETE` → 삭제)**
-    func toggleLike(eventId: Int, isLiked: Bool, completion: @escaping (Result<Void, Error>) -> Void) {
-            let userId = 1
-            let urlString = "http://3.37.130.95:8080/like_events/user/\(userId)/event/\(eventId)"
+    func toggleLike(videoId: Int, isLiked: Bool, completion: @escaping (Result<Void, Error>) -> Void) {
+        let userId = 1
+        let urlString = "http://3.37.130.95:8080/like_events/user/\(userId)/video/\(videoId)"
             guard let url = URL(string: urlString) else { return }
 
             var request = URLRequest(url: url)

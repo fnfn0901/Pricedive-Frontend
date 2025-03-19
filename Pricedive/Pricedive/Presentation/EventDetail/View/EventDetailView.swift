@@ -376,10 +376,14 @@ class EventDetailView: UIView {
         updateHeartButton(isLiked: newLikeState)
         heartButton.isUserInteractionEnabled = false
 
-        viewModel.toggleLikeStatus(userId: userId, eventId: eventId) { [weak self] isLiked in
+        guard let videoId = viewModel.event.videoId else {
+            print("❌ Error: videoId가 nil입니다.")
+            return
+        }
+
+        viewModel.toggleLikeStatus(userId: userId, videoId: videoId) { [weak self] isLiked in
             DispatchQueue.main.async {
                 guard let self = self else { return }
-                
                 self.updateHeartButton(isLiked: isLiked)
                 self.heartButton.isUserInteractionEnabled = true
             }

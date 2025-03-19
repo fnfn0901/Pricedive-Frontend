@@ -41,7 +41,7 @@ class EventDetailViewModel: ObservableObject {
         self.userId = homeViewModel.userId
         self.homeViewModel = homeViewModel
         self.event = event
-        self.isLiked = homeViewModel.isLiked(for: event.eventId)
+        self.isLiked = homeViewModel.isLiked(for: event.videoId ?? -1)
         self.previewImg = event.eventImage
 
         DispatchQueue.main.async {
@@ -81,7 +81,7 @@ class EventDetailViewModel: ObservableObject {
     }
     
     /// **🔹 좋아요 상태 변경**
-    func toggleLikeStatus(userId: Int, eventId: Int, completion: @escaping (Bool) -> Void) {
+    func toggleLikeStatus(userId: Int, videoId: Int, completion: @escaping (Bool) -> Void) {
         guard !isRequestingLike else { return }
         isRequestingLike = true
 
@@ -92,7 +92,7 @@ class EventDetailViewModel: ObservableObject {
             self.isLiked = newLikeState
         }
 
-        APIManager.shared.toggleLike(eventId: eventId, isLiked: !previousState) { [weak self] result in
+        APIManager.shared.toggleLike(videoId: videoId, isLiked: !previousState) { [weak self] result in
             DispatchQueue.main.async {
                 guard let self = self else { return }
                 self.isRequestingLike = false
@@ -139,7 +139,7 @@ class EventDetailViewModel: ObservableObject {
     
     func loadLikedEvents() {
         homeViewModel.loadLikedEvents(ongoing: false)
-        self.isLiked = homeViewModel.isLiked(for: event.eventId)
+        self.isLiked = homeViewModel.isLiked(for: event.videoId ?? -1)
         self.objectWillChange.send()
     }
 }

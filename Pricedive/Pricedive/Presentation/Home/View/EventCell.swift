@@ -114,7 +114,7 @@ class EventCell: UICollectionViewCell {
         setTitle(event.eventItem)
         setImage(event.eventImage)
         setProfileImage(event.channelImg)
-        updateHeartButton(isLiked: viewModel.isLiked(for: event.eventId))
+        updateHeartButton(isLiked: viewModel.isLiked(for: event.videoId ?? -1))
         updateDDayView(with: event.dDayDescription)
         setupHeartButtonInteraction()
 
@@ -153,7 +153,7 @@ class EventCell: UICollectionViewCell {
     }
 
     @objc private func handleHeartTapped() {
-        guard let viewModel = viewModel, let eventId = eventId, !isRequestingLike else { return }
+        guard let viewModel = viewModel, let videoId = videoId, !isRequestingLike else { return }
         
         isRequestingLike = true
         heartButton.isUserInteractionEnabled = false
@@ -166,7 +166,7 @@ class EventCell: UICollectionViewCell {
             }
         }
 
-        viewModel.toggleLike(for: eventId) { [weak self] isLiked in
+        viewModel.toggleLike(for: videoId) { [weak self] isLiked in
             DispatchQueue.main.async {
                 guard let self = self else { return }
                 self.updateHeartButton(isLiked: isLiked)

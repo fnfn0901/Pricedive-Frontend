@@ -145,7 +145,7 @@ final class LikeProductCell: UITableViewCell {
 
         switch style {
         case .like:
-            configureActionButtonForLike(isLiked: viewModel.isLiked(for: event.eventId))
+            configureActionButtonForLike(isLiked: viewModel.isLiked(for: event.videoId ?? -1))
         case .myPage:
             configureActionButtonForMyPage()
         }
@@ -199,7 +199,7 @@ final class LikeProductCell: UITableViewCell {
 
         actionButton.isUserInteractionEnabled = false
 
-        viewModel.toggleLike(for: event.eventId) { [weak self] isLiked in
+        viewModel.toggleLike(for: event.videoId ?? -1) { [weak self] isLiked in
             DispatchQueue.main.async {
                 guard let self = self else { return }
 
