@@ -21,19 +21,19 @@ class ViewedProductRepository {
 
     /// ✅ 최근 본 상품 저장 (중복 제거 후 업데이트)
     func addOrUpdateViewedProduct(_ product: ViewedProduct) {
-        let existingProduct = realm.object(ofType: ViewedProductRealm.self, forPrimaryKey: product.id)
+        let existingProduct = realm.object(ofType: ViewedProductRealm.self, forPrimaryKey: product.videoId)
 
         do {
             try realm.write {
                 if let existing = existingProduct {
                     existing.viewedDate = product.viewedDate
                     existing.eventEndDate = product.eventEndDate
-                    existing.videoId = product.videoId
-                    print("🔄 최근 본 상품 업데이트: \(existing.title)")
+                    existing.title = product.title
+                    existing.imageUrl = product.imageUrl
+                    existing.id = product.id
                 } else {
                     let realmObject = product.toRealmObject()
                     realm.add(realmObject, update: .modified)
-                    print("✅ 최근 본 상품 추가: \(product.title)")
                 }
             }
             removeOldestIfNeeded()

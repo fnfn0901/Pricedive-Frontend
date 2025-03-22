@@ -34,7 +34,7 @@ class EventDetailViewModel: ObservableObject {
     private let videoId: Int
     private let homeViewModel: HomeViewModel
     let event: Event
-    private let gptService = GPTService()
+    let gptService = GPTService()
     
     init(event: Event, homeViewModel: HomeViewModel) {
         self.videoId = event.videoId ?? -1
@@ -59,20 +59,18 @@ class EventDetailViewModel: ObservableObject {
             print("❌ Error: 유효하지 않은 videoId (\(videoId)) - 요청 중단")
             return
         }
-        
+
         APIManager.shared.fetchVideoDetail(videoId: videoId) { [weak self] (result: Result<VideoDTO, NetworkError>) in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let video):
-                    if video.id == -1 {
-                        print("❌ 서버에서 올바른 비디오 데이터를 제공하지 않음")
-                        return
-                    }
                     self?.videoDetail = video
-                    
+
                     if !video.description.isEmpty {
                         self?.eventDescription = video.description
                     }
+
+                    self?.previewImg = video.previewImg
                 case .failure(let error):
                     print("❌ API 요청 실패: \(error.localizedDescription)")
                 }
@@ -113,26 +111,17 @@ class EventDetailViewModel: ObservableObject {
     
     /// **🔹 GPT를 사용해 이벤트 댓글 자동 생성**
     func generateGPTComment() {
-        print("📝 GPT 댓글 생성 요청: \(eventDescription)")
+        guard let videoDetail = videoDetail else { return }
 
-        guard let videoDetail = videoDetail else {
-            print("❌ videoDetail이 없습니다.")
-            return
-        }
-
-        let tags = videoDetail.tags
-        let channelId = videoDetail.channelId
-
-        gptService.generateComment(from: eventDescription, tags: tags, channelId: channelId) { [weak self] result in
+        gptService.generateComment(from: eventDescription, tags: videoDetail.tags, channelId: videoDetail.channelId) { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let comment):
-                    print("✅ GPT 댓글 생성 성공: \(comment)")
                     self?.gptComment = comment
-                case .failure(let error):
-                    print("❌ GPT 댓글 생성 실패: \(error.localizedDescription)")
+                case .failure:
                     self?.gptComment = "댓글을 생성할 수 없습니다. 다시 시도해주세요."
                 }
+                self?.gptService.stopLoadingIndicator()
             }
         }
     }

@@ -56,10 +56,12 @@ class EventDetailViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        _ = LoadingIndicatorManager.shared 
+        _ = LoadingIndicatorManager.shared
         detailView.viewModel = viewModel
         setupBindings()
         setupActions()
+
+        viewModel.gptService.loadingIndicator = detailView.loadingIndicator
 
         viewModel.fetchVideoDetail(videoId: videoId)
 
@@ -69,13 +71,20 @@ class EventDetailViewController: UIViewController {
             if let initialPreviewImg = self.viewModel.previewImg, let url = URL(string: initialPreviewImg) {
                 self.detailView.imageView.kf.setImage(with: url)
             }
+
+            self.detailView.gptLabel.text = "생성 버튼을 눌러보세요. GPT가 자동으로 댓글을 작성해드립니다!"
         }
-        
+
         navigationController?.interactivePopGestureRecognizer?.delegate = self
         navigationController?.interactivePopGestureRecognizer?.isEnabled = true
     }
     
     private func saveViewedProduct() {
+        guard let videoId = event.videoId else {
+            print("❌ videoId 없음. ViewedProduct 저장 중단.")
+            return
+        }
+
         let dateFormatter = ISO8601DateFormatter()
         let viewedDate = dateFormatter.string(from: Date())
 
@@ -85,7 +94,7 @@ class EventDetailViewController: UIViewController {
             imageUrl: event.eventImage,
             viewedDate: viewedDate,
             eventEndDate: event.eventEndDate,
-            videoId: event.videoId
+            videoId: videoId
         )
 
         viewedProductRepository.addOrUpdateViewedProduct(viewedProduct)
@@ -115,6 +124,13 @@ class EventDetailViewController: UIViewController {
             .sink { [weak self] previewImg in
                 guard let self = self, let urlString = previewImg, let url = URL(string: urlString) else { return }
                 self.detailView.imageView.kf.setImage(with: url)
+            }
+            .store(in: &cancellables)
+
+        viewModel.$gptComment
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] gptComment in
+                self?.detailView.gptLabel.text = gptComment
             }
             .store(in: &cancellables)
     }

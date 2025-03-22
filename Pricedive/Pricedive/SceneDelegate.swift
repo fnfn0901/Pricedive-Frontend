@@ -27,23 +27,37 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     /// ✅ Realm 마이그레이션 설정
     private func configureRealmMigration() {
+        resetRealmDataIfNeeded()
+
         let config = Realm.Configuration(
-            schemaVersion: 2,
+            schemaVersion: 3,
             migrationBlock: { migration, oldSchemaVersion in
-                if oldSchemaVersion < 2 {
-                    migration.enumerateObjects(ofType: ViewedProductRealm.className()) { _, newObject in
-                        newObject?["eventEndDate"] = ""
+                if oldSchemaVersion < 3 {
+                    migration.enumerateObjects(ofType: ViewedProductRealm.className()) { oldObject, newObject in
+                        newObject?["videoId"] = oldObject?["videoId"] as? Int ?? -1
                     }
                 }
             }
         )
-
         Realm.Configuration.defaultConfiguration = config
 
         do {
             _ = try Realm()
+            print("✅ Realm 초기화 성공")
         } catch {
             fatalError("❌ Realm 초기화 실패: \(error.localizedDescription)")
+        }
+    }
+    
+    private func resetRealmDataIfNeeded() {
+        let config = Realm.Configuration.defaultConfiguration
+        if let url = config.fileURL {
+            do {
+                try FileManager.default.removeItem(at: url)
+                print("✅ 기존 Realm DB 삭제 완료")
+            } catch {
+                print("❌ 기존 Realm DB 삭제 실패: \(error.localizedDescription)")
+            }
         }
     }
 }

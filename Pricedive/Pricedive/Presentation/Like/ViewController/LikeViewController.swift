@@ -114,23 +114,24 @@ extension LikeViewController: UITableViewDelegate {
         footerView.backgroundColor = .clear
         return footerView
     }
-    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-
+        
         let likedEventDTO = viewModel.likedEventsList[indexPath.section]
-        let eventId = likedEventDTO.eventId
-
-        print("✅ 선택된 이벤트 ID: \(eventId), 데이터 요청 중...")
-
-        APIManager.shared.fetchEventDetail(eventId: eventId) { [weak self] result in
+        guard let videoId = likedEventDTO.videoId else {
+            print("❌ 선택된 이벤트에 videoId가 없습니다.")
+            return
+        }
+        
+        print("✅ 선택된 비디오 ID: \(videoId), 데이터 요청 중...")
+        
+        APIManager.shared.fetchVideoDetail(videoId: videoId) { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
-                case .success(let eventDTO):
-                    let event = eventDTO.toEvent()
+                case .success(let videoDTO):
+                    let event = videoDTO.toEvent()
                     let detailVC = EventDetailViewController(event: event, homeViewModel: self?.viewModel ?? HomeViewModel())
                     self?.navigationController?.pushViewController(detailVC, animated: true)
-                    
                 case .failure(let error):
                     print("❌ 이벤트 상세 정보 가져오기 실패: \(error.localizedDescription)")
                 }

@@ -92,22 +92,6 @@ class APIManager {
         }
     }
 
-    /// **특정 이벤트 상세 정보 가져오기**
-    func fetchEventDetail(eventId: Int, completion: @escaping (Result<EventDTO, NetworkError>) -> Void) {
-        let endpoint = "/events/\(eventId)"
-        
-        request(endpoint: endpoint) { (result: Result<APIResponse<EventDTO>, NetworkError>) in
-            switch result {
-            case .success(let response):
-                print("✅ 이벤트 상세 데이터: \(response.data)")
-                completion(.success(response.data))
-            case .failure(let error):
-                print("❌ 이벤트 상세 데이터 가져오기 실패: \(error.localizedDescription)")
-                completion(.failure(error))
-            }
-        }
-    }
-
     /// **좋아요한 이벤트 리스트 가져오기**
     func fetchLikedEvents(userId: Int, ongoing: Bool, completion: @escaping (Result<[LikedEventDTO], NetworkError>) -> Void) {
         let endpoint = "/like_events/user/\(userId)?ongoing=\(ongoing)"

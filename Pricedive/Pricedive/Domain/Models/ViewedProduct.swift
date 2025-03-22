@@ -13,10 +13,9 @@ struct ViewedProduct {
     let imageUrl: String
     let viewedDate: String
     let eventEndDate: String
-    let videoId: Int?
+    let videoId: Int
 
-    /// ✅ 기본 생성자 추가
-    init(id: Int, title: String, imageUrl: String, viewedDate: String, eventEndDate: String, videoId: Int?) {
+    init(id: Int, title: String, imageUrl: String, viewedDate: String, eventEndDate: String, videoId: Int) {
         self.id = id
         self.title = title
         self.imageUrl = imageUrl
@@ -25,7 +24,6 @@ struct ViewedProduct {
         self.videoId = videoId
     }
 
-    /// ✅ Realm 객체에서 변환할 때 올바르게 초기화
     init(from realmObject: ViewedProductRealm) {
         self.id = realmObject.id
         self.title = realmObject.title
@@ -35,23 +33,21 @@ struct ViewedProduct {
         self.videoId = realmObject.videoId
     }
 
-    /// ✅ Realm 객체로 변환 시 올바르게 생성자 호출
     func toRealmObject() -> ViewedProductRealm {
-        let realmObject = ViewedProductRealm()
-        realmObject.id = id
-        realmObject.title = title
-        realmObject.imageUrl = imageUrl
-        realmObject.viewedDate = viewedDate
-        realmObject.eventEndDate = eventEndDate
-        realmObject.videoId = videoId
-        return realmObject
+        ViewedProductRealm(
+            id: id,
+            title: title,
+            imageUrl: imageUrl,
+            viewedDate: viewedDate,
+            eventEndDate: eventEndDate,
+            videoId: videoId
+        )
     }
 
-    /// `ViewedProduct` → `Event` 변환 메서드
     func toEvent() -> Event {
-        return Event(
+        Event(
             eventId: id,
-            videoId: videoId ?? -1,
+            videoId: videoId,
             eventLink: "",
             eventImage: imageUrl,
             channelImg: "",

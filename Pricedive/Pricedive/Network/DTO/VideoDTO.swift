@@ -41,4 +41,17 @@ struct VideoDTO: Decodable {
         previewImg = try container.decodeIfPresent(String.self, forKey: .previewImg)
         googleFormLink = try container.decodeIfPresent(String.self, forKey: .googleFormLink)
     }
+
+    func toEvent() -> Event {
+        return Event(
+            eventId: self.id,
+            videoId: self.id,
+            eventLink: self.urlLink,
+            eventImage: self.previewImg ?? "",
+            channelImg: self.channelImg,
+            eventEndDate: self.dateEnd,
+            eventItem: self.title,
+            eventDescription: self.description
+        )
+    }
 }

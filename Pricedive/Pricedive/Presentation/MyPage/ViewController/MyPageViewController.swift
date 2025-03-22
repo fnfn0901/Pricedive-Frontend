@@ -169,7 +169,7 @@ class HeaderCell: UITableViewCell {
     private func setupLayout() {
         contentView.addSubview(dateLabel)
         dateLabel.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(20) // ✅ 좌우 패딩 적용
+            make.leading.equalToSuperview().offset(20)
             make.trailing.equalToSuperview().offset(-20)
             make.centerY.equalToSuperview()
         }

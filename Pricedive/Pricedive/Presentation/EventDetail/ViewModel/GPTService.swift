@@ -6,10 +6,25 @@
 //
 
 import Foundation
+import UIKit
 
 class GPTService {
     private let apiKey = "REMOVED"
     private let apiURL = "https://api.openai.com/v1/chat/completions"
+
+    var loadingIndicator: UIActivityIndicatorView?
+
+    func startLoadingIndicator() {
+        DispatchQueue.main.async {
+            self.loadingIndicator?.startAnimating()
+        }
+    }
+
+    func stopLoadingIndicator() {
+        DispatchQueue.main.async {
+            self.loadingIndicator?.stopAnimating()
+        }
+    }
 
     func generateComment(from eventDescription: String, tags: [String], channelId: String, completion: @escaping (Result<String, Error>) -> Void) {
         let prompt = """

@@ -462,12 +462,9 @@ class EventDetailView: UIView {
     }
     
     @objc private func makeButtonTapped() {
-        guard let viewModel = viewModel else { return }
-
-        gptLabel.text = "댓글을 생성 중입니다..."
-        loadingIndicator.startAnimating()
-
-        viewModel.generateGPTComment()
+        self.gptLabel.text = "댓글을 생성 중입니다..."
+        self.loadingIndicator.startAnimating()
+        viewModel?.generateGPTComment()
     }
 
     @objc private func copyButtonTapped() {
@@ -517,6 +514,12 @@ class EventDetailView: UIView {
                 backgroundColor: .mainWhite,
                 cornerRadius: 10
             )
+        }
+    }
+    
+    func updateGptComment(_ comment: String?) {
+        DispatchQueue.main.async {
+            self.gptLabel.text = comment
         }
     }
 }
