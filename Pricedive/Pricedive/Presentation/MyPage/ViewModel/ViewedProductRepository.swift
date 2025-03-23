@@ -78,7 +78,7 @@ class ViewedProductRepository {
     }
     
     func deleteViewedProduct(_ product: ViewedProduct) {
-        guard let productToDelete = realm.object(ofType: ViewedProductRealm.self, forPrimaryKey: product.id) else {
+        guard let productToDelete = realm.object(ofType: ViewedProductRealm.self, forPrimaryKey: product.videoId) else {
             print("❌ 삭제할 상품을 찾을 수 없음: \(product.title)")
             return
         }

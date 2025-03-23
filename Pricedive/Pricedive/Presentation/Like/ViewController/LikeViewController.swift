@@ -123,20 +123,11 @@ extension LikeViewController: UITableViewDelegate {
             return
         }
         
-        print("✅ 선택된 비디오 ID: \(videoId), 데이터 요청 중...")
+        print("✅ 선택된 비디오 ID: \(videoId), 데이터 요청 없이 바로 이동")
         
-        APIManager.shared.fetchVideoDetail(videoId: videoId) { [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let videoDTO):
-                    let event = videoDTO.toEvent()
-                    let detailVC = EventDetailViewController(event: event, homeViewModel: self?.viewModel ?? HomeViewModel())
-                    self?.navigationController?.pushViewController(detailVC, animated: true)
-                case .failure(let error):
-                    print("❌ 이벤트 상세 정보 가져오기 실패: \(error.localizedDescription)")
-                }
-            }
-        }
+        let event = likedEventDTO.toEvent()
+        let detailVC = EventDetailViewController(event: event, homeViewModel: viewModel)
+        navigationController?.pushViewController(detailVC, animated: true)
     }
 }
 

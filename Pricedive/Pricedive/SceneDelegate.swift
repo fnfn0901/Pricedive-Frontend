@@ -27,7 +27,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     /// ✅ Realm 마이그레이션 설정
     private func configureRealmMigration() {
-        resetRealmDataIfNeeded()
 
         let config = Realm.Configuration(
             schemaVersion: 3,
