@@ -10,10 +10,7 @@ import UIKit
 
 class GPTService {
     private var apiKey: String {
-        guard let key = Bundle.main.infoDictionary?["OPENAI_API_KEY"] as? String else {
-            fatalError("OPENAI_API_KEY가 설정되지 않았습니다.")
-        }
-        return key
+        return APIKey.openAI
     }
     private let apiURL = "https://api.openai.com/v1/chat/completions"
 

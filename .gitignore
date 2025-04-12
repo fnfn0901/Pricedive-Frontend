@@ -25,4 +25,4 @@ xcuserdata/
 xcshareddata/
 DerivedData/
 .idea/
-Secrets.xcconfig
+APIKey.swift
