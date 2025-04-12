@@ -25,3 +25,4 @@ xcuserdata/
 xcshareddata/
 DerivedData/
 .idea/
+Secrets.xcconfig
