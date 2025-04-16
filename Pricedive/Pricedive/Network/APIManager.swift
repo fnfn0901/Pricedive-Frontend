@@ -46,19 +46,26 @@ class APIManager {
             }
 
             if let error = error {
+                print("❌ 네트워크 오류: \(error.localizedDescription)")
                 completion(.failure(.other(error)))
                 return
             }
 
             guard let httpResponse = response as? HTTPURLResponse else {
+                print("❌ 응답 없음")
                 completion(.failure(.noResponse))
                 return
             }
 
+            print("📡 상태 코드: \(httpResponse.statusCode)")
+
             guard let data = data else {
+                print("❌ 데이터 없음")
                 completion(.failure(.noData))
                 return
             }
+
+            print("📦 응답 데이터:\n\(String(data: data, encoding: .utf8) ?? "디코딩 실패")")
 
             guard (200...299).contains(httpResponse.statusCode) else {
                 completion(.failure(.serverError(statusCode: httpResponse.statusCode)))
@@ -70,6 +77,7 @@ class APIManager {
                 let decodedData = try decoder.decode(T.self, from: data)
                 completion(.success(decodedData))
             } catch {
+                print("❌ 디코딩 실패: \(error.localizedDescription)")
                 completion(.failure(.decodingError))
             }
         }

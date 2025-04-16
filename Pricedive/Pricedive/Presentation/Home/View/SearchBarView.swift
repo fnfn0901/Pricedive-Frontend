@@ -116,9 +116,9 @@ class SearchBarView: UIView, UITextFieldDelegate {
     }
     
     @objc private func handleXMarkClick() {
-        DispatchQueue.main.async {
-            self.onCancelTapped?()
-        }
+        searchTextField.text = ""
+        onSearch?("")
+        searchTextField.resignFirstResponder()
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
